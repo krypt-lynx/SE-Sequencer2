@@ -51,9 +51,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IngameScript">
-      <HintPath>D:\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\IngameScript.dll</HintPath>
-    </Reference>
     <Reference Include="Sandbox.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\Spiele\Steam Library\steamapps\common\SpaceEngineers\Bin64\Sandbox.Common.dll</HintPath>
