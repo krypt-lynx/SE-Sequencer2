@@ -23,6 +23,9 @@ namespace Script
         float timePassed = 0;
         float delay = 0;
         float extraTime = 0;
+        bool firstTick = true;
+        DateTime deserializationTime = DateTime.Now;
+
         public void Serialize(Serializer encoder)
         {
             encoder.Write(timePassed)
@@ -61,11 +64,8 @@ namespace Script
 
         bool TriggerTimer()
         {
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "TriggerTimer: {0}; {1}; {2};", Timer, Timer?.IsFunctional ?? false, Timer?.IsWorking ?? false);
             if (Timer != null && Timer.IsFunctional)
             {
-                Log.Write(LOG_CAT, LogLevel.Verbose, Timer.GetActionWithName("TriggerNow").IsEnabled(Timer));
-
                 Timer.ApplyAction("TriggerNow");
                 return true;
             }
@@ -78,13 +78,9 @@ namespace Script
 
         bool StartTimer(float delay)
         {
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "StartTimer: {0}; {1}; {2};", Timer, Timer?.IsFunctional ?? false, Timer?.IsWorking ?? false);
-            //            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Trigger; delay {0}", delay);
+            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Trigger; delay {0}", delay);
             if (Timer != null && Timer.IsFunctional)
             {
-                Log.Write(LOG_CAT, LogLevel.Verbose, Timer.GetActionWithName("Start").IsEnabled(Timer));
-                Log.Write(LOG_CAT, LogLevel.Verbose, Timer.GetActionWithName("Start").IsEnabled(Timer));
-
                 Timer.SetValue("TriggerDelay", delay);
                 Timer.ApplyAction("Start");
                 return true;
@@ -98,12 +94,8 @@ namespace Script
 
         bool StopTimer()
         {
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "StopTimer: {0}; {1}; {2};", Timer, Timer?.IsFunctional ?? false, Timer?.IsWorking ?? false);
-
             if (Timer != null && Timer.IsFunctional)
             {
-                Log.Write(LOG_CAT, LogLevel.Verbose, Timer.GetActionWithName("Stop").IsEnabled(Timer));
-
                 Timer.ApplyAction("Stop");
                 return true;
             }
@@ -140,8 +132,6 @@ namespace Script
 
         private void ScheduleStartInternal(bool forceTriggerNow)
         {
-            TriggerTimer();
-
             /* // Because Keen. There is no way to measure delay in Save(), so, I need to log it each tick.
             if (!forceTriggerNow && (delay > (MinTimerDelay + PresicionCheckDelay)))
             {
@@ -152,11 +142,22 @@ namespace Script
                 TriggerTimer();
             }
             */
+
+            TriggerTimer();
         }
 
         public void Update()
         {
             var totalSeconds = (float)Program.Current.Runtime.TimeSinceLastRun.TotalSeconds;
+
+            if (firstTick)
+            {
+                if ((DateTime.Now - deserializationTime).Seconds < 0.25) // if TriggerNow actually was triggered. Rare thing, but happens
+                {
+                    Log.Write(LOG_CAT, LogLevel.Verbose, "TriggerNow ticked after game load");
+                    extraTime = 1.0f / 60;
+                }
+            }
 
             delay -= (totalSeconds + extraTime);
             timePassed += (totalSeconds + extraTime);

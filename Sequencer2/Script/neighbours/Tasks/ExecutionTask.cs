@@ -61,18 +61,11 @@ namespace Script
 
         public override int InstructionsLimit()
         {
-            return 15000; // todo
+            return 15000; 
         }
 
         public override bool DoWork()
         {
-            // time passed sinse last run?
-            // Program.Current.Runtime.TimeSinceLastRun
-            // but if game reloaded?
-            // we can relay only on timer
-            // but lets forget about in for now
-
-
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Time passed: {0}", timerController.TimePassed());
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Have {0} program(s) to run", scheduledPrograms.Count);
 
@@ -89,6 +82,11 @@ namespace Script
             ScheduleWaitIfNeeded();
 
             return true;
+        }
+
+        public bool HaveWork()
+        {
+            return scheduledPrograms.Count > 0;
         }
 
         void ExecuteProgram(SqProgram program)

@@ -58,7 +58,7 @@ namespace Script
                 { Program.LOG_CAT,          LogLevel.Warning },
                 { ExecutionTask.LOG_CAT,    LogLevel.Warning },
                 { ImplLogger.LOG_CAT,       LogLevel.Warning },
-                { TimerController.LOG_CAT,  LogLevel.Verbose },
+                { TimerController.LOG_CAT,  LogLevel.Warning },
             };
 
             Log.NewFrame();
@@ -134,8 +134,19 @@ namespace Script
             if (!string.IsNullOrEmpty(Storage))
             {
                 decoder = new Deserializer(Storage);
-                int major = decoder.ReadInt(); 
-                int minor = decoder.ReadInt();
+                int major = 0;
+                int minor = 0;
+
+                try
+                {
+                    major = decoder.ReadInt();
+                    minor = decoder.ReadInt();
+                }
+                catch
+                {
+                    major = 0;
+                    minor = 0;
+                }
 
                 if (major == majorVersion &&
                     minor == minorVersion)
@@ -213,7 +224,7 @@ namespace Script
 
             paramsRouter.Route(argument);
 
-            if (runtime != null && timerController.Timeout() && !runtime.IsEnqueued)
+            if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
             {
                 sch.EnqueueTask(runtime);
             }
