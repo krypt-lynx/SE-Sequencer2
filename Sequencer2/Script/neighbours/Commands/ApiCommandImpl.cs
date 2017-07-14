@@ -149,6 +149,82 @@ namespace Script
 
             return null;
         }
+
+        public static CommandResult Transmit(IList args)
+        {
+            ImplLogger.LogImpl("transmit", args);
+
+            MatchingType matchingType = (MatchingType)args[0];
+            string filter = (string)args[1];
+
+            List<IMyTerminalBlock> antennas = new List<IMyTerminalBlock>();
+
+            List<IMyTerminalBlock> radioAntennas = new List<IMyTerminalBlock>();
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyRadioAntenna>(matchingType, filter, radioAntennas);
+            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", radioAntennas.Count);
+
+            //----------get most powerful radio antenna
+            IMyRadioAntenna mostPowerfulAntenna = null;
+
+            //get radio antenna with longest radius that's enabled and broadcasting
+            foreach (IMyRadioAntenna antenna in radioAntennas)
+            {
+                if (antenna.Enabled && antenna.GetValueBool("EnableBroadCast")
+                    && (mostPowerfulAntenna == null || antenna.Radius > mostPowerfulAntenna.Radius))
+                {
+                    mostPowerfulAntenna = antenna;
+                }
+            }
+
+            if (mostPowerfulAntenna != null)
+            {
+                antennas.Add(mostPowerfulAntenna);
+            }
+
+            //--------get all laser antennas
+            List<IMyTerminalBlock> laserAntennas = new List<IMyTerminalBlock>();
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyLaserAntenna>((MatchingType)args[0], filter, laserAntennas);
+            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", radioAntennas.Count);
+
+            foreach (IMyLaserAntenna antenna in laserAntennas)
+            {
+                if (antenna.Status == MyLaserAntennaStatus.Connected)
+                {
+                    antennas.Add(antenna);
+                }
+            }
+
+            //-----check whether at least one valid antenna was found
+            if (antennas.Count != 0)
+            {
+                var transmitter = new Transmitter(antennas);
+                transmitter.Transmit((string)args[2], (string)args[3]);
+            }
+            else
+            {
+                string warning;
+                switch (matchingType)
+                {
+                    default:
+                    case MatchingType.match:
+                        warning = string.Format("No antennas called \"{0}\" are currently able to transmit.", filter);
+                        break;
+                    case MatchingType.contains:
+                        warning = string.Format("No antennas containing \"{0}\" are currently able to transmit.", filter);
+                        break;
+                    case MatchingType.head:
+                        warning = string.Format("No antennas starting with \"{0}\" are currently able to transmit.", filter);
+                        break;
+                    case MatchingType.group:
+                        warning = string.Format("No antennas in group \"{0}\" are currently able to transmit.", filter);
+                        break;
+                }
+
+                Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, warning);
+            }
+
+            return null;
+        }
     }
 
     #endregion // ingame script end
