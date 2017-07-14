@@ -98,7 +98,7 @@
     <Compile Include="Script\neighbours\Commands\ImplLogger.cs" />
     <Compile Include="Script\neighbours\Commands\TestCommandImpl.cs" />
     <Compile Include="Script\neighbours\Serializer.cs" />
-    <Compile Include="Script\neighbours\Tasks\ExecutionTask.cs" />
+    <Compile Include="Script\neighbours\Tasks\RuntimeTask.cs" />
     <Compile Include="Script\neighbours\Commands\ExecFlowCommandImpl.cs" />
     <Compile Include="Script\neighbours\BlockSelector.cs" />
     <Compile Include="Script\neighbours\Commands\Commands.cs" />

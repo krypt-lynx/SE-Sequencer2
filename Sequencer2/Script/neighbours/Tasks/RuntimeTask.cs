@@ -10,7 +10,7 @@ namespace Script
     #region ingame script start
 
 
-    class ExecutionTask : FastTask<Stub>
+    class RuntimeTask : FastTask<Stub>
     {
         public const string LOG_CAT = "exe";
 
@@ -18,9 +18,11 @@ namespace Script
 
         private List<string> scheduledPrograms = new List<string>();
         private TimerController timerController;
+        int lastProgramId = 0;
 
         public void Serialize(Serializer encoder)
         {
+            encoder.Write(lastProgramId);
             encoder.Write(scheduledPrograms.Count);
             foreach (var prog in scheduledPrograms)
             {
@@ -34,15 +36,21 @@ namespace Script
             }
         }
 
-        public ExecutionTask(List<SqProgram> programs, TimerController timerController) : base("Runtime")
+        public int GenerateProgramId()
+        {
+            return ++lastProgramId;
+        }
+
+        public RuntimeTask(List<SqProgram> programs, TimerController timerController) : base("Runtime")
         {
             Programs = programs.ToDictionary(x => x.Name);
             this.timerController = timerController;
         }
 
-        public ExecutionTask(Deserializer decoder, TimerController timerController) : base("Runtime")
+        public RuntimeTask(Deserializer decoder, TimerController timerController) : base("Runtime")
         {
             this.timerController = timerController;
+            lastProgramId = decoder.ReadInt();
             int count = decoder.ReadInt();
             scheduledPrograms = new List<string>();
             for (int i = 0; i < count; i++)
@@ -97,8 +105,8 @@ namespace Script
             }
 
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "executing \"{0}\"", program.Name);
-            bool stop = false;
-            while (program.currentCommand < program.Commands.Count && !stop)
+           
+            while (program.currentCommand < program.Commands.Count)
             {
                 var cmd = program.Commands[program.currentCommand];
                 var result = cmd.Run();
@@ -113,31 +121,37 @@ namespace Script
                         StopProgram((string)result.Data);
                         program.currentCommand++;
                         break;
+                    case CommandAction.Unload:
+                        string name = (string)result.Data;
+                        StopProgram(name);
+                        Programs.Remove(name);
+                        program.currentCommand++;
+                        break;
                     case CommandAction.None:
                         program.currentCommand++;
                         break;
                     case CommandAction.Wait:
                         float waitseconds = (float)result.Data;
-                        if (waitseconds > 0 && program.currentCommand + 1 < program.Commands.Count)
+                        program.currentCommand++;
+                        if (waitseconds > 0)
                         {
                             program.TimeToWait = waitseconds;
-                            stop = true;                        
+                            goto pause; // achievement unlocked: use goto
                         }
 
-                        program.currentCommand++;
                         break;
                     case CommandAction.Repeat:
                         program.currentCommand = 0;
                         break;
                 }
             }
-            
 
-            if (program.currentCommand >= program.Commands.Count)
-            {
-                scheduledPrograms.Remove(program.Name);
-                program.currentCommand = 0;
-            }
+            // "else" for condition of while loop
+            scheduledPrograms.Remove(program.Name);
+
+            pause:
+
+            ;
         }
 
 
@@ -159,6 +173,7 @@ namespace Script
             {
                 if (!scheduledPrograms.Contains(arg))
                 {
+                    Programs[arg].currentCommand = 0;
                     scheduledPrograms.Add(arg);
                 }
                 else
@@ -178,7 +193,6 @@ namespace Script
             if (Programs.ContainsKey(arg))
             {
                 Programs[arg].TimeToWait = 0;
-                Programs[arg].currentCommand = 0;
                 scheduledPrograms.Remove(arg);
             }
             else
