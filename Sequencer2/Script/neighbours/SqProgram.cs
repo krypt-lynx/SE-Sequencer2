@@ -18,7 +18,7 @@ namespace Script
             errorMessage = null;
             string cmd = name.ToLower();
 
-            if (!Commands.CommandDefinitions.ContainsKey(cmd))
+            if (!Commands.CommandDefinitions.ContainsKey(cmd) || Commands.CommandDefinitions[cmd].Hidden)
             {
                 errorMessage = string.Format(ErrorMessages.UnknownCommand, name);
                 return false;
@@ -281,7 +281,14 @@ namespace Script
         public float TimeToWait = 0;
 
         public List<SqCommand> Commands;
-        
+
+        public bool IsExecuting {
+            get
+            {
+                return currentCommand != 0; //todo?
+            }
+        }
+
         public SqProgram(string name, IEnumerable<SqCommand> commands)
         {
             Name = name;

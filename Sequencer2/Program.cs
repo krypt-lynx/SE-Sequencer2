@@ -85,11 +85,15 @@ namespace console
 
  ";*/
     owner.CustomData = @"
-@switch_array 
+@test 
 /switch array_action open_array close_array 
  
+@test2
+/wait 5
+/echo ""Done!""
+
 @open_array 
-/action group ""Rotor SH"" Reverse 
+/action group ""Rotor SH"" Reverse
 /wait 17 
 /action group ""Rotor ED"" Reverse 
 /action group ""Rotor IN"" Reverse 
@@ -114,18 +118,7 @@ namespace console
 ";
 
             Script.Program.FutureOwner = owner;
-      /*      Script.Program.FutureStorage =
-"i0;i2;d0;d0;i1;s10,open_array;i4;i0;s0,;bTrue;d0;i0;i0;s12,switch_array;bTrue;d0" +
-";i1;s6,switch;i2;s12,array_action;i2;s10,open_array;s11,close_array;i0;s10,open_" +
-"array;bTrue;d0;i10;s6,action;i3;i3;s8,Rotor SH;s7,Reverse;s4,wait;i1;d17;s6,acti" +
-"on;i3;i3;s8,Rotor ED;s7,Reverse;s6,action;i3;i3;s8,Rotor IN;s7,Reverse;s4,wait;i" +
-"1;d10;s6,action;i3;i3;s8,Rotor OT;s7,Reverse;s6,action;i3;i3;s8,Rotor SH;s7,Reve" +
-"rse;s6,action;i3;i3;s8,Rotor SH;s9,OnOff_Off;s4,wait;i1;d25;s6,setvar;i2;s12,arr" +
-"ay_action;d1;i0;s11,close_array;bTrue;d0;i8;s6,action;i3;i3;s8,Rotor IN;s7,Rever" +
-"se;s4,wait;i1;d8;s6,action;i3;i3;s8,Rotor ED;s7,Reverse;s6,action;i3;i3;s8,Rotor" +
-" OT;s7,Reverse;s4,wait;i1;d10;s6,action;i3;i3;s8,Rotor SH;s8,OnOff_On;s4,wait;i1" +
-";d30;s6,setvar;i2;s12,array_action;d0;i0;";
-*/
+  
             var test = new Script.Program();
 
             TestTextPanel panel1 = new TestTextPanel

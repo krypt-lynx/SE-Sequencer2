@@ -14,7 +14,7 @@ namespace Script
     {
         public const string LOG_CAT = "exe";
 
-        public Dictionary<string, SqProgram> Programs;
+        private Dictionary<string, SqProgram> Programs;
 
         private List<string> scheduledPrograms = new List<string>();
         private TimerController timerController;
@@ -121,10 +121,16 @@ namespace Script
                         StopProgram((string)result.Data);
                         program.currentCommand++;
                         break;
-                    case CommandAction.Unload:
-                        string name = (string)result.Data;
-                        StopProgram(name);
-                        Programs.Remove(name);
+                    case CommandAction.RemoveMethods:
+                        foreach (var name in (string[])result.Data)
+                        {
+                            StopProgram(name);
+                            Programs.Remove(name);
+                        }
+                        program.currentCommand++;
+                        break;
+                    case CommandAction.AddMethods:
+                        RegisterPrograms((IEnumerable<SqProgram>)result.Data);
                         program.currentCommand++;
                         break;
                     case CommandAction.None:
@@ -154,6 +160,26 @@ namespace Script
             ;
         }
 
+        public void RegisterPrograms(IEnumerable<SqProgram> programs)
+        {
+            foreach (var prog in programs)
+            {
+                if (scheduledPrograms.Contains(prog.Name))
+                {
+                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "Unable to replace program \"{0}\" because it executing", prog.Name);   
+                }
+                else 
+                {
+                    if (Programs.ContainsKey(prog.Name))
+                    {
+                        Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Program \"{0}\" was replaced", prog.Name);
+                    }
+
+                    Programs[prog.Name] = prog;
+                }
+
+            }
+        }
 
         private void ScheduleWaitIfNeeded()
         {

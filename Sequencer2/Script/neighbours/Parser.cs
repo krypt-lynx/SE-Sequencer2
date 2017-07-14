@@ -56,9 +56,7 @@ namespace Script
 
         public string ErrorMessage { get { return LastError; } }
 
-        ParserState state;
-
-        List<SqProgram> programs = new List<SqProgram>();
+           List<SqProgram> programs = new List<SqProgram>();
         List<SqCommand> commands = new List<SqCommand>();
 
         Dictionary<string, List<string>> vars = new Dictionary<string, List<string>>();
@@ -73,6 +71,7 @@ namespace Script
         string LastError = null;
 
         EntityType entityType = EntityType.Nothing;
+        ParserState state;
 
         public bool Parse(string src)
         {
@@ -554,6 +553,8 @@ namespace Script
         public const string InvalidTypeValue = "\"{0}\" is invalid value of type {1}";
 
         public const string InvalidEscapeSequence = "\"{0} is invalid escape sequence";
+
+        public const string ExtraCharacterAfterEnd = "extra symbol after command: \"{0}\"";
     }
 
     #endregion // ingame script end

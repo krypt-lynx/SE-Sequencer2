@@ -42,10 +42,11 @@ namespace Script
         public bool Aggrerative; // arrgigative parameter must be last one
         public SqRequirements Requirements;
         public bool IsWait;
+        public bool Hidden;
 
         public CommandRef(string name, ParamRef[] arguments, Func<IList, CommandResult> implementation, 
             int optionalCount = 0, bool aggrerative = false,
-            SqRequirements requirements = SqRequirements.None, bool isWait = false)
+            SqRequirements requirements = SqRequirements.None, bool isWait = false, bool hidden = false)
         {
             Name = name;
             Arguments = arguments;
@@ -54,6 +55,7 @@ namespace Script
             Aggrerative = aggrerative;
             Requirements = requirements;
             IsWait = isWait;
+            Hidden = hidden;
         }
         
     }
@@ -64,7 +66,10 @@ namespace Script
         Wait,
         Start,
         Stop,
-        Repeat
+        Repeat,
+
+        AddMethods,
+        RemoveMethods
     }
 
     public class CommandResult
@@ -114,12 +119,20 @@ namespace Script
                 { "repeat", new CommandRef( "wait", new ParamRef[] {
                 }, ExecFlowCommandImpl.Repeat, requirements: SqRequirements.Wait) },
                 { "start", new CommandRef( "start", new ParamRef[] {
-                    new ParamRef (ParamType.String), // func
-                }, ExecFlowCommandImpl.Start) },
+                    new ParamRef (ParamType.String, true, ""), // func
+                }, ExecFlowCommandImpl.Start, optionalCount: 1) },
                 { "stop", new CommandRef( "stop", new ParamRef[] {
-                    new ParamRef (ParamType.String), // func
-                }, ExecFlowCommandImpl.Stop) },
+                    new ParamRef (ParamType.String, true, ""), // func
+                }, ExecFlowCommandImpl.Stop, optionalCount: 1) },
 
+                { "load", new CommandRef( "load", new ParamRef[] {
+                    new ParamRef (ParamType.String), // code
+                }, ExecFlowCommandImpl.Load) },
+
+                { "unload", new CommandRef( "unload", new ParamRef[] {
+                    new ParamRef (ParamType.String, true, ""), // func
+                }, ExecFlowCommandImpl.Unload, optionalCount: 1) },
+                
                 { "setvar", new CommandRef( "setvar", new ParamRef[] {
                     new ParamRef (ParamType.String), // var name
                     new ParamRef (ParamType.Double), // value
@@ -129,6 +142,13 @@ namespace Script
                     new ParamRef (ParamType.String, aggregative: true), // cases
                 }, ExecFlowCommandImpl.Switch, aggrerative: true) },
 
+                { "echo", new CommandRef( "echo", new ParamRef[] {
+                    new ParamRef (ParamType.String),
+                }, TestCommandImpl.Echo) },
+                { "loglevel", new CommandRef( "loglevel", new ParamRef[] {
+                    new ParamRef (ParamType.String, true, ""),
+                    new ParamRef (ParamType.Double, true, -1.0)
+                }, TestCommandImpl.LogLevel_, optionalCount: 2) },
                 { "test1", new CommandRef( "test1", new ParamRef[] {
                     new ParamRef (ParamType.String),
                     new ParamRef (ParamType.String),

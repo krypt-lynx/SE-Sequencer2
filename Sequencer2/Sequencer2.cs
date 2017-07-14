@@ -42,10 +42,10 @@ namespace Script
         TimerController timerController;       
          
         Scheduler sch;
-        ExecutionTask runtime;
+        RuntimeTask runtime;
 
         const int majorVersion = 0;
-        const int minorVersion = 3;
+        const int minorVersion = 4;
 
         public Program()
         {
@@ -53,10 +53,10 @@ namespace Script
 
             Log.Categories = new Dictionary<string, LogLevel>
             {
-                { Scheduler.LOG_CAT,        LogLevel.Warning },
-                { Parser.LOG_CAT,           LogLevel.Warning },
-                { Program.LOG_CAT,          LogLevel.Warning },
-                { ExecutionTask.LOG_CAT,    LogLevel.Warning },
+                { Scheduler.LOG_CAT,        LogLevel.Verbose },
+                { Parser.LOG_CAT,           LogLevel.Verbose },
+                { Program.LOG_CAT,          LogLevel.Verbose },
+                { RuntimeTask.LOG_CAT,      LogLevel.Verbose },
                 { ImplLogger.LOG_CAT,       LogLevel.Warning },
                 { TimerController.LOG_CAT,  LogLevel.Warning },
             };
@@ -73,7 +73,7 @@ namespace Script
             {
                 { "start", RunProgram },
                 { "stop", StopProgram },
-                //{ "exec", null },
+                { "exec", ExecuteLine },
                 { "reset", ResetState },
             };
 
@@ -82,6 +82,24 @@ namespace Script
             sch.Run();
 
             Current = null;
+        }
+
+        private void ExecuteLine(string arg)
+        {
+            var parser = new Parser();
+            if (parser.Parse(arg))
+            {
+                var prog = parser.Programs.First();
+                if (runtime != null)
+                {
+                    string tempName = "_run_" + runtime.GenerateProgramId().ToString();
+
+                    prog.Commands.Add(new SqCommand { Cmd = "unload", Args = new object[] { tempName }, Impl = ExecFlowCommandImpl.Unload }); // todo:
+                    prog.Name = tempName;
+                    runtime.RegisterPrograms(new SqProgram[] { prog }); 
+                    runtime.StartProgram(tempName);
+                }
+            }
         }
 
         private void RunProgram(string arg)
@@ -167,8 +185,9 @@ namespace Script
                 try
                 {
                     timerController = new TimerController(decoder);
-                    runtime = new ExecutionTask(decoder, timerController);
+                    runtime = new RuntimeTask(decoder, timerController);
                     VariablesStorage.Deserialize(decoder);
+                    // todo: load loglevels
                 }
                 catch (Exception e)
                 {
@@ -185,7 +204,7 @@ namespace Script
                 {
                     if (r.Item1 != null)
                     {
-                        runtime = new ExecutionTask(r.Item1, timerController);
+                        runtime = new RuntimeTask(r.Item1, timerController);
                     }
                 };
                 sch.EnqueueTask(parse);
@@ -205,6 +224,8 @@ namespace Script
             timerController.Serialize(encoder);
             runtime.Serialize(encoder);
             VariablesStorage.Shared.Serialize(encoder);
+            // todo: save loglevels
+
 
             Storage = encoder.ToString();
 

@@ -120,6 +120,7 @@ namespace Script
                             break;
                         case "Color":
                             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "Color property parsing is not impelemented. Now color is orange :)");
+
                             block.SetValueColor(prop, Color.OrangeRed); // todo
                             break;
                     }

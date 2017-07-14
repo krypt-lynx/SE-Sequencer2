@@ -31,6 +31,55 @@ namespace Script
             return null;
         }
 
+        internal static CommandResult LogLevel_(IList args)
+        {
+            ImplLogger.LogImpl("loglevel", args);
+
+            string cat = (string)args[0];
+            double level = (double)args[1];
+
+            if (string.IsNullOrEmpty((string)args[0]))
+            {
+                Log.Write("LogLevels:");
+                foreach (var kvp in Log.Categories)
+                {
+                    Log.WriteFormat("{0} : {1}", kvp.Key, kvp.Value);
+                }
+            }
+            else
+            {
+                if (level < 0)
+                {
+                    Log.WriteFormat("LogLevel for \"{0}\": {1}", cat, Log.Categories.ContainsKey(cat) ? Log.Categories[cat] : LogLevel.None);
+                }
+                else
+                {
+                    if (cat.Equals("all", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        foreach (var key in new List<string>(Log.Categories.Keys))
+                        {
+                            Log.Categories[key] = (LogLevel)level;
+                        }
+                    }
+                    else
+                    {
+                        Log.Categories[cat] = (LogLevel)level;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        internal static CommandResult Echo(IList args)
+        {
+            ImplLogger.LogImpl("echo", args);
+
+            Log.Write((string)args[0]);
+
+            return null;
+        }
+
         internal static CommandResult ListProps(IList args)
         {
             ImplLogger.LogImpl("listprops", args);

@@ -75,6 +75,27 @@ namespace Script
                 return new CommandResult { Action = CommandAction.Start, Data = (string)cases[var] };
             }
         }
+
+        internal static CommandResult Load(IList args)
+        {
+            Parser parser = new Parser();
+            if (parser.Parse((string)args[0]))
+            {
+
+                return new CommandResult { Action = CommandAction.AddMethods, Data = parser.Programs.Where(x => x.Name != "") };
+            }
+            else
+            {
+                Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "exception during parsing: {0}", parser.ErrorMessage);
+                return null;
+            }
+
+        }
+
+        internal static CommandResult Unload(IList args)
+        {
+            return new CommandResult { Action = CommandAction.RemoveMethods, Data = new string[] { (string)args[0] } };
+        }
     }
 
     #endregion // ingame script end
