@@ -111,6 +111,7 @@
     <Compile Include="Script\neighbours\SqProgram.cs" />
     <Compile Include="Script\neighbours\ParamsRouter.cs" />
     <Compile Include="Script\neighbours\TimerController.cs" />
+    <Compile Include="Script\neighbours\Transmitter.cs" />
     <Compile Include="Script\neighbours\VariablesStorage.cs" />
     <Compile Include="Sequencer2.cs" />
     <Compile Include="TestEnv\Blocks\TestBatteryBlock.cs" />

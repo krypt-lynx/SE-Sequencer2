@@ -3,3 +3,4 @@ C:\Users\Jannes\Source\Repos\SE-Sequencer2\Publish\bin\Debug\Publish.exe
 C:\Users\Jannes\Source\Repos\SE-Sequencer2\Publish\bin\Debug\Publish.pdb
 C:\Users\Jannes\Source\Repos\SE-Sequencer2\Publish\obj\Debug\Publish.exe
 C:\Users\Jannes\Source\Repos\SE-Sequencer2\Publish\obj\Debug\Publish.pdb
+C:\Users\Jannes\Source\Repos\SE-Sequencer2\Publish\obj\Debug\Deploy.csprojResolveAssemblyReference.cache

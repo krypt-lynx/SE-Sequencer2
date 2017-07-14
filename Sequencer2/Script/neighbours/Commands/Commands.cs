@@ -77,7 +77,6 @@ namespace Script
     {
         public static Dictionary<string, CommandRef> CommandDefinitions;
 
-
         static Commands()
         {
             CommandDefinitions = new Dictionary<string, CommandRef>
@@ -104,6 +103,12 @@ namespace Script
                     new ParamRef (ParamType.String), // value
                     new ParamRef (ParamType.Bool, true, false), // append
                 }, ApiCommandImpl.Text, optionalCount: 2) },
+                { "transmit", new CommandRef( "transmit", new ParamRef[] {
+                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.String), // value
+                    new ParamRef (ParamType.String, true, "default"), // MyTransmitTarget
+                }, ApiCommandImpl.Transmit, optionalCount: 2) },
 
                 { "wait", new CommandRef( "wait", new ParamRef[] {
                     new ParamRef (ParamType.Double), // delay
