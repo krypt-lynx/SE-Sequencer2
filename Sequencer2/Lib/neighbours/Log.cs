@@ -28,7 +28,7 @@ namespace Script
 
     class Log
     {
-        public static Dictionary<string, LogLevel> Categories = null;
+        public static Dictionary<string, LogLevel> LogLevels = null;
         const string NewFrameSeparator = "--------------------------------------";
         static bool insertNewFrameSeparator = false;
 
@@ -44,7 +44,7 @@ namespace Script
         private static bool IsAllowed(string logcat, LogLevel level)
         {
             LogLevel currentLevel = LogLevel.None;
-            bool isAllowed = Categories == null || ((Categories?.TryGetValue(logcat, out currentLevel) ?? false) && level <= currentLevel);
+            bool isAllowed = LogLevels == null || ((LogLevels?.TryGetValue(logcat, out currentLevel) ?? false) && level <= currentLevel);
             return isAllowed;
         }
 
@@ -112,6 +112,33 @@ namespace Script
         internal static void NewFrame()
         {
             insertNewFrameSeparator = true;
+        }
+
+        internal static void Deserialize(Deserializer decoder)
+        {
+            if (decoder.ReadBool())
+            {
+                int count = decoder.ReadInt();
+                LogLevels = new Dictionary<string, LogLevel>();
+                for (int i = 0; i < count; i++)
+                {
+                    LogLevels[decoder.ReadString()] = (LogLevel)decoder.ReadInt();
+                }
+            }
+        }
+
+        internal static void Serialize(Serializer encoder)
+        {
+            encoder.Write(LogLevels != null);
+            if (LogLevels != null)
+            {
+                encoder.Write(LogLevels.Count);
+                foreach (var kvp in LogLevels)
+                {
+                    encoder.Write(kvp.Key);
+                    encoder.Write((int)kvp.Value);
+                }
+            }
         }
     }
 

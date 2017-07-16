@@ -41,7 +41,7 @@ namespace Script
             if (string.IsNullOrEmpty((string)args[0]))
             {
                 Log.Write("LogLevels:");
-                foreach (var kvp in Log.Categories)
+                foreach (var kvp in Log.LogLevels)
                 {
                     Log.WriteFormat("{0} : {1}", kvp.Key, kvp.Value);
                 }
@@ -50,20 +50,20 @@ namespace Script
             {
                 if (level < 0)
                 {
-                    Log.WriteFormat("LogLevel for \"{0}\": {1}", cat, Log.Categories.ContainsKey(cat) ? Log.Categories[cat] : LogLevel.None);
+                    Log.WriteFormat("LogLevel for \"{0}\": {1}", cat, Log.LogLevels.ContainsKey(cat) ? Log.LogLevels[cat] : LogLevel.None);
                 }
                 else
                 {
                     if (cat.Equals("all", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        foreach (var key in new List<string>(Log.Categories.Keys))
+                        foreach (var key in new List<string>(Log.LogLevels.Keys))
                         {
-                            Log.Categories[key] = (LogLevel)level;
+                            Log.LogLevels[key] = (LogLevel)level;
                         }
                     }
                     else
                     {
-                        Log.Categories[cat] = (LogLevel)level;
+                        Log.LogLevels[cat] = (LogLevel)level;
                     }
                 }
             }

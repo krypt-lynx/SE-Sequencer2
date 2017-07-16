@@ -29,9 +29,24 @@ namespace Script
         }
 
 
+
+
         #region ingame script start
 
         public const string TimerName = "Sequencer Timer";
+
+        private static void SetLogLevel()
+        {
+            Log.LogLevels = new Dictionary<string, LogLevel>
+            {
+                { Scheduler.LOG_CAT,        LogLevel.Warning },
+                { Parser.LOG_CAT,           LogLevel.Warning },
+                { Program.LOG_CAT,          LogLevel.Warning },
+                { RuntimeTask.LOG_CAT,      LogLevel.Warning },
+                { ImplLogger.LOG_CAT,       LogLevel.Warning },
+                { TimerController.LOG_CAT,  LogLevel.Warning },
+            };
+        }
 
         const string LOG_CAT = "gen";
 
@@ -44,22 +59,14 @@ namespace Script
         Scheduler sch;
         RuntimeTask runtime;
 
-        const int majorVersion = 0;
-        const int minorVersion = 4;
+        const int major = 0;
+        const int minor = 5;
 
         public Program()
         {
             Current = this;
 
-            Log.Categories = new Dictionary<string, LogLevel>
-            {
-                { Scheduler.LOG_CAT,        LogLevel.Verbose },
-                { Parser.LOG_CAT,           LogLevel.Verbose },
-                { Program.LOG_CAT,          LogLevel.Verbose },
-                { RuntimeTask.LOG_CAT,      LogLevel.Verbose },
-                { ImplLogger.LOG_CAT,       LogLevel.Warning },
-                { TimerController.LOG_CAT,  LogLevel.Warning },
-            };
+            SetLogLevel();
 
             Log.NewFrame();
 
@@ -96,8 +103,8 @@ namespace Script
 
                     prog.Commands.Add(new SqCommand { Cmd = "unload", Args = new object[] { tempName }, Impl = ExecFlowCommandImpl.Unload }); // todo:
                     prog.Name = tempName;
-                    runtime.RegisterPrograms(new SqProgram[] { prog }); 
-                    runtime.StartProgram(tempName);
+                    runtime.RegisterPrograms(new SqProgram[] { prog });
+                    RunProgram(tempName);
                 }
             }
         }
@@ -152,28 +159,28 @@ namespace Script
             if (!string.IsNullOrEmpty(Storage))
             {
                 decoder = new Deserializer(Storage);
-                int major = 0;
-                int minor = 0;
+                int mj = 0;
+                int mn = 0;
 
                 try
                 {
-                    major = decoder.ReadInt();
-                    minor = decoder.ReadInt();
+                    mj = decoder.ReadInt();
+                    mn = decoder.ReadInt();
                 }
                 catch
                 {
-                    major = 0;
-                    minor = 0;
+                    mj = 0;
+                    mn = 0;
                 }
 
-                if (major == majorVersion &&
-                    minor == minorVersion)
+                if (mj == major &&
+                    mn == minor)
                 {
                     hasStoredData = true;
                 }
                 else
                 {
-                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}.{1}), skipping state restore", major, minor);
+                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}.{1}), skipping state restore", mj, mn);
                 }
             }
 
@@ -187,7 +194,7 @@ namespace Script
                     timerController = new TimerController(decoder);
                     runtime = new RuntimeTask(decoder, timerController);
                     VariablesStorage.Deserialize(decoder);
-                    // todo: load loglevels
+                    Log.Deserialize(decoder);
                 }
                 catch (Exception e)
                 {
@@ -198,6 +205,7 @@ namespace Script
 
             if (!hasStoredData)
             {
+                SetLogLevel();
                 timerController = new TimerController();
                 var parse = new ParserTask(Current.Me.CustomData);
                 parse.Done = r =>
@@ -218,13 +226,13 @@ namespace Script
             Log.NewFrame();
 
             var encoder = new Serializer()
-                .Write(majorVersion)
-                .Write(minorVersion);
+                .Write(major)
+                .Write(minor);
 
             timerController.Serialize(encoder);
             runtime.Serialize(encoder);
             VariablesStorage.Shared.Serialize(encoder);
-            // todo: save loglevels
+            Log.Serialize(encoder);
 
 
             Storage = encoder.ToString();
