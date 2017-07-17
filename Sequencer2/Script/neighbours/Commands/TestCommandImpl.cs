@@ -119,7 +119,7 @@ namespace Script
                             value = block.GetValue<StringBuilder>(prop.Id);
                             break;
                         default:
-                            throw new Exception(prop.TypeName);
+                            throw new Exception(prop.TypeName); // todo: log instead Exception
                     }
 
                     Log.WriteFormat("\"{0}\" of type \"{1}\", current value is \"{2}\"", new object[] { prop.Id, prop.TypeName, value });

@@ -81,8 +81,7 @@ namespace Script
             Parser parser = new Parser();
             if (parser.Parse((string)args[0]))
             {
-
-                return new CommandResult { Action = CommandAction.AddMethods, Data = parser.Programs.Where(x => x.Name != "") };
+                return new CommandResult { Action = CommandAction.AddMethods, Data = parser.Programs };
             }
             else
             {

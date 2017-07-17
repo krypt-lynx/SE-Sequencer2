@@ -35,15 +35,15 @@ namespace Script
 
         public const string TimerName = "Sequencer Timer";
 
-        private static void SetLogLevel()
+        private static void LogLevels()
         {
             Log.LogLevels = new Dictionary<string, LogLevel>
             {
-                { Scheduler.LOG_CAT,        LogLevel.Warning },
-                { Parser.LOG_CAT,           LogLevel.Warning },
-                { Program.LOG_CAT,          LogLevel.Warning },
-                { RuntimeTask.LOG_CAT,      LogLevel.Warning },
-                { ImplLogger.LOG_CAT,       LogLevel.Warning },
+                { Scheduler.LOG_CAT,        LogLevel.Verbose },
+                { Parser.LOG_CAT,           LogLevel.Verbose },
+                { Program.LOG_CAT,          LogLevel.Verbose },
+                { RuntimeTask.LOG_CAT,      LogLevel.Verbose },
+                { ImplLogger.LOG_CAT,       LogLevel.Verbose },
                 { TimerController.LOG_CAT,  LogLevel.Warning },
             };
         }
@@ -66,7 +66,7 @@ namespace Script
         {
             Current = this;
 
-            SetLogLevel();
+            LogLevels();
 
             Log.NewFrame();
 
@@ -81,6 +81,7 @@ namespace Script
                 { "start", RunProgram },
                 { "stop", StopProgram },
                 { "exec", ExecuteLine },
+                { "parse", ReloadSctipt },
                 { "reset", ResetState },
             };
 
@@ -91,13 +92,27 @@ namespace Script
             Current = null;
         }
 
+        private void ReloadSctipt(string obj)
+        {
+            var parse = new ParserTask(Current.Me.CustomData);
+            parse.Done = r =>
+            {
+                if (r.Item1 != null)
+                {
+                    runtime.RegisterPrograms(r.Item1);
+                }
+            };
+            sch.EnqueueTask(parse);
+        }
+
         private void ExecuteLine(string arg)
         {
-            var parser = new Parser();
-            if (parser.Parse(arg))
+            var parse = new ParserTask(arg);
+            parse.Done = r =>
             {
-                var prog = parser.Programs.First();
-                if (runtime != null)
+                SqProgram prog = r.Item1?.FirstOrDefault();
+
+                if (r.Item1 != null)
                 {
                     string tempName = "_run_" + runtime.GenerateProgramId().ToString();
 
@@ -106,7 +121,9 @@ namespace Script
                     runtime.RegisterPrograms(new SqProgram[] { prog });
                     RunProgram(tempName);
                 }
-            }
+
+            };
+            sch.EnqueueTask(parse);
         }
 
         private void RunProgram(string arg)
@@ -147,7 +164,14 @@ namespace Script
 
         private void UnknownCommand(string arg)
         {
-            Log.WriteFormat(LOG_CAT, LogLevel.Warning, "unknown command recieved \"{0}\"", arg);
+            if (arg.FirstOrDefault() == '/')
+            {
+                ExecuteLine(arg);
+            }
+            else
+            {
+                Log.WriteFormat(LOG_CAT, LogLevel.Warning, "unknown command recieved \"{0}\"", arg);
+            }
         }
 
         void Initialize()
@@ -205,14 +229,16 @@ namespace Script
 
             if (!hasStoredData)
             {
-                SetLogLevel();
+                LogLevels();
                 timerController = new TimerController();
+                runtime = new RuntimeTask(timerController);
+
                 var parse = new ParserTask(Current.Me.CustomData);
                 parse.Done = r =>
                 {
                     if (r.Item1 != null)
                     {
-                        runtime = new RuntimeTask(r.Item1, timerController);
+                        runtime.RegisterPrograms(r.Item1);
                     }
                 };
                 sch.EnqueueTask(parse);
@@ -258,7 +284,10 @@ namespace Script
                 sch.EnqueueTask(runtime);
             }
 
-            sch.Run();
+            if (sch.HasTasks())
+            {
+                sch.Run();
+            }
 
             timerController.ContinueWait(sch.HasTasks());
 

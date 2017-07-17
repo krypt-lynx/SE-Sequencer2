@@ -41,9 +41,9 @@ namespace Script
             return ++lastProgramId;
         }
 
-        public RuntimeTask(List<SqProgram> programs, TimerController timerController) : base("Runtime")
+        public RuntimeTask(TimerController timerController) : base("Runtime")
         {
-            Programs = programs.ToDictionary(x => x.Name);
+            Programs = new Dictionary<string, SqProgram>();
             this.timerController = timerController;
         }
 
