@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,15 +44,14 @@ namespace Script
         public bool IsWait;
         public bool Hidden;
 
-        public CommandRef(string name, ParamRef[] arguments, Func<IList, CommandResult> implementation, 
-            int optionalCount = 0, bool aggrerative = false,
+        public CommandRef(string name, ParamRef[] arguments, Func<IList, CommandResult> implementation,
             SqRequirements requirements = SqRequirements.None, bool isWait = false, bool hidden = false)
         {
             Name = name;
             Arguments = arguments;
             Implementation = implementation;
-            OptionalCount = optionalCount;
-            Aggrerative = aggrerative;
+            OptionalCount = arguments.Count(x => x.Optional);
+            Aggrerative = arguments.Any(x => x.Aggregative);
             Requirements = requirements;
             IsWait = isWait;
             Hidden = hidden;
@@ -84,98 +83,14 @@ namespace Script
 
         static Commands()
         {
-            CommandDefinitions = new Dictionary<string, CommandRef>
-            {
-                { "run", new CommandRef( "run", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match), 
-                    new ParamRef (ParamType.String), // name
-                    new ParamRef (ParamType.String), // arg
-                }, ApiCommandImpl.Run, optionalCount: 1) },
-                { "action", new CommandRef( "action", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
-                    new ParamRef (ParamType.String), // name
-                    new ParamRef (ParamType.String), // action
-                }, ApiCommandImpl.Action, optionalCount: 1) },
-                { "set", new CommandRef( "set", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
-                    new ParamRef (ParamType.String), // name
-                    new ParamRef (ParamType.String), // prop
-                    new ParamRef (ParamType.String), // value
-                }, ApiCommandImpl.Set, optionalCount: 1) },
-                { "text", new CommandRef( "text", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
-                    new ParamRef (ParamType.String), // name
-                    new ParamRef (ParamType.String), // value
-                    new ParamRef (ParamType.Bool, true, false), // append
-                }, ApiCommandImpl.Text, optionalCount: 2) },
-                { "transmit", new CommandRef( "transmit", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
-                    new ParamRef (ParamType.String), // name
-                    new ParamRef (ParamType.String), // value
-                    new ParamRef (ParamType.String, true, "default"), // MyTransmitTarget
-                }, ApiCommandImpl.Transmit, optionalCount: 2) },
+            List<CommandRef> cmdDefs = new List<CommandRef>();
 
-                { "wait", new CommandRef( "wait", new ParamRef[] {
-                    new ParamRef (ParamType.Double), // delay
-                }, ExecFlowCommandImpl.Wait, requirements: SqRequirements.Timer, isWait: true) },
-                { "waitticks", new CommandRef( "wait", new ParamRef[] {
-                    new ParamRef (ParamType.Double), // delay
-                }, ExecFlowCommandImpl.WaitTicks, requirements: SqRequirements.Timer, isWait: true) },
-                { "repeat", new CommandRef( "wait", new ParamRef[] {
-                }, ExecFlowCommandImpl.Repeat, requirements: SqRequirements.Wait) },
-                { "start", new CommandRef( "start", new ParamRef[] {
-                    new ParamRef (ParamType.String, true, ""), // func
-                }, ExecFlowCommandImpl.Start, optionalCount: 1) },
-                { "stop", new CommandRef( "stop", new ParamRef[] {
-                    new ParamRef (ParamType.String, true, ""), // func
-                }, ExecFlowCommandImpl.Stop, optionalCount: 1) },
+            cmdDefs.AddRange(ExecFlowCommandImpl.Defs());
+            cmdDefs.AddRange(ApiCommandImpl.Defs());
+            cmdDefs.AddRange(DebugCommandImpl.Defs());
+            cmdDefs.AddRange(TestCommandImpl.Defs()); // todo: Remove before release!
 
-                { "load", new CommandRef( "load", new ParamRef[] {
-                    new ParamRef (ParamType.String), // code
-                }, ExecFlowCommandImpl.Load) },
-
-                { "unload", new CommandRef( "unload", new ParamRef[] {
-                    new ParamRef (ParamType.String, true, ""), // func
-                }, ExecFlowCommandImpl.Unload, optionalCount: 1) },
-                
-                { "setvar", new CommandRef( "setvar", new ParamRef[] {
-                    new ParamRef (ParamType.String), // var name
-                    new ParamRef (ParamType.Double), // value
-                }, ExecFlowCommandImpl.SetVar) },
-                { "switch", new CommandRef( "select", new ParamRef[] {
-                    new ParamRef (ParamType.String), // case var name
-                    new ParamRef (ParamType.String, aggregative: true), // cases
-                }, ExecFlowCommandImpl.Switch, aggrerative: true) },
-
-                { "echo", new CommandRef( "echo", new ParamRef[] {
-                    new ParamRef (ParamType.String),
-                }, TestCommandImpl.Echo) },
-                { "loglevel", new CommandRef( "loglevel", new ParamRef[] {
-                    new ParamRef (ParamType.String, true, ""),
-                    new ParamRef (ParamType.Double, true, -1.0)
-                }, TestCommandImpl.LogLevel_, optionalCount: 2) },
-                { "test1", new CommandRef( "test1", new ParamRef[] {
-                    new ParamRef (ParamType.String),
-                    new ParamRef (ParamType.String),
-                }, TestCommandImpl.Test1) },
-                { "listprops", new CommandRef( "listprops", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
-                    new ParamRef (ParamType.String),
-                }, TestCommandImpl.ListProps, optionalCount: 1) },
-                { "listactions", new CommandRef( "listactions", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
-                    new ParamRef (ParamType.String),
-                }, TestCommandImpl.ListActions, optionalCount: 1) },
-
-                
-                /*{ "waituntil", new CommandRef( "waituntil", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
-                    new ParamRef (ParamType.String, false), // name
-                    new ParamRef (ParamType.String, false), // prop
-                    new ParamRef (ParamType.String, false), // is/is not/less then/greater then/smaller then/not greater then/not smaller then
-                    new ParamRef (ParamType.String, false), // value
-                }, ExecFlowCommandImpl.WaitUntil, optionalCount: 1, requirements: SqRequirements.Timer, isWait: true) },*/ // not implemented :(
-            };
+            CommandDefinitions = cmdDefs.ToDictionary(x => x.Name);
         }
     }
 

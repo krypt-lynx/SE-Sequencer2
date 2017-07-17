@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="Script\neighbours\Commands\ApiCommandImpl.cs" />
     <Compile Include="Script\neighbours\Commands\ImplLogger.cs" />
+    <Compile Include="Script\neighbours\Commands\DebugCommandImpl.cs" />
     <Compile Include="Script\neighbours\Commands\TestCommandImpl.cs" />
     <Compile Include="Script\neighbours\Serializer.cs" />
     <Compile Include="Script\neighbours\Tasks\RuntimeTask.cs" />

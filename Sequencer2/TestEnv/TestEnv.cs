@@ -184,14 +184,14 @@ namespace SETestEnv
 
         public IMySlimBlock GetCubeBlock(Vector3I pos)
         {
-            try
+         //   try
             {
                 return Blocks[(int)(pos.X)];
             }
-            catch
+          /*  catch
             {
                 return null;
-            }
+            }*/
 
         }
 

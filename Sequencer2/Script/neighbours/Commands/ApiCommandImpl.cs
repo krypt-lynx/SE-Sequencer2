@@ -15,6 +15,42 @@ namespace Script
 
     class ApiCommandImpl
     {
+
+        internal static CommandRef[] Defs()
+        {
+            return new CommandRef[] {
+                new CommandRef("run", new ParamRef[] {
+                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.String), // arg
+                }, Run),
+                new CommandRef("action", new ParamRef[] {
+                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.String), // action
+                }, Action),
+                new CommandRef("set", new ParamRef[] {
+                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.String), // prop
+                    new ParamRef (ParamType.String), // value
+                }, Set),
+                 new CommandRef("text", new ParamRef[] {
+                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.String), // value
+                    new ParamRef (ParamType.Bool, true, false), // append
+                }, Text),
+                new CommandRef("transmit", new ParamRef[] {
+                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.String), // value
+                    new ParamRef (ParamType.String, true, "default"), // MyTransmitTarget
+                }, Transmit),
+            };
+        }
+
+
         public static CommandResult Run(IList args)
         {
             ImplLogger.LogImpl("run", args);
@@ -133,7 +169,6 @@ namespace Script
 
             return null;
         }
-
         internal static CommandResult Text(IList args)
         {
             ImplLogger.LogImpl("text", args);

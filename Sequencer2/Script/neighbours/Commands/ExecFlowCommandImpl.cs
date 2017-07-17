@@ -16,6 +16,42 @@ namespace Script
 
     class ExecFlowCommandImpl
     {
+
+        internal static CommandRef[] Defs()
+        {
+            return new CommandRef[] {
+                new CommandRef("wait", new ParamRef[] {
+                    new ParamRef (ParamType.Double), // delay
+                }, Wait, requirements: SqRequirements.Timer, isWait: true),
+                new CommandRef("waitticks", new ParamRef[] {
+                    new ParamRef (ParamType.Double), // delay
+                }, WaitTicks, requirements: SqRequirements.Timer, isWait: true),
+                new CommandRef("repeat", new ParamRef[] {
+                }, Repeat, requirements: SqRequirements.Wait),
+                new CommandRef("start", new ParamRef[] {
+                    new ParamRef (ParamType.String, true, ""), // func
+                }, Start),
+                new CommandRef("stop", new ParamRef[] {
+                    new ParamRef (ParamType.String, true, ""), // func
+                }, Stop),
+                new CommandRef("load", new ParamRef[] {
+                    new ParamRef (ParamType.String), // code
+                }, Load) ,
+                new CommandRef("unload", new ParamRef[] {
+                    new ParamRef (ParamType.String, true, ""), // func
+                }, Unload),
+                new CommandRef("setvar", new ParamRef[] {
+                    new ParamRef (ParamType.String), // var name
+                    new ParamRef (ParamType.Double), // value
+                }, SetVar),
+                 new CommandRef("select", new ParamRef[] {
+                    new ParamRef (ParamType.String), // case var name
+                    new ParamRef (ParamType.String, aggregative: true), // cases
+                }, Switch),
+            };
+        }
+
+
         public static CommandResult Wait(IList args)
         {
             ImplLogger.LogImpl("wait", args);
