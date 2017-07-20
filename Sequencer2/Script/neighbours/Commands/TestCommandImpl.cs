@@ -30,12 +30,13 @@ namespace Script
         {
             ImplLogger.LogImpl("test1", args);
 
-            List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyMotorStator>(MatchingType.match, (string)args[0], blocks);
-            IMyMotorStator Rotor = blocks.FirstOrDefault() as IMyMotorStator;
+            List<IMyMotorStator> rotors = new List<IMyMotorStator>();
+            BlockSelector.GetBlocksOfTypeWithQuery(MatchingType.match, (string)args[0], rotors);
+            IMyMotorStator Rotor = rotors.FirstOrDefault();
 
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTextPanel>(MatchingType.match, (string)args[1], blocks);
-            IMyTextPanel Text = blocks.FirstOrDefault() as IMyTextPanel;
+            List<IMyTextPanel> lcds = new List<IMyTextPanel>();
+            BlockSelector.GetBlocksOfTypeWithQuery(MatchingType.match, (string)args[1], lcds);
+            IMyTextPanel Text = lcds.FirstOrDefault();
 
             Text?.WritePublicText(Rotor?.Angle.ToString() ?? "<null>", true);
 

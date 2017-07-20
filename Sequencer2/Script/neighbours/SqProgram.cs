@@ -176,12 +176,15 @@ namespace Script
         public IList Args;
         public Func<IList, CommandResult> Impl;
 
+        public int _cycle = 0;
+
         public SqCommand() { }
 
         public SqCommand(Deserializer decoder)
         {
             Cmd = decoder.ReadString();
             Impl = Commands.CommandDefinitions[Cmd].Implementation;
+            _cycle = decoder.ReadInt();
 
             int count = decoder.ReadInt();
             Args = new List<object>();
@@ -230,7 +233,8 @@ namespace Script
 
         public void Serialize(Serializer encoder)
         {
-            encoder.Write(Cmd);
+            encoder.Write(Cmd)
+                   .Write(_cycle);
 
             encoder.Write(Args.Count);
 
@@ -277,8 +281,8 @@ namespace Script
     {
         public int currentCommand = 0;
         public string Name;
-        public bool IsValid = false;
         public float TimeToWait = 0;
+        public int _cycle = 0;
 
         public List<SqCommand> Commands;
 
@@ -299,8 +303,8 @@ namespace Script
         {
             currentCommand = decoder.ReadInt();
             Name = decoder.ReadString();
-            IsValid = decoder.ReadBool();
             TimeToWait = (float)decoder.ReadDouble();
+            _cycle = decoder.ReadInt();
 
             int count = decoder.ReadInt();
             Commands = new List<SqCommand>(count);
@@ -315,8 +319,8 @@ namespace Script
         {
             encoder.Write(currentCommand)
                 .Write(Name)
-                .Write(IsValid)
-                .Write(TimeToWait);
+                .Write(TimeToWait)
+                .Write(_cycle);
 
             encoder.Write(Commands.Count);
 

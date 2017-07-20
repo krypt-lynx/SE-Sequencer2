@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,44 +25,35 @@ namespace Script
 
     class SqValidator
     {
-        internal bool Validate(List<SqProgram> programs, SqRequirements capabilities)
+        internal void Validate(List<SqProgram> programs, SqRequirements capabilities)
         {
-            bool allValid = true;
+            List<string> messages = new List<string>();
+
             foreach (var program in programs)
             {
-                allValid = allValid && Validate(program, capabilities);
+                Validate(program, capabilities, messages);
             }
-            return allValid;
         }
 
-        private bool Validate(SqProgram program, SqRequirements capabilities)
+        private void Validate(SqProgram program, SqRequirements capabilities, List<string> messages)
         {
-            // todo: messages
-
-            bool hasWait = false;
             bool hasTimer = (capabilities & SqRequirements.Timer) == SqRequirements.Timer;
-            program.IsValid = false;
 
-            foreach (var command in program.Commands)
+            var repeatPos = program.Commands.FindIndex(x => x.Cmd == "repeat");
+            if (repeatPos != -1 && repeatPos != program.Commands.Count - 1)
             {
-                var cmdDef = Commands.CommandDefinitions[command.Cmd];
-
-                if ((cmdDef.Requirements & SqRequirements.Timer) == SqRequirements.Timer && !hasTimer)
-                {
-                    return false;
-                }
-
-                if ((cmdDef.Requirements & SqRequirements.Wait) == SqRequirements.Wait && !hasWait)
-                {
-                    return false;
-                }
-
-                hasWait = hasWait || cmdDef.IsWait;
-
+                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "Unreachable code found in @{0}: all commands after /repeat will never executed", program.Name);
             }
 
-            program.IsValid = true;
-            return true;
+            if (repeatPos != -1 && !program.Commands.Take(repeatPos).Any(x => Commands.CommandDefinitions[x.Cmd].IsWait))
+            {
+                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "Where is no any wait command before /repeat in @{0}. Script can ignore it to prevent \"Script Too Complex\" exception", program.Name);
+            }
+
+            if (!hasTimer && program.Commands.Any(x => Commands.CommandDefinitions[x.Cmd].IsWait))
+            {
+                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "@{0} contains wait command, but where is no timer to execute it", program.Name);
+            }
         }
     }
 

@@ -39,11 +39,11 @@ namespace Script
         {
             Log.LogLevels = new Dictionary<string, LogLevel>
             {
-                { Scheduler.LOG_CAT,        LogLevel.Verbose },
-                { Parser.LOG_CAT,           LogLevel.Verbose },
-                { Program.LOG_CAT,          LogLevel.Verbose },
-                { RuntimeTask.LOG_CAT,      LogLevel.Verbose },
-                { ImplLogger.LOG_CAT,       LogLevel.Verbose },
+                { Scheduler.LOG_CAT,        LogLevel.Warning },
+                { Parser.LOG_CAT,           LogLevel.Warning },
+                { Program.LOG_CAT,          LogLevel.Warning },
+                { RuntimeTask.LOG_CAT,      LogLevel.Warning },
+                { ImplLogger.LOG_CAT,       LogLevel.Warning },
                 { TimerController.LOG_CAT,  LogLevel.Warning },
             };
         }
@@ -60,7 +60,7 @@ namespace Script
         RuntimeTask runtime;
 
         const int major = 0;
-        const int minor = 5;
+        const int minor = 7;
 
         public Program()
         {
@@ -92,13 +92,14 @@ namespace Script
             Current = null;
         }
 
-        private void ReloadSctipt(string obj)
+        private void ReloadSctipt(string arg)
         {
             var parse = new ParserTask(Current.Me.CustomData);
             parse.Done = r =>
             {
                 if (r.Item1 != null)
                 {
+                    Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing done");
                     runtime.RegisterPrograms(r.Item1);
                 }
             };
@@ -238,6 +239,7 @@ namespace Script
                 {
                     if (r.Item1 != null)
                     {
+                        Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing done");
                         runtime.RegisterPrograms(r.Item1);
                     }
                 };

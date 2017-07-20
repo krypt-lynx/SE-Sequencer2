@@ -31,17 +31,13 @@ namespace Script
             if (parser.Parse(src))
             {
                 var validator = new SqValidator();
-                if (!validator.Validate(parser.Programs, SqRequirements.Timer))
-                {
-                    Log.Write("validation failed");
-                }
+                validator.Validate(parser.Programs, SqRequirements.Timer);
             }
 
             result = new Tuple<List<SqProgram>, string>(parser.Programs, parser.ErrorMessage);
 
             return true;
         }
-
     }
 
     #endregion // ingame script end

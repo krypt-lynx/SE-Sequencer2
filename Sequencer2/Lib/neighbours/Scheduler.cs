@@ -196,7 +196,8 @@ namespace Script
         {
             if ((endInst - startInst) > instLimit)
             {
-                Log.WriteFormat(LOG_CAT, LogLevel.Error, "\uE056 Task exceeded instructions limit!");
+                Log.WriteFormat(LOG_CAT, LogLevel.Error, "\uE056 Task exceeded instructions limit!\n" +
+                    "instructions: {0,5}/{1}", endInst, Program.Current.Runtime.MaxInstructionCount);
                 endInst = 0;
                 startInst = 0;
                 instLimit = 1;

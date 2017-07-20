@@ -20,7 +20,7 @@ namespace Script
 
     class BlockSelector
     {
-        public static void GetBlocksOfTypeWithQuery<T>(MatchingType selectionMode, string query, List<IMyTerminalBlock> blocks) where T : class
+        public static void GetBlocksOfTypeWithQuery<T>(MatchingType selectionMode, string query, List<T> blocks) where T : class, IMyTerminalBlock
         {
             switch (selectionMode)
             {
@@ -45,7 +45,7 @@ namespace Script
                         blocks.Clear();
                         if (group != null)
                         {
-                            List<IMyTerminalBlock> gBlocks = new List<IMyTerminalBlock>();
+                            List<T> gBlocks = new List<T>();
                             group.GetBlocksOfType<T>(blocks);
                         }
                         return;

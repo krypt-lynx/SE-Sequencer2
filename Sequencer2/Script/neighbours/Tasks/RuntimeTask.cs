@@ -14,10 +14,13 @@ namespace Script
     {
         public const string LOG_CAT = "exe";
 
-        private Dictionary<string, SqProgram> Programs;
+        private Dictionary<string, SqProgram> Programs = new Dictionary<string, SqProgram>();
 
         private List<string> scheduledPrograms = new List<string>();
+        private Queue<SqProgram> replecments = new Queue<SqProgram>();
+
         private TimerController timerController;
+
         int lastProgramId = 0;
 
         public void Serialize(Serializer encoder)
@@ -43,7 +46,6 @@ namespace Script
 
         public RuntimeTask(TimerController timerController) : base("Runtime")
         {
-            Programs = new Dictionary<string, SqProgram>();
             this.timerController = timerController;
         }
 
@@ -82,14 +84,23 @@ namespace Script
             {
                 var program = Programs[key];
 
-                program.TimeToWait = Math.Max(0, program.TimeToWait - timerController.TimePassed()); 
-                    // attempting to substract passed time from just added task. Can be a problem in future.
+                program.TimeToWait = Math.Max(0, program.TimeToWait - timerController.TimePassed());
+                // attempting to substract passed time from just added task. Can be a problem in future.
                 ExecuteProgram(program);
             }
+
+            RetryRegisterPrograms();
 
             ScheduleWaitIfNeeded();
 
             return true;
+        }
+
+        private void RetryRegisterPrograms()
+        {
+            List<SqProgram> temp = new List<SqProgram>(replecments);
+            replecments.Clear();
+            RegisterPrograms(temp); // todo: fix messages
         }
 
         public bool HaveWork()
@@ -105,10 +116,22 @@ namespace Script
             }
 
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "executing \"{0}\"", program.Name);
-           
+
+            program._cycle ++; // Breaking OOP a bit
+
             while (program.currentCommand < program.Commands.Count)
             {
                 var cmd = program.Commands[program.currentCommand];
+                if (cmd._cycle == program._cycle)
+                {
+                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "Program \"{0}\" is not sleeping. Forcing break.", program.Name);
+                    goto pause;
+                }
+                else
+                {
+                    cmd._cycle = program._cycle;
+                }
+
                 var result = cmd.Run();
 
                 switch (result?.Action ?? CommandAction.None)
@@ -166,15 +189,19 @@ namespace Script
             {
                 if (scheduledPrograms.Contains(prog.Name))
                 {
-                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "Unable to replace program \"{0}\" because it executing", prog.Name);   
+                    Log.WriteFormat(LOG_CAT, LogLevel.Error, "Unable to replace program \"{0}\" because it executing. It will updated after termination", prog.Name);
+                    replecments.Enqueue(prog);
                 }
                 else 
                 {
                     if (Programs.ContainsKey(prog.Name))
                     {
-                        Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Program \"{0}\" was replaced", prog.Name);
+                        Log.WriteFormat(LOG_CAT, LogLevel.Warning, "Program \"{0}\" was replaced", prog.Name);
                     }
-
+                    else
+                    {
+                        Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Program \"{0}\" was added", prog.Name);
+                    }
                     Programs[prog.Name] = prog;
                 }
 
@@ -185,12 +212,15 @@ namespace Script
         {
             if (scheduledPrograms.Count == 0)
             {
+                timerController.CancelStart();
                 return;
             }
+            else
+            {
+                var waitseconds = scheduledPrograms.Select(x => Programs[x]).Min(x => x.TimeToWait);
 
-            var waitseconds = scheduledPrograms.Select(x => Programs[x]).Min(x => x.TimeToWait);
-
-            timerController.ScheduleStart( waitseconds );
+                timerController.ScheduleStart(waitseconds);
+            }
         }
 
         public void StartProgram(string arg)
@@ -220,6 +250,9 @@ namespace Script
             {
                 Programs[arg].TimeToWait = 0;
                 scheduledPrograms.Remove(arg);
+
+                RetryRegisterPrograms();
+                ScheduleWaitIfNeeded();
             }
             else
             {

@@ -84,8 +84,8 @@ namespace console
   
 
  ";*/
-    owner.CustomData = @"
-@test 
+  /*  owner.CustomData = @"
+@switch_array 
 /switch array_action open_array close_array 
  
 @test2
@@ -114,6 +114,33 @@ namespace console
 /wait 30 
 /setvar array_action 0 
 
+
+";*/
+            owner.CustomData = @"
+@all
+/start light1
+/wait 1
+/start light2 
+/wait 1 
+/start light3
+
+@light1
+/action match ""light 1"" OnOff
+/echo light1 
+#/wait 15
+/repeat
+
+@light2
+/action match ""light 2"" OnOff 
+/echo light2
+/wait 15
+/repeat
+
+@light3 
+/action match ""light 3"" OnOff 
+/echo light3
+/wait 15
+/repeat
 
 ";
 

@@ -162,7 +162,7 @@ namespace Script
             delay -= (totalSeconds + extraTime);
             timePassed += (totalSeconds + extraTime);
             extraTime = 0;
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Delay now is {0}", delay);
+            Log.WriteFormat(LOG_CAT, LogLevel.SpamMeToDeath, "Delay now is {0}", delay); // The only idea how to avoid log spamming by timer. I need this data.
 
             if (delay < IgnoreDelayLessThen)
             {
@@ -191,6 +191,12 @@ namespace Script
         public bool IsInterupted()
         {
             return false;
+        }
+
+        internal void CancelStart()
+        {
+            this.delay = 0;
+            this.timePassed = 0;
         }
     }
 

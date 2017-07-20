@@ -23,7 +23,8 @@ namespace Script
         None,
         Error,
         Warning,
-        Verbose
+        Verbose,
+        SpamMeToDeath
     }
 
     class Log
