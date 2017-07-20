@@ -151,7 +151,7 @@ namespace Script
                 case ParamType.GroupType:
                     {
                         MatchingType g;
-                        bool success = Enum.TryParse(value.ToString(), out g);
+                        bool success = Enum.TryParse(value, true, out g);
                         result = g;
                         return success;
                     }

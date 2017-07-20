@@ -26,11 +26,11 @@ namespace Script
                     new ParamRef (ParamType.Double, true, -1.0)
                 }, LogLevel_),
                 new CommandRef("listprops", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String),
                 }, ListProps),
                 new CommandRef("listactions", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String),
                 }, ListActions),
             };
@@ -123,6 +123,7 @@ namespace Script
                         case "StringBuilder":
                             value = block.GetValue<StringBuilder>(prop.Id);
                             break;
+                        // case "Int64": todo
                         default:
                             throw new Exception(prop.TypeName); // todo: log instead Exception
                     }

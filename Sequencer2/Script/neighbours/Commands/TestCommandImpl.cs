@@ -31,11 +31,11 @@ namespace Script
             ImplLogger.LogImpl("test1", args);
 
             List<IMyMotorStator> rotors = new List<IMyMotorStator>();
-            BlockSelector.GetBlocksOfTypeWithQuery(MatchingType.match, (string)args[0], rotors);
+            BlockSelector.GetBlocksOfTypeWithQuery(MatchingType.Match, (string)args[0], rotors);
             IMyMotorStator Rotor = rotors.FirstOrDefault();
 
             List<IMyTextPanel> lcds = new List<IMyTextPanel>();
-            BlockSelector.GetBlocksOfTypeWithQuery(MatchingType.match, (string)args[1], lcds);
+            BlockSelector.GetBlocksOfTypeWithQuery(MatchingType.Match, (string)args[1], lcds);
             IMyTextPanel Text = lcds.FirstOrDefault();
 
             Text?.WritePublicText(Rotor?.Angle.ToString() ?? "<null>", true);

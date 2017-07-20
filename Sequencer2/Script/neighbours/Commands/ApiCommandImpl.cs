@@ -20,29 +20,29 @@ namespace Script
         {
             return new CommandRef[] {
                 new CommandRef("run", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // arg
                 }, Run),
                 new CommandRef("action", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // action
                 }, Action),
                 new CommandRef("set", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // prop
                     new ParamRef (ParamType.String), // value
                 }, Set),
                  new CommandRef("text", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // value
                     new ParamRef (ParamType.Bool, true, false), // append
                 }, Text),
                 new CommandRef("transmit", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.match),
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // value
                     new ParamRef (ParamType.String, true, "default"), // MyTransmitTarget
@@ -92,6 +92,8 @@ namespace Script
             return null;
         }
 
+
+
         public static CommandResult Set(IList args)
         {
             ImplLogger.LogImpl("set", args);
@@ -117,11 +119,12 @@ namespace Script
                 List<ITerminalProperty> props = new List<ITerminalProperty>();
                 block.GetProperties(props);
 
-                if (propDef != null)
+                PropType propType;
+                if (propDef != null && Enum.TryParse(propDef.TypeName, out propType))
                 {
-                    switch (propDef.TypeName) // todo
+                    switch (propType) // todo
                     {
-                        case "Boolean":
+                        case PropType.Boolean:
                             {
                                 bool b;
                                 if (bool.TryParse(value, out b))
@@ -130,31 +133,31 @@ namespace Script
                                 }
                                 break;
                             }
-                        case "StringBuilder":
+                        case PropType.StringBuilder:
                             {
                                 block.SetValue(prop, new StringBuilder(value));
                                 break;
                             }
-                        case "Single":
+                        case PropType.Single:
                             {
                                 float s;
                                 if (float.TryParse(value, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out s))
                                 {
-
                                     block.SetValue(prop, s);
                                 }
                             }
                             break;
-                        case "Int64":
+                        case PropType.Int64:
                             {
                                 long i;
-                                if (long.TryParse(value, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out i))
+
+                                if (PropListConverter.ResolveListProperty(prop, value, out i))
                                 {
                                     block.SetValue(prop, i);
                                 }
                             }
                             break;
-                        case "Color":
+                        case PropType.Color:
                             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "Color property parsing is not impelemented. Now color is orange :)");
 
                             block.SetValueColor(prop, Color.OrangeRed); // todo
@@ -241,16 +244,16 @@ namespace Script
                 switch (matchingType)
                 {
                     default:
-                    case MatchingType.match:
+                    case MatchingType.Match:
                         warning = string.Format("No antennas called \"{0}\" are currently able to transmit.", filter);
                         break;
-                    case MatchingType.contains:
+                    case MatchingType.Contains:
                         warning = string.Format("No antennas containing \"{0}\" are currently able to transmit.", filter);
                         break;
-                    case MatchingType.head:
+                    case MatchingType.Head:
                         warning = string.Format("No antennas starting with \"{0}\" are currently able to transmit.", filter);
                         break;
-                    case MatchingType.group:
+                    case MatchingType.Group:
                         warning = string.Format("No antennas in group \"{0}\" are currently able to transmit.", filter);
                         break;
                 }

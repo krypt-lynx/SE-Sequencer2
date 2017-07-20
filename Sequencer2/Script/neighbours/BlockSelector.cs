@@ -10,12 +10,12 @@ namespace Script
     #region ingame script start
 
 
-    public enum MatchingType // lowercase is requared
+    public enum MatchingType
     {
-        match,
-        contains,
-        head,
-        group
+        Match,
+        Contains,
+        Head,
+        Group
     }
 
     class BlockSelector
@@ -24,22 +24,22 @@ namespace Script
         {
             switch (selectionMode)
             {
-                case MatchingType.match:
+                case MatchingType.Match:
                     {
                         Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x.CustomName.Equals(query));
                         return;
                     }
-                case MatchingType.contains:
+                case MatchingType.Contains:
                     {
                         Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x.CustomName.Contains(query));
                         return;
                     }
-                case MatchingType.head:
+                case MatchingType.Head:
                     {
                         Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x.CustomName.StartsWith(query));
                         return;
                     }
-                case MatchingType.group:
+                case MatchingType.Group:
                     {
                         IMyBlockGroup group = Program.Current.GridTerminalSystem.GetBlockGroupWithName(query);
                         blocks.Clear();

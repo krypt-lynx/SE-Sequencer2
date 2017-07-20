@@ -193,7 +193,7 @@ namespace Publish
 
             if (start == -1)
             {
-                string message = string.Format("Code start not specified in file {0}", path);
+                string message = string.Format("\nCode start not specified in file {0}", path);
                 Console.WriteLine(message);
                 throw new Exception(message);
             }
