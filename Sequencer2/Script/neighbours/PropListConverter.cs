@@ -36,9 +36,9 @@ namespace Script
 
         static Dictionary<string, TryGet> knownLists = new Dictionary<string, TryGet>() {
             { "CameraList", TryGetBlockId<IMyCameraBlock> },
-            { "FlightMode", flightModes.TryGetValue },
-            { "Direction", (string str, out long value) => { return Enum.TryParse(str, true, out value); } },
-            { "blacklistWhitelist", filterTypes.TryGetValue },
+            { "FlightMode", (string str, out long value) => flightModes.TryGetValue(str.ToLower(), out value) },
+            { "Direction", (string str, out long value) => Enum.TryParse(str, true, out value) },
+            { "blacklistWhitelist", (string str, out long value) => filterTypes.TryGetValue(str.ToLower(), out value) },
             { "PBList", TryGetBlockId<IMyProductionBlock> },
             { "Font",  (string str, out long value) => { value = VRageHash.GetHash(str); return true; } },
         };
