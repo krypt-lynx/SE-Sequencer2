@@ -19,7 +19,7 @@ namespace Script
         {
             ImplLogger.LogImpl("run", args);
 
-            List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
+            List<IMyProgrammableBlock> blocks = new List<IMyProgrammableBlock>();
             BlockSelector.GetBlocksOfTypeWithQuery<IMyProgrammableBlock>((MatchingType)args[0], (string)args[1], blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
@@ -137,7 +137,7 @@ namespace Script
         {
             ImplLogger.LogImpl("text", args);
 
-            List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
+            List<IMyTextPanel> blocks = new List<IMyTextPanel>();
             BlockSelector.GetBlocksOfTypeWithQuery<IMyTextPanel>((MatchingType)args[0], (string)args[1], blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
@@ -158,7 +158,7 @@ namespace Script
 
             List<IMyTerminalBlock> antennas = new List<IMyTerminalBlock>();
 
-            List<IMyTerminalBlock> radioAntennas = new List<IMyTerminalBlock>();
+            List<IMyRadioAntenna> radioAntennas = new List<IMyRadioAntenna>();
             BlockSelector.GetBlocksOfTypeWithQuery<IMyRadioAntenna>(matchingType, filter, radioAntennas);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", radioAntennas.Count);
 
@@ -181,7 +181,7 @@ namespace Script
             }
 
             //--------get all laser antennas
-            List<IMyTerminalBlock> laserAntennas = new List<IMyTerminalBlock>();
+            List<IMyLaserAntenna> laserAntennas = new List<IMyLaserAntenna>();
             BlockSelector.GetBlocksOfTypeWithQuery<IMyLaserAntenna>((MatchingType)args[0], filter, laserAntennas);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", radioAntennas.Count);
 

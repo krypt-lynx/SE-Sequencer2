@@ -20,7 +20,7 @@ namespace Script
 
     class BlockSelector
     {
-        public static void GetBlocksOfTypeWithQuery<T>(MatchingType selectionMode, string query, List<IMyTerminalBlock> blocks) where T : class
+        public static void GetBlocksOfTypeWithQuery<T>(MatchingType selectionMode, string query, List<T> blocks) where T : class, IMyTerminalBlock
         {
             switch (selectionMode)
             {
