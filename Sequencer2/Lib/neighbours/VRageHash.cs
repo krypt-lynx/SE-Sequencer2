@@ -13,6 +13,11 @@ namespace Script
         static Dictionary<string, int> m_stringToHash = new Dictionary<string, int>();
         public static readonly int NullOrEmpty;
 
+        static VRageHash()
+        {
+            NullOrEmpty = CalcHash("");
+        }
+
         public static int GetHash(string str)
         {
             int result;

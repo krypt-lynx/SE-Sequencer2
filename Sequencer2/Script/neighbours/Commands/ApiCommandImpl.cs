@@ -50,7 +50,6 @@ namespace Script
             };
         }
 
-
         public static CommandResult Run(IList args)
         {
             ImplLogger.LogImpl("run", args);
@@ -120,9 +119,10 @@ namespace Script
                 block.GetProperties(props);
 
                 PropType propType;
+
                 if (propDef != null && Enum.TryParse(propDef.TypeName, out propType))
                 {
-                    switch (propType) // todo
+                    switch (propType)
                     {
                         case PropType.Boolean:
                             {
@@ -151,16 +151,23 @@ namespace Script
                             {
                                 long i;
 
-                                if (PropListConverter.ResolveListProperty(prop, value, out i))
+                                if (ListConverter.ResolveListProperty(prop, value, out i))
                                 {
                                     block.SetValue(prop, i);
                                 }
                             }
                             break;
                         case PropType.Color:
-                            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "Color property parsing is not impelemented. Now color is orange :)");
+                            {
+                                Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "Color property parsing is not impelemented. Now color is orange :)");
 
-                            block.SetValueColor(prop, Color.OrangeRed); // todo
+                                Color c;
+
+                                if (ColorConverter.TryParseColor(value, out c))
+                                {
+                                    block.SetValueColor(prop, c); 
+                                }
+                            }
                             break;
                     }
                 }

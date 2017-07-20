@@ -99,6 +99,7 @@
     <Compile Include="Script\neighbours\Commands\ImplLogger.cs" />
     <Compile Include="Script\neighbours\Commands\DebugCommandImpl.cs" />
     <Compile Include="Script\neighbours\Commands\TestCommandImpl.cs" />
+    <Compile Include="Script\neighbours\Converters\ColorConverter.cs" />
     <Compile Include="Script\neighbours\Serializer.cs" />
     <Compile Include="Script\neighbours\Tasks\RuntimeTask.cs" />
     <Compile Include="Script\neighbours\Commands\ExecFlowCommandImpl.cs" />
@@ -114,7 +115,7 @@
     <Compile Include="Script\neighbours\ParamsRouter.cs" />
     <Compile Include="Script\neighbours\TimerController.cs" />
     <Compile Include="Script\neighbours\Transmitter.cs" />
-    <Compile Include="Script\neighbours\PropListConverter.cs" />
+    <Compile Include="Script\neighbours\Converters\ListConverter.cs" />
     <Compile Include="Script\neighbours\VariablesStorage.cs" />
     <Compile Include="Sequencer2.cs" />
     <Compile Include="TestEnv\Blocks\TestBatteryBlock.cs" />

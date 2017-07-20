@@ -19,7 +19,7 @@ namespace Script
         Color
     }
 
-    public static class PropListConverter
+    public static class ListConverter
     {
         delegate bool TryGet(string str, out long value); // TryGet<K, V>
 
