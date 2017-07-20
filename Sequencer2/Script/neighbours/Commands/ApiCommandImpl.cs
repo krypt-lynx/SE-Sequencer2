@@ -159,13 +159,15 @@ namespace Script
                             break;
                         case PropType.Color:
                             {
-                                Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "Color property parsing is not impelemented. Now color is orange :)");
-
                                 Color c;
 
                                 if (ColorConverter.TryParseColor(value, out c))
                                 {
                                     block.SetValueColor(prop, c); 
+                                }
+                                else
+                                {
+                                    Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "\"{0}\" is not a valid color", value);
                                 }
                             }
                             break;

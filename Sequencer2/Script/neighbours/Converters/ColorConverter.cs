@@ -177,25 +177,38 @@ namespace Script
                 }
                 else
                 {
-                    uint packedValue;
+                    int r = 0;
+                    int g = 0;
+                    int b = 0;
+                    int a = 0;
 
-                    if (str.Length == 6 || str.Length == 8)
+                    if (str.Length == 6)
                     {
-                        success = uint.TryParse(str, System.Globalization.NumberStyles.HexNumber, null, out packedValue);
+                        success = int.TryParse(str.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out r)
+                            && int.TryParse(str.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out g)
+                            && int.TryParse(str.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out b);
 
-                        if (success)
-                        {
-                            value = new Color(packedValue);
-                        }
-                        else
-                        {
-                            value = Color.Orange;
-                        }
+                        a = 255;
+                    }
+                    else if (str.Length == 8)
+                    {
+                        success = int.TryParse(str.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out r)
+                            && int.TryParse(str.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out g)
+                            && int.TryParse(str.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out b)
+                            && int.TryParse(str.Substring(6, 2), System.Globalization.NumberStyles.HexNumber, null, out a);
                     }
                     else
                     {
                         success = false;
-                        value = Color.Orange;
+                    }
+
+                    if (success)
+                    {
+                        value = new Color(r, g, b, a);
+                    }
+                    else
+                    {
+                        value = Color.White; //this value is never used. is there an alternative to doing it this way?
                     }
                 }
             }
