@@ -163,6 +163,7 @@ namespace Script
         public static bool TryParseColor(string str, out Color value)
         {
             bool success = true;
+            str = str.ToLower();
 
             if (ColorDict.ContainsKey(str))
             {
