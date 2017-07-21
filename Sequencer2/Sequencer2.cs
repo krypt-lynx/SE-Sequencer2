@@ -233,6 +233,7 @@ namespace Script
                 LogLevels();
                 timerController = new TimerController();
                 runtime = new RuntimeTask(timerController);
+                VariablesStorage.Clear();
 
                 var parse = new ParserTask(Current.Me.CustomData);
                 parse.Done = r =>
@@ -292,6 +293,10 @@ namespace Script
             }
 
             timerController.ContinueWait(sch.HasTasks());
+
+            Color val;
+            var test = ColorConverter.TryParseColor("128 255 0", out val);
+
 
             Current = null;
         }

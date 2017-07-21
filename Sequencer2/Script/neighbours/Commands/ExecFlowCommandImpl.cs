@@ -44,7 +44,7 @@ namespace Script
                     new ParamRef (ParamType.String), // var name
                     new ParamRef (ParamType.Double), // value
                 }, SetVar),
-                 new CommandRef("select", new ParamRef[] {
+                 new CommandRef("switch", new ParamRef[] {
                     new ParamRef (ParamType.String), // case var name
                     new ParamRef (ParamType.String, aggregative: true), // cases
                 }, Switch),

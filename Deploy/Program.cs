@@ -18,7 +18,7 @@ namespace Publish
                 { Opt.Key.TrimLeadingSpaces, Opt.Value.Yes },
                 { Opt.Key.TrimTrailingSpaces, Opt.Value.Yes },
                 { Opt.Key.StripEmptyLines, Opt.Value.No },
-                { Opt.Key.TrimComments, Opt.Value.No },
+                { Opt.Key.TrimComments, Opt.Value.Yes },
                 { Opt.Key.ForceLocalNotImplementedException, Opt.Value.Yes },  // Unaccurate!
                 { Opt.Key.Squeeze, Opt.Value.No } // Very unaccurate!
         });

@@ -10,6 +10,9 @@ using VRageMath;
 
 namespace Script
 {
+    /* #override
+     * IgnoreFile: true
+     */
 
     #region ingame script start
 

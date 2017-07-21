@@ -18,15 +18,15 @@ namespace Script
             errorMessage = null;
             string cmd = name.ToLower();
 
-            if (!Commands.CommandDefinitions.ContainsKey(cmd) || Commands.CommandDefinitions[cmd].Hidden)
+            if (!Commands.CmdDefs.ContainsKey(cmd) || Commands.CmdDefs[cmd].Hidden)
             {
                 errorMessage = string.Format(ErrorMessages.UnknownCommand, name);
                 return false;
             }
 
-            var def = Commands.CommandDefinitions[cmd];
+            var def = Commands.CmdDefs[cmd];
 
-            if ((args.Count > def.Arguments.Length) && !def.Aggrerative)
+            if ((args.Count > def.Arguments.Length) && !def.Aggregative)
             {
 
                 errorMessage = string.Format(ErrorMessages.TooManyArgumentsIn, name, 
@@ -41,7 +41,7 @@ namespace Script
             if (args.Count < def.Arguments.Length - def.OptionalCount)
             {
                 string countText;
-                if (def.Aggrerative)
+                if (def.Aggregative)
                 {
                     countText = string.Format("at least {0}", def.Arguments.Length - def.OptionalCount - 1);
                 }
@@ -66,7 +66,7 @@ namespace Script
             command.Args = new List<object>();
             command.Impl = def.Implementation;
 
-            int allowedOptional = args.Count - def.Arguments.Length + def.OptionalCount + (def.Aggrerative ? 1 : 0);
+            int allowedOptional = args.Count - def.Arguments.Length + def.OptionalCount + (def.Aggregative ? 1 : 0);
 
             int argIndex = 0;
             for (int i = 0, imax = def.Arguments.Length; i < imax; i++)
@@ -183,14 +183,14 @@ namespace Script
         public SqCommand(Deserializer decoder)
         {
             Cmd = decoder.ReadString();
-            Impl = Commands.CommandDefinitions[Cmd].Implementation;
+            Impl = Commands.CmdDefs[Cmd].Implementation;
             _cycle = decoder.ReadInt();
 
             int count = decoder.ReadInt();
             Args = new List<object>();
             for (int i = 0; i < count; i++)
             {
-                ParamRef paramRef = Commands.CommandDefinitions[Cmd].Arguments[i];
+                ParamRef paramRef = Commands.CmdDefs[Cmd].Arguments[i];
 
                 int argCount = paramRef.Aggregative ? decoder.ReadInt() : 1;
 
@@ -240,7 +240,7 @@ namespace Script
 
             for (int i = 0; i < Args.Count; i++)
             {
-                ParamRef paramRef = Commands.CommandDefinitions[Cmd].Arguments[i];
+                ParamRef paramRef = Commands.CmdDefs[Cmd].Arguments[i];
 
                 IList list = paramRef.Aggregative ? (IList)Args[i] : new object[] { Args[i] };
 

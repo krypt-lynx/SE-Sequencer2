@@ -123,9 +123,12 @@ namespace Script
                         case "StringBuilder":
                             value = block.GetValue<StringBuilder>(prop.Id);
                             break;
-                        // case "Int64": todo
+                        case "Int64":
+                            value = block.GetValue<long>(prop.Id);
+                            break;
                         default:
-                            throw new Exception(prop.TypeName); // todo: log instead Exception
+                            value = null;
+                            break;
                     }
 
                     Log.WriteFormat("\"{0}\" of type \"{1}\", current value is \"{2}\"", new object[] { prop.Id, prop.TypeName, value });

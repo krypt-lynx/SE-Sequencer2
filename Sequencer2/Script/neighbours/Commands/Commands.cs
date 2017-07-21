@@ -39,7 +39,7 @@ namespace Script
         public ParamRef[] Arguments;
         public Func<IList, CommandResult> Implementation;
         public int OptionalCount;
-        public bool Aggrerative; // arrgigative parameter must be last one
+        public bool Aggregative; // aggregative parameter must be last one
         public SqRequirements Requirements;
         public bool IsWait;
         public bool Hidden;
@@ -51,7 +51,7 @@ namespace Script
             Arguments = arguments;
             Implementation = implementation;
             OptionalCount = arguments.Count(x => x.Optional);
-            Aggrerative = arguments.Any(x => x.Aggregative);
+            Aggregative = arguments.Any(x => x.Aggregative);
             Requirements = requirements;
             IsWait = isWait;
             Hidden = hidden;
@@ -79,18 +79,18 @@ namespace Script
 
     static class Commands
     {
-        public static Dictionary<string, CommandRef> CommandDefinitions;
+        public static Dictionary<string, CommandRef> CmdDefs;
 
         static Commands()
         {
-            List<CommandRef> cmdDefs = new List<CommandRef>();
+            List<CommandRef> cmdDefs_ = new List<CommandRef>();
 
-            cmdDefs.AddRange(ExecFlowCommandImpl.Defs());
-            cmdDefs.AddRange(ApiCommandImpl.Defs());
-            cmdDefs.AddRange(DebugCommandImpl.Defs());
-            cmdDefs.AddRange(TestCommandImpl.Defs()); // todo: Remove before release!
+            cmdDefs_.AddRange(ExecFlowCommandImpl.Defs());
+            cmdDefs_.AddRange(ApiCommandImpl.Defs());
+            cmdDefs_.AddRange(DebugCommandImpl.Defs());
+            //cmdDefs_.AddRange(TestCommandImpl.Defs()); // todo: Remove before release!
 
-            CommandDefinitions = cmdDefs.ToDictionary(x => x.Name);
+            CmdDefs = cmdDefs_.ToDictionary(x => x.Name);
         }
     }
 

@@ -45,12 +45,12 @@ namespace Script
                 Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "Unreachable code found in @{0}: all commands after /repeat will never executed", program.Name);
             }
 
-            if (repeatPos != -1 && !program.Commands.Take(repeatPos).Any(x => Commands.CommandDefinitions[x.Cmd].IsWait))
+            if (repeatPos != -1 && !program.Commands.Take(repeatPos).Any(x => Commands.CmdDefs[x.Cmd].IsWait))
             {
                 Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "Where is no any wait command before /repeat in @{0}. Script can ignore it to prevent \"Script Too Complex\" exception", program.Name);
             }
 
-            if (!hasTimer && program.Commands.Any(x => Commands.CommandDefinitions[x.Cmd].IsWait))
+            if (!hasTimer && program.Commands.Any(x => Commands.CmdDefs[x.Cmd].IsWait))
             {
                 Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "@{0} contains wait command, but where is no timer to execute it", program.Name);
             }

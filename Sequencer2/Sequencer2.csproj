@@ -100,7 +100,7 @@
     <Compile Include="Script\neighbours\Commands\DebugCommandImpl.cs" />
     <Compile Include="Script\neighbours\Commands\TestCommandImpl.cs" />
     <Compile Include="Script\neighbours\Converters\ColorConverter.cs" />
-    <Compile Include="Script\neighbours\Serializer.cs" />
+    <Compile Include="Lib\neighbours\Serializer.cs" />
     <Compile Include="Script\neighbours\Tasks\RuntimeTask.cs" />
     <Compile Include="Script\neighbours\Commands\ExecFlowCommandImpl.cs" />
     <Compile Include="Script\neighbours\BlockSelector.cs" />

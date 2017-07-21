@@ -57,6 +57,11 @@ namespace Script
         {
             variables[name] = value;
         }
+
+        internal static void Clear()
+        {
+            _shared = new VariablesStorage();
+        }
     }
 
     #endregion // ingame script end
