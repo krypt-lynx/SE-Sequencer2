@@ -99,7 +99,7 @@ namespace Script
                     len--;
                 }
                 i++;
-                ColorDict[key.ToString()] = new Color(lo + (hi << 12));
+                ColorDict[key.ToString()] = new Color(0xFF000000 + (hi << 12) + lo);
             }
         }
 
@@ -143,73 +143,28 @@ namespace Script
             {
                 if (!TryParseIntGroup(str, out value))
                 {
-                    int r = 0;
-                    int g = 0;
-                    int b = 0;
-                    int a = 0;
+                    uint p;
 
                     var style = System.Globalization.NumberStyles.HexNumber;
+                    value = default(Color);
+
                     switch (str.Length)
                     {
-                        case 3:
-                            success =
-                                int.TryParse(str.Substring(0, 1), style, null, out r) &&
-                                int.TryParse(str.Substring(1, 1), style, null, out g) &&
-                                int.TryParse(str.Substring(2, 1), style, null, out b);
-
-                            a = 255;
-                            break;
-                        case 4:
-                            success =
-                                int.TryParse(str.Substring(0, 1), style, null, out r) &&
-                                int.TryParse(str.Substring(1, 1), style, null, out g) &&
-                                int.TryParse(str.Substring(2, 1), style, null, out b) &&
-                                int.TryParse(str.Substring(3, 1), style, null, out a);
-
-
                         case 6:
-                            success =
-                                int.TryParse(str.Substring(0, 2), style, null, out r) &&
-                                int.TryParse(str.Substring(2, 2), style, null, out g) &&
-                                int.TryParse(str.Substring(4, 2), style, null, out b);
-
-                            a = 255;
+                            if (uint.TryParse(str, style, null, out p))
+                            {
+                                value = new Color(p | 0xFF000000);
+                            }
                             break;
                         case 8:
-                            success = 
-                                int.TryParse(str.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out r) &&
-                                int.TryParse(str.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out g) &&
-                                int.TryParse(str.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out b) &&
-                                int.TryParse(str.Substring(6, 2), System.Globalization.NumberStyles.HexNumber, null, out a);
+                            if (success = uint.TryParse(str, style, null, out p))
+                            {
+                                value = new Color(p);
+                            }
                             break;
-                    }
-                    if (str.Length == 6)
-                    {
-                        success = int.TryParse(str.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out r)
-                            && int.TryParse(str.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out g)
-                            && int.TryParse(str.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out b);
-
-                        a = 255;
-                    }
-                    else if (str.Length == 8)
-                    {
-                        success = int.TryParse(str.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out r)
-                            && int.TryParse(str.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out g)
-                            && int.TryParse(str.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out b)
-                            && int.TryParse(str.Substring(6, 2), System.Globalization.NumberStyles.HexNumber, null, out a);
-                    }
-                    else
-                    {
-                        success = false;
-                    }
-
-                    if (success)
-                    {
-                        value = new Color(r, g, b, a);
-                    }
-                    else
-                    {
-                        value = default(Color);
+                        default:
+                            success = false;
+                            break;
                     }
                 }
             }

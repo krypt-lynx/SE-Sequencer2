@@ -117,6 +117,9 @@ namespace console
 
 ";*/
             owner.CustomData = @"
+@_load
+/start enable_broadcast
+
 @all
 /start light1
 /wait 1

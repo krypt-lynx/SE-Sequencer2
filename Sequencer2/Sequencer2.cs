@@ -60,7 +60,7 @@ namespace Script
         RuntimeTask runtime;
 
         const int major = 0;
-        const int minor = 7;
+        const int minor = 8;
 
         public Program()
         {
@@ -81,7 +81,7 @@ namespace Script
                 { "start", RunProgram },
                 { "stop", StopProgram },
                 { "exec", ExecuteLine },
-                { "parse", ReloadSctipt },
+                { "parse", ReloadScript },
                 { "reset", ResetState },
             };
 
@@ -92,7 +92,7 @@ namespace Script
             Current = null;
         }
 
-        private void ReloadSctipt(string arg)
+        private void ReloadScript(string arg)
         {
             var parse = new ParserTask(Current.Me.CustomData);
             parse.Done = r =>
@@ -161,6 +161,7 @@ namespace Script
         {
             Storage = "";
             Initialize();
+            Log.Write("Script was reseted");
         }
 
         private void UnknownCommand(string arg)
@@ -242,6 +243,7 @@ namespace Script
                     {
                         Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing done");
                         runtime.RegisterPrograms(r.Item1);
+                        runtime.StartProgram("_load", true);
                     }
                 };
                 sch.EnqueueTask(parse);
@@ -293,10 +295,6 @@ namespace Script
             }
 
             timerController.ContinueWait(sch.HasTasks());
-
-            Color val;
-            var test = ColorConverter.TryParseColor("128 255 0", out val);
-
 
             Current = null;
         }

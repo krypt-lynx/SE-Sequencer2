@@ -223,7 +223,7 @@ namespace Script
             }
         }
 
-        public void StartProgram(string arg)
+        public void StartProgram(string arg, bool silent = false)
         {
             if (Programs.ContainsKey(arg))
             {
@@ -232,19 +232,21 @@ namespace Script
                     Programs[arg].currentCommand = 0;
                     scheduledPrograms.Add(arg);
                 }
-                else
+                else if (!silent)
                 {
                     Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "attempt to start already started program \"{0}\", ignoring", arg);
                 }
             }
             else
             {
-                Log.WriteFormat(LOG_CAT, LogLevel.Warning, "attempt to start unknown program \"{0}\", ignoring", arg);
+                if (!silent)
+                {
+                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "attempt to start unknown program \"{0}\", ignoring", arg);
+                }
             }
         }
 
-
-        public void StopProgram(string arg)
+         public void StopProgram(string arg)
         {
             if (Programs.ContainsKey(arg))
             {
