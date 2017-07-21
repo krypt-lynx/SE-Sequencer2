@@ -19,7 +19,6 @@ namespace Publish
                 { Opt.Key.TrimTrailingSpaces, Opt.Value.Yes },
                 { Opt.Key.StripEmptyLines, Opt.Value.No },
                 { Opt.Key.TrimComments, Opt.Value.No },
-                { Opt.Key.StripTestEnv, Opt.Value.Force },
                 { Opt.Key.ForceLocalNotImplementedException, Opt.Value.Yes },  // Unaccurate!
                 { Opt.Key.Squeeze, Opt.Value.No } // Very unaccurate!
         });
@@ -33,7 +32,6 @@ namespace Publish
                 TrimTrailingSpaces,
                 StripEmptyLines,
                 TrimComments,
-                StripTestEnv,
                 ForceLocalNotImplementedException,
                 Squeeze,
                 IgnoreFile
@@ -247,12 +245,6 @@ namespace Publish
                 if (mergedOptions.Allowed(Opt.Key.StripEmptyLines))
                 {
                     if (string.IsNullOrWhiteSpace(line))
-                        continue;
-                }
-
-                if (mergedOptions.Allowed(Opt.Key.StripTestEnv))
-                {
-                    if (line.EndsWith(testenvMark))
                         continue;
                 }
 

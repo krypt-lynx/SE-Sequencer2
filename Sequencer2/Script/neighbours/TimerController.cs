@@ -156,6 +156,7 @@ namespace Script
                 {
                     Log.Write(LOG_CAT, LogLevel.Verbose, "TriggerNow ticked after game load");
                     extraTime = 1.0f / 60;
+                    firstTick = false;
                 }
             }
 
