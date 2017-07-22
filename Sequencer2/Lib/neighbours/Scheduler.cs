@@ -49,6 +49,7 @@ namespace Script
         }
     }
 
+    /* not used
     abstract class InterruptibleTask<T> : Task<T>
     {
 
@@ -80,6 +81,8 @@ namespace Script
             return int.MaxValue;
         }
     }
+    */
+
 
     abstract class FastTask<T> : Task<T>
     {
@@ -102,6 +105,7 @@ namespace Script
         }
     }
 
+    /* not used
     abstract class ContinuousTask<T> : Task<T>
     {
         public ContinuousTask(string name = null) : base(name) { }
@@ -122,7 +126,9 @@ namespace Script
             return 3000;
         }
     }
+    */
 
+    /* not used
     class SimpleTask<T> : FastTask<T>
     {
         Func<T> _task;
@@ -152,7 +158,7 @@ namespace Script
             };
         }
     }
-
+    */
 
     class Scheduler
     {

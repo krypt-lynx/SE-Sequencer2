@@ -1,1 +1,90 @@
-﻿// Sequenser v2, prealpha 8
+﻿// Sequencer v2.0
+// http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
+/* 
+
+[Not very] simple replacement for bunch of timer blocks
+
+Capabilities:
+ - multiple scripts executed by one block 
+ - simultaneous execution of multiple scripts
+ - ability to start actions
+ - ability to change properties
+ - ability to run another programmable block
+ - ability to change text on lcd screen
+ - ability to send remote message 
+ - wait for time period with sub second precision
+ - transparent save/load handling
+
+
+Installation:
+ - Install Programmable block ("Sequencer")
+ - Install Timer Block
+ - Rename Timer Block to "Sequencer Timer"
+ - Set Timer delay to 1 second
+ - [recommended] Make in silent
+ - Make Timer block to run actions:
+   - Sequencer - "Run" with empty argument
+   - Self - "Trigger Now"
+   - Self - "Start"
+ - Load Sequencer v2 script in "Sequencer"
+ - Put your code into Custom Data of "Sequencer"
+   - Every time then code changed you need to run "Sequencer" with "reset" or "parse" argument
+
+
+Run Arguments
+ start [method]
+   start method named "method" if not started
+ stop [method]
+   stop method named "method" if started
+ exec code
+   parse and execute "code"
+ parse 
+   reload code from "CustomData" (respects existing variables and executing methods)
+ reset 
+   reset script state (forces state reset and script parsing)
+ anything starting with "/" will considered as code and executed as "exec code"
+ 
+ stuff inside [] is optional
+
+Syntax:
+
+ @method-name
+ #comment
+ /command argument "also argument" :third argument
+
+
+Commands:
+ /run [filter_type] filter argument
+ /action [filter_type] filter action
+ /set [filter_type] filter property value
+ /text [filter_type] filter text [append]
+ /transmit [filter_type] filter value [target]
+
+ /wait seconds
+ /waitticks ticks
+ /repeat
+ /start [method]
+ /stop [method]
+ /load [code]
+ /unload [method]
+ /setvar variable
+ /switch variable method1 method2 ...
+
+ /echo [text]
+ /loglevel [category|all] [value]
+ /listprops [filter_type] filter
+ /listactions [filter_type] filter
+
+ stuff inside [] is optional
+
+
+Filter times:
+ Match
+ Contains
+ Head
+ Group
+
+full is guide available there
+http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
+*/
+

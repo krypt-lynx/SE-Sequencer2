@@ -29,12 +29,17 @@ namespace Script
         }
 
 
-
+        /* #override
+         * InsertFileName : false
+         * TrimComments : false
+         */
 
         #region ingame script start
 
+        // Name of the Timer, used by script.
         public const string TimerName = "Sequencer Timer";
 
+        // Logging levels for all used categories. Those values is used if was not overrided using /loglevel command
         private static void LogLevels()
         {
             Log.LogLevels = new Dictionary<string, LogLevel>
@@ -48,9 +53,19 @@ namespace Script
             };
         }
 
-        const string LOG_CAT = "gen";
 
+
+
+
+
+
+        //---------------------------------------------
+        // Do not report issues if code below is modified
   
+
+
+
+
 
         public static MyGridProgram Current;
         ParamsRouter paramsRouter;
@@ -59,8 +74,8 @@ namespace Script
         Scheduler sch;
         RuntimeTask runtime;
 
-        const int major = 0;
-        const int minor = 8;
+        const int major = 2;
+        const int minor = 0;
 
         public Program()
         {
@@ -70,8 +85,8 @@ namespace Script
 
             Log.NewFrame();
 
-            Log.Write("To recompile sequencer script run the Programable Block with argument \"reset\"");
-
+            Log.Write("To recompile sequencer script run the Programable Block with argument \"parse\"");
+            Log.Write("To reset sequencer script run the Programable Block with argument \"reset\"");
 
             paramsRouter = new ParamsRouter();
 
@@ -129,7 +144,6 @@ namespace Script
 
         private void RunProgram(string arg)
         {
-            // todo: is initialized check
             if (runtime != null)
             {
                 runtime.StartProgram(arg.Trim());
@@ -146,7 +160,6 @@ namespace Script
 
         private void StopProgram(string arg)
         {
-            // todo: is initialized check
             if (runtime != null)
             {
                 runtime.StopProgram(arg.Trim());
@@ -273,6 +286,8 @@ namespace Script
 
             Current = null;
         }
+
+        const string LOG_CAT = "gen";
 
         public void Main(string argument)
         {

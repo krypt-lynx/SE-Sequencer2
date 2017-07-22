@@ -53,35 +53,20 @@ namespace Script
             MyTransmitTarget targetGroup = MyTransmitTarget.None;
 
             string[] tokens = targetName.Split(new char[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < tokens.Length; i++)
+
+            targetGroup = tokens.Aggregate(MyTransmitTarget.None, (r, t) =>
             {
-                switch (tokens[i])
+                MyTransmitTarget e;
+                if (Enum.TryParse(t, true, out e))
                 {
-                    case "none":
-                        targetGroup = targetGroup | MyTransmitTarget.None;
-                        break;
-                    case "owned":
-                        targetGroup = targetGroup | MyTransmitTarget.Owned;
-                        break;
-                    case "ally":
-                        targetGroup = targetGroup | MyTransmitTarget.Ally;
-                        break;
-                    case "neutral":
-                        targetGroup = targetGroup | MyTransmitTarget.Neutral;
-                        break;
-                    case "enemy":
-                        targetGroup = targetGroup | MyTransmitTarget.Enemy;
-                        break;
-                    case "everyone":
-                        targetGroup = targetGroup | MyTransmitTarget.Everyone;
-                        break;
-                    case "default":
-                        targetGroup = targetGroup | MyTransmitTarget.Default;
-                        break;
-                    default:
-                        throw new FormatException(tokens[i] + " is not a valid target.");
+                    r |= e;
                 }
-            }
+                else
+                {
+                    Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "{0} is not a valid target.", t);
+                }
+                return r;
+            });
 
             return targetGroup;
         }

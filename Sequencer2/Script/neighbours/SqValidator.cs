@@ -47,7 +47,7 @@ namespace Script
 
             if (repeatPos != -1 && !program.Commands.Take(repeatPos).Any(x => Commands.CmdDefs[x.Cmd].IsWait))
             {
-                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "Where is no any wait command before /repeat in @{0}. Script can ignore it to prevent \"Script Too Complex\" exception", program.Name);
+                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "Where is no any wait command before /repeat in @{0}. Script will wait 1 tock to prevent \"Script Too Complex\" exception", program.Name);
             }
 
             if (!hasTimer && program.Commands.Any(x => Commands.CmdDefs[x.Cmd].IsWait))
