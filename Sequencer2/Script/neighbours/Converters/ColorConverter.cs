@@ -151,7 +151,7 @@ namespace Script
                     switch (str.Length)
                     {
                         case 6:
-                            if (uint.TryParse(str, style, null, out p))
+                            if (success = uint.TryParse(str, style, null, out p))
                             {
                                 value = new Color(p | 0xFF000000);
                             }
