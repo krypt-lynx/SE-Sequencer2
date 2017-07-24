@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace Script
 {
+    /* #override
+     * TrimComments : false
+     */
+
     #region ingame script start
 
+    // Why not? Lets made it 66666 
+    // 6666666666666666666666666666666
 
     public enum SqCapablities
     {

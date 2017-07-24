@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Script
 {
+    /* #overrides
+    * Squeeze : true
+    */
+
     #region ingame script start
 
     public static class VRageHash // VRage.Utils.MyUtils + VRage.Utils.MyStringHash cocktail

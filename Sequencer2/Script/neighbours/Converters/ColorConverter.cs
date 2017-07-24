@@ -78,7 +78,6 @@ namespace Script
 
             ColorDict = new Dictionary<string, Color>();
             StringBuilder key = new StringBuilder();
-
             char[] dt = data.ToCharArray();
             int i = 0;
 
@@ -105,7 +104,7 @@ namespace Script
 
         static bool TryParseIntGroup(string str, out Color value)
         {
-            string[] values = str.Split(" \n\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string[] values = str.Split(" ,\n\t".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             try
             {
                 byte[] bytes = values.Select(x => byte.Parse(x)).ToArray();

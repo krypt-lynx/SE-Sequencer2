@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sandbox.ModAPI.Ingame;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,10 @@ namespace Script
 
         public abstract bool Run();
         public abstract string TypeCode();
+        public string DisplayName()
+        {
+            return string.Format("*{0}* {1}-{2}", TypeCode(), id, Name ?? "-");
+        }
 
         public abstract int InstructionsLimit();
     }
@@ -197,13 +202,18 @@ namespace Script
         }
 
         int startInst = 0, endInst = 0, instLimit = 1;
+        string taskName = "";
+
+        IMyGridProgramRuntimeInfo Runtime()
+        {
+            return Program.Current.Runtime;
+        }
 
         void ShowInstructionsAlertIfNeeded()
         {
             if ((endInst - startInst) > instLimit)
             {
-                Log.WriteFormat(LOG_CAT, LogLevel.Error, "\uE056 Task exceeded instructions limit!\n" +
-                    "instructions: {0,5}/{1}", endInst, Program.Current.Runtime.MaxInstructionCount);
+                Log.WriteFormat(LOG_CAT, LogLevel.Error, "\uE056 Task \"{2}\" exceeded instructions limit ({0,5}/{1})!\n", endInst - startInst, instLimit, taskName);
                 endInst = 0;
                 startInst = 0;
                 instLimit = 1;
@@ -212,8 +222,8 @@ namespace Script
          
         public void Run()
         {
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "instructions: {0,5}/{1}", Program.Current.Runtime.CurrentInstructionCount,
-                Program.Current.Runtime.MaxInstructionCount);
+            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "instructions: {0,5}/{1}", Runtime().CurrentInstructionCount,
+                Runtime().MaxInstructionCount);
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "tasks: {0}", string.Join("/", tasks.Select(x => x.Count)));
 
             Queue<Task> taskBuffer = new Queue<Task>();
@@ -224,13 +234,13 @@ namespace Script
             {
                 ShowInstructionsAlertIfNeeded();
                 
-                startInst = Program.Current.Runtime.CurrentInstructionCount;
+                startInst = Runtime().CurrentInstructionCount;
                 Task task = DequeTaskInt();
                 current = task;
 
-                Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "*{0}* {1}-{2}", task.TypeCode(), task.id, task.Name ?? "-");
+                Log.WriteFormat(LOG_CAT, LogLevel.Verbose, task.DisplayName());
                 instLimit = task.InstructionsLimit();
-
+                taskName = task.DisplayName();
                 if (CanStartTask(instLimit))
                 {
                     if (!task.Run())
@@ -245,9 +255,9 @@ namespace Script
                 }
                 current = null;
 
-                endInst = Program.Current.Runtime.CurrentInstructionCount;
+                endInst = Runtime().CurrentInstructionCount;
                 Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "instructions: {0,5}/{1}", endInst,
-                    Program.Current.Runtime.MaxInstructionCount);
+                    Runtime().MaxInstructionCount);
 
             }
 
@@ -259,7 +269,7 @@ namespace Script
 
         public void EnqueueTask(Task task)
         {
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "new {0} {1} task: {2}-{3}", task.priority == -1 ? "pA" : "p" + task.priority.ToString(), task.TypeCode(), task.id, task.Name ?? "-");
+            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "new {0} task: {1}", task.priority == -1 ? "pA" : "p" + task.priority.ToString(), task.DisplayName());
             EnqueueTaskInt(task);
         }
 

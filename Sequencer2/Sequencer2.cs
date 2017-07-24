@@ -80,7 +80,7 @@ namespace Script
         public Program()
         {
             Current = this;
-
+            
             LogLevels();
 
             Log.NewFrame();

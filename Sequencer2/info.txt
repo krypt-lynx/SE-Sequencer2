@@ -1,4 +1,4 @@
-﻿// Sequencer v2.0.1
+﻿// Sequencer v2.0.2
 // http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
 /* 
 
