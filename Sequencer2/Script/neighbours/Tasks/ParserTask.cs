@@ -10,33 +10,30 @@ namespace Script
     #region ingame script start
 
 
-    class ParserTask : FastTask<Tuple<List<SqProgram>, string>>
+    class ParserTask : InterruptibleTask<Tuple<List<SqProgram>, string>>
     {
-        string src;
         Parser parser;
 
 		public ParserTask(string src) : base("ParserTask")
         {
-            this.src = src;
-            parser = new Parser();
-        }
-
-        public override int InstructionsLimit()
-        {
-            return 15000;
+            parser = new Parser(src);
         }
 
         public override bool DoWork()
         {
-            if (parser.Parse(src))
+            bool done = parser.Parse(Timeout);
+            if (done)
             {
-                var validator = new SqValidator();
-                validator.Validate(parser.Programs, SqRequirements.Timer);
+                if (parser.Finalize())
+                {
+                    var validator = new SqValidator();
+                    validator.Validate(parser.Programs, SqRequirements.Timer);
+                }
+
+                result = new Tuple<List<SqProgram>, string>(parser.Programs, parser.ErrorMessage);
             }
 
-            result = new Tuple<List<SqProgram>, string>(parser.Programs, parser.ErrorMessage);
-
-            return true;
+            return done;
         }
     }
 

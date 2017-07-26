@@ -116,9 +116,9 @@ namespace console
 
 
 ";*/
+/*
             owner.CustomData = @"
 @_load
-/start enable_broadcast
 
 @all
 /start light1
@@ -130,7 +130,7 @@ namespace console
 @light1
 /action match ""light 1"" OnOff
 /echo light1 
-#/wait 15
+/wait 15
 /repeat
 
 @light2
@@ -145,6 +145,32 @@ namespace console
 /wait 15
 /repeat
 
+";*/
+owner.CustomData = @"
+@_load
+/echo test
+
+@test
+/stop return
+/text ""Test Result LCD"" ""Testing...""
+/set Rotor Velocity 1
+/wait 10
+/set Rotor Velocity 0
+/text ""Test Result LCD"" ""Done!\nCurrent: ""
+#/test1 Rotor ""Test Result LCD""
+/text match ""Test Result LCD"" true ""\nExpected: 1.085228""
+
+@return
+/stop test 
+/text ""Test Result LCD"" """" 
+/set Rotor Velocity -6 
+/wait 5.1
+/set Rotor Velocity 0 
+#/test1 Rotor ""Test Result LCD"" 
+
+@info
+/listprops ""Sequencer Timer""
+/listactions ""Sequencer Timer""
 ";
 
             Script.Program.FutureOwner = owner;

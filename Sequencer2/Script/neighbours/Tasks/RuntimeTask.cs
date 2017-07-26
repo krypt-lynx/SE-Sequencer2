@@ -10,7 +10,7 @@ namespace Script
     #region ingame script start
 
 
-    class RuntimeTask : FastTask<Stub>
+    class RuntimeTask : YieldTask<bool>
     {
         public const string LOG_CAT = "exe";
 
@@ -69,31 +69,29 @@ namespace Script
             }
         }
 
-        public override int InstructionsLimit()
-        {
-            return 15000; 
-        }
-
-        public override bool DoWork()
+        public override IEnumerator<bool> DoWork()
         {
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Time passed: {0}", timerController.TimePassed());
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Have {0} program(s) to run", scheduledPrograms.Count);
 
-            // LinkedList<>
+
             foreach (var key in new List<string>(scheduledPrograms))
             {
                 var program = Programs[key];
 
                 program.TimeToWait = Math.Max(0, program.TimeToWait - timerController.TimePassed());
                 // attempting to substract passed time from just added task. Can be a problem in future.
-                ExecuteProgram(program);
+                foreach (var stub in ExecuteProgram(program))
+                {
+                    yield return false;
+                }
             }
 
             RetryRegisterPrograms();
 
             ScheduleWaitIfNeeded();
 
-            return true;
+            yield return true;
         }
 
         private void RetryRegisterPrograms()
@@ -108,11 +106,11 @@ namespace Script
             return scheduledPrograms.Count > 0;
         }
 
-        void ExecuteProgram(SqProgram program)
+        IEnumerable<bool> ExecuteProgram(SqProgram program)
         {
             if (program.TimeToWait > TimerController.IgnoreDelayLessThen)
             {
-                return;
+                yield break;
             }
 
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "executing \"{0}\"", program.Name);
@@ -173,6 +171,8 @@ namespace Script
                         program.currentCommand = 0;
                         break;
                 }
+
+                yield return false;
             }
 
             // "else" for condition of while loop
@@ -180,7 +180,7 @@ namespace Script
 
             pause:
 
-            ;
+            yield return true;
         }
 
         public void RegisterPrograms(IEnumerable<SqProgram> programs)
@@ -246,7 +246,7 @@ namespace Script
             }
         }
 
-         public void StopProgram(string arg)
+        public void StopProgram(string arg)
         {
             if (Programs.ContainsKey(arg))
             {
@@ -260,6 +260,16 @@ namespace Script
             {
                 Log.WriteFormat(LOG_CAT, LogLevel.Warning, "attempt to stop unknown program \"{0}\", ignoring", arg);
             }
+        }
+
+        public IEnumerable<string> StoredPrograms()
+        {
+            return Programs.Values.Select(x => x.Name);
+        }
+
+        public IEnumerable<string> Startedrograms()
+        {
+            return scheduledPrograms;
         }
     }
 

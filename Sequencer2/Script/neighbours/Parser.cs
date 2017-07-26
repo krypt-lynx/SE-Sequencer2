@@ -73,15 +73,22 @@ namespace Script
         EntityType entityType = EntityType.Nothing;
         ParserState state;
 
-        public bool Parse(string src)
-        {
-            char[] chars = src.ToCharArray();
 
-            int nextPos = 0;
-            char ch = '\0';
+        char[] chars;
+
+        int nextPos;
+        char ch;
+
+        Dictionary<ParserState, Func<char, ParserState>> transitions;
+
+        public Parser(string src)
+        {
+            chars = src.ToCharArray();
+            nextPos = 0;
+            ch = '\0';
 
             state = ParserState.AwaitingEntity;
-            var transitions = new Dictionary<ParserState, Func<char, ParserState>>{
+            transitions = new Dictionary<ParserState, Func<char, ParserState>>{
                 { ParserState.AwaitingEntity, ProcessAwaitingEntity },
                 { ParserState.InFuncName, ProcessInFuncName },
                 { ParserState.InCommand, ProcessInCommand },
@@ -94,6 +101,10 @@ namespace Script
                 { ParserState.InVarDef, ProcessInVarDef },
                 { ParserState.InVar, ProcessInVar },
             };
+        }
+
+        public bool Parse(Func<bool> timeout)
+        {
 
             while ((state != ParserState.SyntaxError) && (nextPos < chars.Length))
             {
@@ -111,8 +122,18 @@ namespace Script
                 }
 
                 state = transitions[state](ch);
-            }
 
+                if (timeout())
+                {
+                    return false;
+                }                        
+            }
+            return true;
+        }
+
+
+        public bool Finalize()
+        { 
             state = FinalizeParsing(state);
             FinalizeLastFunction();
 

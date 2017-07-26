@@ -90,7 +90,7 @@ namespace Script
                         }
                         else
                         {
-                            errorMessage = string.Format(ErrorMessages.InvalidTypeValue, value, argDef.Type);
+                            errorMessage = string.Format(ErrorMessages.InvalidTypeValue, args[argIndex], argDef.Type);
                             return false;
                         }
 
@@ -110,7 +110,7 @@ namespace Script
                         }
                         else
                         {
-                            errorMessage = string.Format(ErrorMessages.InvalidTypeValue, value, argDef.Type);
+                            errorMessage = string.Format(ErrorMessages.InvalidTypeValue, args[argIndex], argDef.Type);
                             return false;
                         }
                         argIndex++;

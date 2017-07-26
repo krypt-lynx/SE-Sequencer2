@@ -114,8 +114,11 @@ namespace Script
 
         internal static CommandResult Load(IList args)
         {
-            Parser parser = new Parser();
-            if (parser.Parse((string)args[0]))
+
+            Parser parser = new Parser((string)args[0]);
+            parser.Parse(() => false);
+
+            if (parser.Finalize())
             {
                 return new CommandResult { Action = CommandAction.AddMethods, Data = parser.Programs };
             }

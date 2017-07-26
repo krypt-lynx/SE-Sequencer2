@@ -74,8 +74,9 @@ namespace Script
         Scheduler sch;
         RuntimeTask runtime;
 
-        const int major = 2;
-        const int minor = 0;
+        const uint major = 2;
+        const uint minor = 1;
+        const uint patch = 0;
 
         public Program()
         {
@@ -98,6 +99,7 @@ namespace Script
                 { "exec", ExecuteLine },
                 { "parse", ReloadScript },
                 { "reset", ResetState },
+                { "status", ShowStatus },
             };
 
             Initialize();
@@ -107,18 +109,30 @@ namespace Script
             Current = null;
         }
 
+        private void ShowStatus(string obj)
+        {
+            Log.Write("Status:");
+            Log.Write("Sheduller tasks:");
+            foreach (var task in sch.AllTasks())
+            {
+                Log.Write(task.DisplayName());
+            }
+            Log.Write("Stored methods:");
+            foreach (var programName in runtime.StoredPrograms())
+            {
+                Log.WriteFormat("\"{0}\"", programName);
+            }
+            Log.Write("Started methods:");
+            foreach (var programName in runtime.Startedrograms())
+            {
+                Log.WriteFormat("\"{0}\"", programName);
+            }
+        }
+
         private void ReloadScript(string arg)
         {
-            var parse = new ParserTask(Current.Me.CustomData);
-            parse.Done = r =>
-            {
-                if (r.Item1 != null)
-                {
-                    Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing done");
-                    runtime.RegisterPrograms(r.Item1);
-                }
-            };
-            sch.EnqueueTask(parse);
+            ScheduleParse(false);
+            Log.Write("Parsing scheduled"); // force log cleanup
         }
 
         private void ExecuteLine(string arg)
@@ -198,29 +212,35 @@ namespace Script
             if (!string.IsNullOrEmpty(Storage))
             {
                 decoder = new Deserializer(Storage);
-                int mj = 0;
-                int mn = 0;
-
+                uint mj = 0;
+                uint mn = 0;
+                uint ver = 0;
                 try
                 {
-                    mj = decoder.ReadInt();
-                    mn = decoder.ReadInt();
+                    mj = (uint)decoder.ReadInt();
+                    mn = (uint)decoder.ReadInt();
+                    ver = (mj << 20) + (mn << 10);
+
+                    if (ver > 0x200000)
+                    {
+                        ver += (uint)decoder.ReadInt();
+                    } 
                 }
                 catch
                 {
                     mj = 0;
                     mn = 0;
+                    ver = 0;
                 }
 
-                if (mj == major &&
-                    mn == minor)
+                if (ver == (major << 20) + (minor << 10) + patch)
                 {
                     hasStoredData = true;
                 }
                 else
                 {
                     Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}.{1}), skipping state restore", mj, mn);
-                }
+                } 
             }
 
             sch = new Scheduler();
@@ -234,6 +254,11 @@ namespace Script
                     runtime = new RuntimeTask(decoder, timerController);
                     VariablesStorage.Deserialize(decoder);
                     Log.Deserialize(decoder);
+
+                    if (!runtime.StoredPrograms().Any())
+                    {
+                        ScheduleParse(true);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -249,19 +274,27 @@ namespace Script
                 runtime = new RuntimeTask(timerController);
                 VariablesStorage.Clear();
 
-                var parse = new ParserTask(Current.Me.CustomData);
-                parse.Done = r =>
-                {
-                    if (r.Item1 != null)
-                    {
-                        Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing done");
-                        runtime.RegisterPrograms(r.Item1);
-                        runtime.StartProgram("_load", true);
-                    }
-                };
-                sch.EnqueueTask(parse);
+                ScheduleParse(true);
             }
 
+        }
+
+        private void ScheduleParse(bool runLoad)
+        {
+            var parse = new ParserTask(Current.Me.CustomData);
+            parse.Done = r =>
+            {
+                if (r.Item1 != null)
+                {
+                    Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing done");
+                    runtime.RegisterPrograms(r.Item1);
+                    if (runLoad)
+                    {
+                        runtime.StartProgram("_load", true);
+                    }
+                }
+            };
+            sch.EnqueueTask(parse);
         }
 
         public void Save()
@@ -270,8 +303,9 @@ namespace Script
             Log.NewFrame();
 
             var encoder = new Serializer()
-                .Write(major)
-                .Write(minor);
+                .Write((int)major)
+                .Write((int)minor)
+                .Write((int)patch);
 
             timerController.Serialize(encoder);
             runtime.Serialize(encoder);

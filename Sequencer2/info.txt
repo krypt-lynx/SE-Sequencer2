@@ -1,4 +1,4 @@
-﻿// Sequencer v2.0.2
+﻿// Sequencer v2.1.0
 // http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
 /* 
 
@@ -42,9 +42,12 @@ Run Arguments
    reload code from "CustomData" (respects existing variables and executing methods)
  reset 
    reset script state (forces state reset and script parsing)
+ status
+   outputs diagnostic information
  anything starting with "/" will considered as code and executed as "exec code"
  
  stuff inside [] is optional
+
 
 Syntax:
 
@@ -55,11 +58,12 @@ Syntax:
  /command %tuple
 
 Commands:
- /run [filter_type] filter argument
- /action [filter_type] filter action
- /set [filter_type] filter property value
- /text [filter_type] filter text [append]
- /transmit [filter_type] filter value [target]
+
+ /run [filter_type] programmable_blocks argument
+ /action [filter_type] blocks action
+ /set [filter_type] blocks property value
+ /text [filter_type] text_panels [append] text
+ /transmit [filter_type] antennas [target] value
 
  /wait seconds
  /waitticks ticks
@@ -79,13 +83,35 @@ Commands:
  stuff inside [] is optional
 
 
-Filter times:
+Filter types:
  Match
  Contains
  Head
  Group
 
-full is guide available there
+ default is Match
+
+Full is guide available there
 http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
+
+
+changelog:
+
+2.1.0
+! order of /transmit and /text arguments is switched
++ "status" argument
++ "Too Complex Exception" presention now actually working. 
+* Invalid type syntax error message fixed
+* script now trying to reparse script it have no parsed code
+
+2.0.2
+* Diagnostic message format
+
+2.0.1
+* color parsing fix
+
+2.0
++ initial release
+
 */
 

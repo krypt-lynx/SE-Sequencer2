@@ -38,14 +38,14 @@ namespace Script
                  new CommandRef("text", new ParamRef[] {
                     new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
-                    new ParamRef (ParamType.String), // value
                     new ParamRef (ParamType.Bool, true, false), // append
+                    new ParamRef (ParamType.String), // value
                 }, Text),
                 new CommandRef("transmit", new ParamRef[] {
                     new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
-                    new ParamRef (ParamType.String), // value
                     new ParamRef (ParamType.String, true, "default"), // MyTransmitTarget
+                    new ParamRef (ParamType.String), // value
                 }, Transmit),
             };
         }
@@ -189,20 +189,25 @@ namespace Script
             BlockSelector.GetBlocksOfTypeWithQuery<IMyTextPanel>((MatchingType)args[0], (string)args[1], blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
+            bool append = (bool)args[2];
+            string text = (string)args[3];
+
             foreach (var block in blocks)
             {
-                block.WritePublicText((string)args[2], (bool)args[3]);
+                block.WritePublicText(text, append);
             }
 
             return null;
         }
 
-        public static CommandResult Transmit(IList args)
+        public static CommandResult Transmit(IList args_)
         {
-            ImplLogger.LogImpl("transmit", args);
+            ImplLogger.LogImpl("transmit", args_);
 
-            MatchingType matchingType = (MatchingType)args[0];
-            string filter = (string)args[1];
+            MatchingType matchingType = (MatchingType)args_[0];
+            string filter = (string)args_[1];
+            string targetString = (string)args_[2];
+            string message = (string)args_[3];
 
             List<IMyTerminalBlock> antennas = new List<IMyTerminalBlock>();
 
@@ -210,7 +215,7 @@ namespace Script
             BlockSelector.GetBlocksOfTypeWithQuery<IMyRadioAntenna>(matchingType, filter, radioAntennas);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", radioAntennas.Count);
 
-            //----------get most powerful radio antenna
+            //get most powerful radio antenna
             IMyRadioAntenna mostPowerfulAntenna = null;
 
             //get radio antenna with longest radius that's enabled and broadcasting
@@ -230,8 +235,8 @@ namespace Script
 
             //--------get all laser antennas
             List<IMyLaserAntenna> laserAntennas = new List<IMyLaserAntenna>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyLaserAntenna>((MatchingType)args[0], filter, laserAntennas);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", radioAntennas.Count);
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyLaserAntenna>(matchingType, filter, laserAntennas);
+            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", laserAntennas.Count);
 
             foreach (IMyLaserAntenna antenna in laserAntennas)
             {
@@ -245,7 +250,7 @@ namespace Script
             if (antennas.Count != 0)
             {
                 var transmitter = new Transmitter(antennas);
-                transmitter.Transmit((string)args[2], (string)args[3]);
+                transmitter.Transmit(message, targetString);
             }
             else
             {

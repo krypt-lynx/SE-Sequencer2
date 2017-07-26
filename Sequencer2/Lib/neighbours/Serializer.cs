@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace Script
 {
-    /* #overrides
-    * Squeeze : true
-    */
-
     #region ingame script start
 
     // I don't want to write serializetion also! Lets try to use half measures...

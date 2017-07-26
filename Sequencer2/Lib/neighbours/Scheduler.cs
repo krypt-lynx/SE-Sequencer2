@@ -47,14 +47,10 @@ namespace Script
         protected void DoDone()
         {
             EndWork();
-            if (Done != null)
-            {
-                Done(result);
-            }
+            Done?.Invoke(result);
         }
     }
 
-    /* not used
     abstract class InterruptibleTask<T> : Task<T>
     {
 
@@ -86,8 +82,54 @@ namespace Script
             return int.MaxValue;
         }
     }
-    */
 
+    abstract class YieldTask<T> : Task
+    {
+        public Action Done;
+        IEnumerator<T> work;
+
+        public YieldTask(string name = null) : base(name) { }
+
+        internal bool Timeout()
+        {
+            return Program.Current.Runtime.CurrentInstructionCount > (Program.Current.Runtime.MaxInstructionCount - Scheduler.TASK_END_LIMIT);
+        }
+
+        public override bool Run()
+        {
+            if (work == null)
+            {
+                work = DoWork();
+            }
+
+            bool done = false;
+
+            while (!Timeout() && !done)
+            {
+                done = !work.MoveNext();
+            }
+
+            if (done)
+            {
+                work = null;
+                Done?.Invoke();
+            }
+
+            return done;
+        }
+
+        abstract public IEnumerator<T> DoWork();
+
+        public override string TypeCode()
+        {
+            return "INY";
+        }
+
+        public override int InstructionsLimit()
+        {
+            return int.MaxValue;
+        }
+    }
 
     abstract class FastTask<T> : Task<T>
     {
@@ -188,12 +230,12 @@ namespace Script
 
         internal bool CanStartTask(int limit)
         {
-            return limit < Program.Current.Runtime.MaxInstructionCount - Program.Current.Runtime.CurrentInstructionCount - TASK_END_LIMIT;
+            return limit + TASK_END_LIMIT < Program.Current.Runtime.MaxInstructionCount - Program.Current.Runtime.CurrentInstructionCount;
         }
 
         internal bool Timeout()
         {
-            return Program.Current.Runtime.CurrentInstructionCount > (Program.Current.Runtime.MaxInstructionCount - SCHEDULLER_START_LIMIT);
+            return SCHEDULLER_START_LIMIT > Program.Current.Runtime.MaxInstructionCount - Program.Current.Runtime.CurrentInstructionCount;
         }
 
         public bool HasTasks()
@@ -305,6 +347,11 @@ namespace Script
             }
             task.IsEnqueued = true;
             tasks[task.priority].Add(task);
+        }
+
+        public List<Task> AllTasks()
+        {
+            return tasks.SelectMany(x => x).ToList();
         }
     }
 
