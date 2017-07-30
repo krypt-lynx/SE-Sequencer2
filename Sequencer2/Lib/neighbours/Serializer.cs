@@ -59,7 +59,7 @@ namespace Script
         }
     }
 
-    public class Deserializer
+    public class Deserializer : IDisposable
     {
 
         private string data;
@@ -135,6 +135,13 @@ namespace Script
             e.MoveNext();
 
             return str.ToString();
+        }
+
+        public void Dispose()
+        {
+            e.Dispose();
+            e = null;
+            data = null;
         }
     }
 

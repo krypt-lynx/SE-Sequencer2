@@ -111,6 +111,7 @@ namespace Script
 
             if (done)
             {
+                work.Dispose();
                 work = null;
                 Done?.Invoke();
             }

@@ -94,7 +94,7 @@ namespace Script
             paramsRouter.UnknownCase = UnknownCommand;
             paramsRouter.Cases = new Dictionary<string, Action<string>>
             {
-                { "start", RunProgram },
+                { "start", StartProgram },
                 { "stop", StopProgram },
                 { "exec", ExecuteLine },
                 { "parse", ReloadScript },
@@ -149,14 +149,14 @@ namespace Script
                     prog.Commands.Add(new SqCommand { Cmd = "unload", Args = new object[] { tempName }, Impl = ExecFlowCommandImpl.Unload }); // todo:
                     prog.Name = tempName;
                     runtime.RegisterPrograms(new SqProgram[] { prog });
-                    RunProgram(tempName);
+                    StartProgram(tempName);
                 }
 
             };
             sch.EnqueueTask(parse);
         }
 
-        private void RunProgram(string arg)
+        private void StartProgram(string arg)
         {
             if (runtime != null)
             {
@@ -214,22 +214,20 @@ namespace Script
                 decoder = new Deserializer(Storage);
                 uint mj = 0;
                 uint mn = 0;
+                uint pt = 0;
                 uint ver = 0;
                 try
                 {
                     mj = (uint)decoder.ReadInt();
                     mn = (uint)decoder.ReadInt();
-                    ver = (mj << 20) + (mn << 10);
-
-                    if (ver > 0x200000)
-                    {
-                        ver += (uint)decoder.ReadInt();
-                    } 
+                    pt = (uint)decoder.ReadInt();
+                    ver = (mj << 20) + (mn << 10) + pt;
                 }
                 catch
                 {
                     mj = 0;
                     mn = 0;
+                    pt = 0;
                     ver = 0;
                 }
 
@@ -239,8 +237,8 @@ namespace Script
                 }
                 else
                 {
-                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}.{1}), skipping state restore", mj, mn);
-                } 
+                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}.{1}.{2}), skipping state restore", mj, mn, pt);
+                }
             }
 
             sch = new Scheduler();
@@ -265,6 +263,11 @@ namespace Script
                     hasStoredData = false;
                     Log.WriteFormat(LOG_CAT, LogLevel.Error, "state restoring failed: {0}", e.ToString());
                 }
+            }
+
+            if (decoder != null)
+            {
+                decoder.Dispose();
             }
 
             if (!hasStoredData)
