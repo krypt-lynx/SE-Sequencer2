@@ -61,10 +61,10 @@ namespace Script
 
         Dictionary<string, List<string>> vars = new Dictionary<string, List<string>>();
         List<string> argList = new List<string>();
-        string funcName = "";
-        string entityName = "";
-        string entityValue = "";
-        string escapedValue = "";
+        StringBuilder funcName = new StringBuilder();
+        StringBuilder entityName = new StringBuilder();
+        StringBuilder entityValue = new StringBuilder();
+        StringBuilder escapedValue = new StringBuilder();
 
         int line = 0;
         int column = 0;
@@ -154,7 +154,7 @@ namespace Script
 
                 case ParserState.InArg:
                 case ParserState.InTailArg:
-                    argList.Add(entityValue);
+                    argList.Add(entityValue.ToString());
                     return FinalizeLastEntity() ? state : ParserState.SyntaxError;
 
                 case ParserState.InVar:
@@ -188,7 +188,7 @@ namespace Script
         private ParserState ProcessInFuncName(char ch)
         {
             return TestNameOrWhitespace(ch, () => {
-                funcName += ch;
+                funcName.Append(ch);
                 return ParserState.InFuncName;
             }, () => {
                 return ParserState.AwaitingEntity;
@@ -201,7 +201,7 @@ namespace Script
         private ParserState ProcessInCommand(char ch)
         {
             return TestNameOrWhitespace(ch, () => {
-                entityName += ch;
+                entityName.Append(ch);
                 return ParserState.InCommand;
             }, () => {
                 return ParserState.AwaitingEntity;
@@ -214,7 +214,7 @@ namespace Script
         private ParserState ProcessInVarDef(char ch)
         {
             return TestNameOrWhitespace(ch, () => {
-                entityName += ch;
+                entityName.Append(ch);
                 return ParserState.InVarDef;
             }, () => {
                 return ParserState.AwaitingEntity;
@@ -232,10 +232,10 @@ namespace Script
                 case '\r':
                     return ParserState.InTailArg;
                 case '\n':
-                    argList.Add(entityValue);
+                    argList.Add(entityValue.ToString());
                     return ParserState.AwaitingEntity;
                 default:
-                    entityValue += ch;
+                    entityValue.Append(ch);
                     return ParserState.InTailArg;
             }
         }
@@ -245,12 +245,12 @@ namespace Script
             switch (ch)
             {
                 case '\"':
-                    argList.Add(entityValue);
+                    argList.Add(entityValue.ToString());
                     return ParserState.AwaitingEntity;
                 case '\\':
                     return ParserState.InTextAwaitingEscaped;
                 default:
-                    entityValue += ch;
+                    entityValue.Append(ch);
                     return ParserState.InTextArg;
             }
         }
@@ -264,36 +264,36 @@ namespace Script
                 case '\"':
                 case '?':
                 case '\\':
-                    entityValue += ch;
+                    entityValue.Append(ch);
                     return ParserState.InTextArg;
                 case 'n':
-                    entityValue += '\n';
+                    entityValue.Append('\n');
                     return ParserState.InTextArg;
                 case 'r':
-                    entityValue += '\r';
+                    entityValue.Append('\r');
                     return ParserState.InTextArg;
                 case 't': // I have no idea what the hell Keen's text engine will do with tabulation char :D
-                    entityValue += '\t';
+                    entityValue.Append('\t');
                     return ParserState.InTextArg;
                 case 'a': 
-                    entityValue += '\a';
+                    entityValue.Append('\a');
                     return ParserState.InTextArg;
                 case 'b':
-                    entityValue += '\b';
+                    entityValue.Append('\b');
                     return ParserState.InTextArg;
                 case 'f':
-                    entityValue += '\f';
+                    entityValue.Append('\f');
                     return ParserState.InTextArg;
                 case 'v':
-                    entityValue += '\v';
+                    entityValue.Append('\v');
                     return ParserState.InTextArg;
-                // case 'x': fuck this. Too compex to implement, too unobvious for users. We have \u instead.
+                // case 'x': Too compex to implement, too unobvious for users. We have \u instead.
                 case 'u':
-                    escapedValue = "";
+                    escapedValue.Clear();
                     expectedEscapedSequenceLength = 4;
                     return ParserState.InTextEscapedUnicode;
                 case 'U': // probably does not work because SpaceEngineers uses 2 bytes long chars.
-                    escapedValue = "";
+                    escapedValue.Clear();
                     expectedEscapedSequenceLength = 8;
                     return ParserState.InTextEscapedUnicode;
                 default:
@@ -308,12 +308,12 @@ namespace Script
         {
             if (hexdigits.Contains(ch))
             {
-                escapedValue += ch;
+                escapedValue.Append(ch);
                 if (escapedValue.Length >= expectedEscapedSequenceLength)
                 {
                     uint ucharcode;
-                    uint.TryParse(escapedValue, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out ucharcode);
-                    entityValue += (char)ucharcode;
+                    uint.TryParse(escapedValue.ToString(), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out ucharcode);
+                    entityValue.Append(ucharcode);
                     return ParserState.InTextArg;
                 }
                 else
@@ -323,7 +323,8 @@ namespace Script
             }
             else
             {
-                LastError = string.Format(ErrorMessages.InvalidEscapeSequence, escapedValue + ch);
+                escapedValue.Append(ch);
+                LastError = string.Format(ErrorMessages.InvalidEscapeSequence, escapedValue.ToString());
                 return ParserState.SyntaxError;
             }
         }
@@ -332,12 +333,12 @@ namespace Script
         {
             if (char.IsWhiteSpace(ch))
             {
-                argList.Add(entityValue);
+                argList.Add(entityValue.ToString());
                 return ParserState.AwaitingEntity;
             }
             else
             {
-                entityValue += ch;
+                entityValue.Append(ch);
                 return ParserState.InArg;
             }
         }
@@ -346,7 +347,7 @@ namespace Script
         private ParserState ProcessInVar(char ch)
         {
             return TestNameOrWhitespace(ch, () => {
-                entityValue += ch;
+                entityValue.Append(ch);
                 return ParserState.InVar;
             }, () =>
             {
@@ -367,9 +368,9 @@ namespace Script
 
         private bool TryAppendArgs()
         {
-            if (vars.ContainsKey(entityValue))
+            if (vars.ContainsKey(entityValue.ToString()))
             {
-                argList.AddList(vars[entityValue]);
+                argList.AddList(vars[entityValue.ToString()]);
                 return true;
             }
             else
@@ -401,8 +402,8 @@ namespace Script
                         return ParserState.SyntaxError;
                     }
                     FinalizeLastFunction();
-                    entityName = "";
-                    funcName = "";
+                    entityName.Clear();
+                    funcName.Clear();
                     return ParserState.InFuncName;
                 case '#':
                     return ParserState.InComment;
@@ -413,7 +414,7 @@ namespace Script
                         return ParserState.SyntaxError;
                     }
                     entityType = EntityType.Var;
-                    entityName = "";
+                    entityName.Clear();
                     argList.Clear();
                     return ParserState.InVarDef;
                 case '/':
@@ -423,16 +424,16 @@ namespace Script
                         return ParserState.SyntaxError;
                     }
                     entityType = EntityType.Command;
-                    entityName = "";
+                    entityName.Clear();
                     argList.Clear();
                     return ParserState.InCommand;
                 case '$':
-                    entityValue = "";
+                    entityValue.Clear();
                     return ParserState.InVar;
                 case ':':
                     if (TestHasEntity())
                     {
-                        entityValue = "";
+                        entityValue.Clear();
                         return ParserState.InTailArg;
                     }
                     else
@@ -443,7 +444,7 @@ namespace Script
                 case '\"':
                     if (TestHasEntity())
                     {
-                        entityValue = "";
+                        entityValue.Clear();
                         return ParserState.InTextArg;
                     }
                     else
@@ -460,7 +461,8 @@ namespace Script
                     {
                         if (TestHasEntity())
                         {
-                            entityValue = ch.ToString();
+                            entityValue.Clear();
+                            entityValue.Append(ch);
                             return ParserState.InArg;
                         }
                         else
@@ -474,7 +476,7 @@ namespace Script
 
         private void FinalizeLastFunction()
         {
-            programs.Add(new SqProgram(funcName, commands));
+            programs.Add(new SqProgram(funcName.ToString(), commands));
             commands = new List<SqCommand>();
         }
 
@@ -494,11 +496,11 @@ namespace Script
 
         private bool FinalizeCommand()
         {
-            if (!string.IsNullOrEmpty(entityName))
+            if (entityName.Length != 0)
             {
                 SqCommand cmd;
                 string errmsg;
-                if (SqCommandBuilder.TryCreateCommand(entityName, argList, out cmd, out errmsg))
+                if (SqCommandBuilder.TryCreateCommand(entityName.ToString(), argList, out cmd, out errmsg))
                 {
                     commands.Add(cmd);
                 }
@@ -513,16 +515,16 @@ namespace Script
 
         private bool FinalizeVarDef()
         {
-            if (!string.IsNullOrEmpty(entityName))
+            if (entityName.Length != 0)
             {
-                vars[entityName] = new List<string>(argList);
+                vars[entityName.ToString()] = new List<string>(argList);
             }
             return true;
         }
 
         bool TestHasEntity()
         {
-            if (string.IsNullOrEmpty(entityName))
+            if (entityName.Length == 0)
             {
                 //ReportException("Command expected");
                 return false;
