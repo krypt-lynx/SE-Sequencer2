@@ -1,4 +1,4 @@
-﻿// Sequencer v2.1.0
+﻿// Sequencer v2.1.1
 // http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
 /* 
 
@@ -96,6 +96,9 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 
 
 changelog:
+
+2.1.1
+* bugixes and optimizations
 
 2.1.0
 ! order of /transmit and /text arguments is switched
