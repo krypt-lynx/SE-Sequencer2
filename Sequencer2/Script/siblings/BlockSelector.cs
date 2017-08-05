@@ -15,7 +15,8 @@ namespace Script
         Match,
         Contains,
         Head,
-        Group
+        Group,
+        Type,
     }
 
     class BlockSelector
@@ -48,6 +49,11 @@ namespace Script
                             List<T> gBlocks = new List<T>();
                             group.GetBlocksOfType<T>(blocks);
                         }
+                        return;
+                    }
+                case MatchingType.Type:
+                    {
+                        Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x. .StartsWith(query));
                         return;
                     }
             }

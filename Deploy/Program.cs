@@ -139,7 +139,7 @@ namespace Publish
             foreach (var root in rootPaths)
             {
                 Console.WriteLine(new string(' ', logOffset) + root);
-                var files = Directory.EnumerateFiles(root + "neighbours/", "*.cs", SearchOption.AllDirectories);
+                var files = Directory.EnumerateFiles(root + "siblings/", "*.cs", SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
                     Console.Write(new string(' ', logOffset * 2) + file);

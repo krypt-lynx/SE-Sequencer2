@@ -86,8 +86,8 @@
   <ItemGroup>
     <Compile Include="Console2.cs" />
     <Compile Include="ConsoleFunctions.cs" />
-    <Compile Include="Lib\neighbours\ExtraLinq.cs" />
-    <Compile Include="Lib\neighbours\VRageHash.cs" />
+    <Compile Include="Lib\siblings\ExtraLinq.cs" />
+    <Compile Include="Lib\siblings\VRageHash.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -95,28 +95,28 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Script\neighbours\Commands\ApiCommandImpl.cs" />
-    <Compile Include="Script\neighbours\Commands\ImplLogger.cs" />
-    <Compile Include="Script\neighbours\Commands\DebugCommandImpl.cs" />
-    <Compile Include="Script\neighbours\Commands\TestCommandImpl.cs" />
-    <Compile Include="Script\neighbours\Converters\ColorConverter.cs" />
-    <Compile Include="Lib\neighbours\Serializer.cs" />
-    <Compile Include="Script\neighbours\Tasks\RuntimeTask.cs" />
-    <Compile Include="Script\neighbours\Commands\ExecFlowCommandImpl.cs" />
-    <Compile Include="Script\neighbours\BlockSelector.cs" />
-    <Compile Include="Script\neighbours\Commands\Commands.cs" />
-    <Compile Include="Lib\neighbours\Keeeen.cs" />
-    <Compile Include="Script\neighbours\Parser.cs" />
-    <Compile Include="Lib\neighbours\Scheduler.cs" />
-    <Compile Include="Lib\neighbours\Log.cs" />
-    <Compile Include="Script\neighbours\SqValidator.cs" />
-    <Compile Include="Lib\neighbours\Stub.cs" />
-    <Compile Include="Script\neighbours\SqProgram.cs" />
-    <Compile Include="Script\neighbours\ParamsRouter.cs" />
-    <Compile Include="Script\neighbours\TimerController.cs" />
-    <Compile Include="Script\neighbours\Transmitter.cs" />
-    <Compile Include="Script\neighbours\Converters\ListConverter.cs" />
-    <Compile Include="Script\neighbours\VariablesStorage.cs" />
+    <Compile Include="Script\siblings\Commands\ApiCommandImpl.cs" />
+    <Compile Include="Script\siblings\Commands\ImplLogger.cs" />
+    <Compile Include="Script\siblings\Commands\DebugCommandImpl.cs" />
+    <Compile Include="Script\siblings\Commands\TestCommandImpl.cs" />
+    <Compile Include="Script\siblings\Converters\ColorConverter.cs" />
+    <Compile Include="Lib\siblings\Serializer.cs" />
+    <Compile Include="Script\siblings\Tasks\RuntimeTask.cs" />
+    <Compile Include="Script\siblings\Commands\ExecFlowCommandImpl.cs" />
+    <Compile Include="Script\siblings\BlockSelector.cs" />
+    <Compile Include="Script\siblings\Commands\Commands.cs" />
+    <Compile Include="Lib\siblings\Keeeen.cs" />
+    <Compile Include="Script\siblings\Parser.cs" />
+    <Compile Include="Lib\siblings\Scheduler.cs" />
+    <Compile Include="Lib\siblings\Log.cs" />
+    <Compile Include="Script\siblings\SqValidator.cs" />
+    <Compile Include="Lib\siblings\Stub.cs" />
+    <Compile Include="Script\siblings\SqProgram.cs" />
+    <Compile Include="Script\siblings\ParamsRouter.cs" />
+    <Compile Include="Script\siblings\TimerController.cs" />
+    <Compile Include="Script\siblings\Transmitter.cs" />
+    <Compile Include="Script\siblings\Converters\ListConverter.cs" />
+    <Compile Include="Script\siblings\VariablesStorage.cs" />
     <Compile Include="Sequencer2.cs" />
     <Compile Include="TestEnv\Blocks\TestBatteryBlock.cs" />
     <Compile Include="TestEnv\Blocks\TestProgrammableBlock.cs" />
@@ -131,7 +131,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Script\neighbours\Tasks\ParserTask.cs" />
+    <Compile Include="Script\siblings\Tasks\ParserTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
