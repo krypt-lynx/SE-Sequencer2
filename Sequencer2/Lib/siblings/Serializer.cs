@@ -6,48 +6,62 @@ using System.Threading.Tasks;
 
 namespace Script
 {
+    // check git history for unminified version
+
+    /* #override
+     * Squeeze: true
+     */
+
     #region ingame script start
+
 
     // I don't want to write serializetion also! Lets try to use half measures...
 
+
+    class C
+    {
+        public static System.Globalization.CultureInfo I = System.Globalization.CultureInfo.InvariantCulture;
+    }
+
     public class Serializer
     {
-        StringBuilder data = new StringBuilder();
+        StringBuilder d = new StringBuilder();
+        
 
-        public Serializer Write(int value)
+        public Serializer Write(int v)
         {
-            data.Append('i')
-                .Append(value.ToString(System.Globalization.CultureInfo.InvariantCulture))
-                .Append(';');
+            d.Append('i')
+             .Append(v.ToString(C.I))
+             .Append(';');
 
             return this;
         }
 
-        public Serializer Write(string value)
+        public Serializer Write(string v)
         {
-            data.Append('s')
-                .Append(value.Length.ToString(System.Globalization.CultureInfo.InvariantCulture))
-                .Append(',')
-                .Append(value.ToString(System.Globalization.CultureInfo.InvariantCulture))
-                .Append(';');
+            d.Append('s')
+             .Append(v.Length.ToString(C.I))
+             .Append(',')
+             .Append(v.ToString(C.I))
+             .Append(';');
 
             return this;
         }
 
-        public Serializer Write(bool value)
+        public Serializer Write(bool v)
         {
-            data.Append('b')
-                .Append(value.ToString())
-                .Append(';');
+            d.Append('b')
+             .Append(v.ToString(C.I))
+             .Append(';');
 
             return this;
         }
 
-        public Serializer Write(double value)
+        public Serializer Write(double v)
         {
-            data.Append('d')
-                .Append(value.ToString(System.Globalization.CultureInfo.InvariantCulture))
-                .Append(';');
+            d.Append('d')
+             .Append(v.ToString(C.I))
+             .Append(';');
 
             return this;
         }
@@ -55,93 +69,92 @@ namespace Script
 
         public override string ToString()
         {
-            return data.ToString();
+            return d.ToString();
         }
     }
 
     public class Deserializer : IDisposable
     {
+        string d;
+        IEnumerator<char> e;
 
-        private string data;
-        private IEnumerator<char> e;
-
-        public Deserializer(string data)
+        public Deserializer(string s)
         {
-            this.data = data; 
-            e = data.GetEnumerator();
+            d = s; 
+            e = s.GetEnumerator();
         }
 
-        private void TestType(char type)
+        void T(char t) // TestType
         {
-            if (!e.MoveNext() || e.Current != type)
+            if (!e.MoveNext() || e.Current != t)
             {
                 throw new InvalidFormatException();
             }
         }
 
-        private StringBuilder ReadValue(char type)
+        StringBuilder R(char t) // ReadValue
         {
-            TestType(type);
+            T(t);
 
-            StringBuilder str = new StringBuilder();
+            StringBuilder s = new StringBuilder();
             while (e.MoveNext() && e.Current != ';')
             {
-                str.Append(e.Current);
+                s.Append(e.Current);
             }
 
-            return str;
+            return s;
         }
 
         public int ReadInt()
         {
-            StringBuilder str = ReadValue('i');
+            StringBuilder s = R('i');
 
-            return int.Parse(str.ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            return int.Parse(s.ToString(), C.I);
         }
 
 
         public double ReadDouble()
         {
-            StringBuilder str = ReadValue('d');
+            StringBuilder s = R('d');
 
-            return double.Parse(str.ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            return double.Parse(s.ToString(), C.I);
         }
 
         internal bool ReadBool()
         {
-            StringBuilder str = ReadValue('b');
+            StringBuilder s = R('b');
 
-            return bool.Parse(str.ToString());
+            return bool.Parse(s.ToString());
         }
 
         public string ReadString()
         {
-            TestType('s');
+            T('s');
 
-            StringBuilder str = new StringBuilder();
+            StringBuilder s = new StringBuilder();
             while (e.MoveNext() && e.Current != ',')
             {
-                str.Append(e.Current);
+                s.Append(e.Current);
             }
-            int len = int.Parse(str.ToString(), System.Globalization.CultureInfo.InvariantCulture);
+            int l = int.Parse(s.ToString(), C.I);
 
-            str.Clear();
-            while (len > 0 && e.MoveNext())
+            s.Clear();
+            while (l > 0 && e.MoveNext())
             {
-                str.Append(e.Current);
-                len--;
+                s.Append(e.Current);
+                l--;
             }
 
             e.MoveNext();
 
-            return str.ToString();
+            return s.ToString();
         }
 
         public void Dispose()
         {
             e.Dispose();
             e = null;
-            data = null;
+            d = null;
         }
     }
 

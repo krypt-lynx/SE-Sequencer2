@@ -6,59 +6,61 @@ using System.Threading.Tasks;
 
 namespace Script
 {
+    // check git history for unminified version
+
+    /* #override
+     * Squeeze: true
+     */
+
     #region ingame script start
 
     public static class VRageHash // VRage.Utils.MyUtils + VRage.Utils.MyStringHash cocktail
     {
-        static Dictionary<string, int> m_stringToHash = new Dictionary<string, int>();
-        public static readonly int NullOrEmpty;
-
-        static VRageHash()
+        class D : Dictionary<string, int> { }
+        static D m = new D(); // string to hash map
+        public static readonly int NullOrEmpty = C("");
+        
+        public static int GetHash(string s)
         {
-            NullOrEmpty = CalcHash("");
-        }
-
-        public static int GetHash(string str)
-        {
-            int result;
-            if (str == null)
+            int r;
+            if (s == null)
             {
-                result = NullOrEmpty;
+                r = NullOrEmpty;
             }
-            else if (!m_stringToHash.TryGetValue(str, out result))
+            else if (!m.TryGetValue(s, out r))
             {
-                result = CalcHash(str);
-                m_stringToHash.Add(str, result);
+                r = C(s);
+                m.Add(s, r);
             }
 
-            return result;
+            return r;
         }
 
-        private static int HashStep(int value, int hash)
+        static int S(int v, int h) // hash step
         {
-            hash = hash ^ value;
-            hash *= 16777619;
-            return hash;
+            h = h ^ v;
+            h *= 16777619;
+            return h;
         }
 
-        private static int CalcHash(string str)
+        static int C(string s) // calc hash
         {
-            int hash = 0;
+            int h = 0; // hash
 
             //two chars per int32
-            if (str != null)
+            if (s != null)
             {
                 int i = 0;
-                for (; i < str.Length - 1; i += 2)
+                for (; i < s.Length - 1; i += 2)
                 {
-                    hash = HashStep(((int)str[i] << 16) + (int)str[i + 1], hash);
+                    h = S((s[i] << 16) + s[i + 1], h);
                 }
-                if ((str.Length & 1) != 0)
+                if ((s.Length & 1) != 0)
                 {//last char
-                    hash = HashStep((int)str[i], hash);
+                    h = S(s[i], h);
                 }
             }
-            return hash;
+            return h;
         }
     }
 

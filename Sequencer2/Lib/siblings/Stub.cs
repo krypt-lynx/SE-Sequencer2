@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Script
 {
+    /* #override
+     * Squeeze: true
+     */
+
     #region ingame script start
-    sealed class Stub { }
+    class Stub { }
     #endregion // ingame script end
 }

@@ -88,6 +88,7 @@
     <Compile Include="ConsoleFunctions.cs" />
     <Compile Include="Lib\siblings\ExtraLinq.cs" />
     <Compile Include="Lib\siblings\VRageHash.cs" />
+    <Compile Include="Lib\siblings\WatchDog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -95,6 +96,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Script\nested\Commands.cs" />
     <Compile Include="Script\siblings\Commands\ApiCommandImpl.cs" />
     <Compile Include="Script\siblings\Commands\ImplLogger.cs" />
     <Compile Include="Script\siblings\Commands\DebugCommandImpl.cs" />
@@ -152,7 +154,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Lib\nested\" />
-    <Folder Include="Script\nested\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="info.txt" />

@@ -179,6 +179,12 @@ namespace Script
         public int _cycle = 0;
 
         public SqCommand() { }
+        public SqCommand(string cmd, IList args, Func<IList, CommandResult> impl)
+        {
+            Cmd = cmd;
+            Args = args;
+            Impl = impl;
+        }
 
         public SqCommand(Deserializer decoder)
         {

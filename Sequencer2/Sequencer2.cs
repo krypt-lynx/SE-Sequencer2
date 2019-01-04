@@ -61,16 +61,18 @@ namespace Script
 
         //---------------------------------------------
         // Do not report issues if code below is modified
-  
 
 
 
 
+
+        const string LOG_CAT = "gen";
 
         public static MyGridProgram Current;
+
         ParamsRouter paramsRouter;
-        TimerController timerController;       
-         
+        TimerController timerController;
+
         Scheduler sch;
         RuntimeTask runtime;
 
@@ -79,181 +81,82 @@ namespace Script
         const uint patch = 0;
 
         Exception lastException = null;
-        int lastLine = -1;
+
         public Program()
         {
-            var test = Enum.GetValues(typeof(MatchingType)).Cast<MatchingType>();
-
-
-            if (lastException == null)
+            IsolatedRun(() =>
             {
-                try
-                {
-                    Current = this;
+                LogLevels();
 
-                    LogLevels();
+                Log.NewFrame();
 
-                    Log.NewFrame();
+                Log.Write("To recompile sequencer script run the Programable Block with argument \"parse\"");
+                Log.Write("To reset sequencer script run the Programable Block with argument \"reset\"");
 
-                    Log.Write("To recompile sequencer script run the Programable Block with argument \"parse\"");
-                    Log.Write("To reset sequencer script run the Programable Block with argument \"reset\"");
-
-                    paramsRouter = new ParamsRouter();
-
-                    paramsRouter.UnknownCase = UnknownCommand;
-                    paramsRouter.Cases = new Dictionary<string, Action<string>>
-                    { 
+                paramsRouter = new ParamsRouter();
+                paramsRouter.UnknownCase = UnknownCommand;
+                paramsRouter.Cases = new Dictionary<string, Action<string>>
+                    {
                         { "start", StartProgram },
                         { "stop", StopProgram },
                         { "exec", ExecuteLine },
                         { "parse", ReloadScript },
                         { "reset", ResetState },
                         { "status", ShowStatus },
-                        { "ping", Pong },
+                        { "ping", WatchDog.Reply },
                     };
 
-                    Initialize();
+                Initialize();
 
-                    sch.Run();
-
-                    Current = null;
-                }
-                catch (Exception e)
-                {
-                    lastException = e;
-                }
-            }
-
-            if (lastException != null)
-            {
-                EchoException();
-                return;
-            }
-        }
-
-        private void Pong(string arg)
-        {
-            long id;
-
-            if (long.TryParse(arg, out id))
-            {
-                var block = GridTerminalSystem.GetBlockWithId(id);
-                if (block != null)
-                {
-                    block.CustomData = "pong";
-                }
-            }
-        }
-
-        private void EchoException()
-        {
-            Echo("Exception handled!");
-            Echo("Please, make screenshot of this message and report the issue to developer");
-            Echo("To recover recompile the script");
-            Echo(lastException.Message);
-            Echo(lastException.StackTrace);
-            Echo(lastException.Message);
-            Echo("Last Line: " + lastLine.ToString());
-        }
-
-        private void ShowStatus(string obj)
-        {
-            Log.Write("Status:");
-            Log.Write("Sheduller tasks:");
-            foreach (var task in sch.AllTasks())
-            {
-                Log.Write(task.DisplayName());
-            }
-            Log.Write("Stored methods:");
-            foreach (var programName in runtime.StoredPrograms())
-            {
-                Log.WriteFormat("\"{0}\"", programName);
-            }
-            Log.Write("Started methods:");
-            foreach (var programName in runtime.Startedrograms())
-            {
-                Log.WriteFormat("\"{0}\"", programName);
-            }
-        }
-
-        private void ReloadScript(string arg)
-        {
-            ScheduleParse(false);
-            Log.Write("Parsing scheduled"); // force log cleanup
-        }
-
-        private void ExecuteLine(string arg)
-        {
-            var parse = new ParserTask(arg);
-            parse.Done = r =>
-            {
-                SqProgram prog = r.Item1?.FirstOrDefault();
-
-                if (r.Item1 != null)
-                {
-                    string tempName = "_run_" + runtime.GenerateProgramId().ToString();
-
-                    prog.Commands.Add(new SqCommand { Cmd = "unload", Args = new object[] { tempName }, Impl = ExecFlowCommandImpl.Unload }); // todo:
-                    prog.Name = tempName;
-                    runtime.RegisterPrograms(new SqProgram[] { prog });
-                    StartProgram(tempName);
-                }
-
-            };
-            sch.EnqueueTask(parse);
-        }
-
-        private void StartProgram(string arg)
-        {
-            if (runtime != null)
-            {
-                runtime.StartProgram(arg.Trim());
-                if (!runtime.IsEnqueued)
-                {
-                    sch.EnqueueTask(runtime);
-                }
-            }
-            else
-            {
-                Log.Write("Script is not initialized");
-            }
-        }
-
-        private void StopProgram(string arg)
-        {
-            if (runtime != null)
-            {
-                runtime.StopProgram(arg.Trim());
-            }
-            else
-            {
-                Log.Write("Script is not initialized");
-            }
-        }
-
-        private void ResetState(string arg)
-        {
-            Storage = "";
-            Initialize();
-            Log.Write("Script was reseted");
-        }
-
-        private void UnknownCommand(string arg)
-        {
-            if (arg.FirstOrDefault() == '/')
-            {
-                ExecuteLine(arg);
-            }
-            else
-            {
-                Log.WriteFormat(LOG_CAT, LogLevel.Warning, "unknown command recieved \"{0}\"", arg);
-            }
+                sch.Run();
+            });
         }
 
         void Initialize()
         {
-            bool hasStoredData = false;
+            Deserializer decoder = TryInitStorageDecoder();
+            bool hasStoredData = decoder != null;
 
+            sch = new Scheduler();
+            runtime = null;
+
+            if (decoder != null)
+            {
+                try
+                {
+                    timerController = new TimerController(decoder);
+                    runtime = new RuntimeTask(decoder, timerController);
+                    VariablesStorage.Deserialize(decoder);
+                    Log.Deserialize(decoder);
+
+                    if (!runtime.StoredPrograms().Any())
+                    {
+                        ScheduleParse(true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    hasStoredData = false;
+                    Log.WriteFormat(LOG_CAT, LogLevel.Error, "state restoring failed: {0}", e.ToString());
+                }
+                
+                decoder.Dispose();
+            }
+            
+            if (!hasStoredData)
+            {
+                LogLevels();
+                timerController = new TimerController();
+                runtime = new RuntimeTask(timerController);
+                VariablesStorage.Clear();
+
+                ScheduleParse(true);
+            }
+
+        }
+
+        Deserializer TryInitStorageDecoder()
+        {
             Deserializer decoder = null;
 
             if (!string.IsNullOrEmpty(Storage))
@@ -278,55 +181,16 @@ namespace Script
                     ver = 0;
                 }
 
-                if (ver == (major << 20) + (minor << 10) + patch)
+                if (ver != (major << 20) + (minor << 10) + patch)
                 {
-                    hasStoredData = true;
-                }
-                else
-                {
+                    decoder.Dispose();
+                    decoder = null;
+
                     Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}.{1}.{2}), skipping state restore", mj, mn, pt);
                 }
             }
 
-            sch = new Scheduler();
-            runtime = null;
-
-            if (hasStoredData)
-            {
-                try
-                {
-                    timerController = new TimerController(decoder);
-                    runtime = new RuntimeTask(decoder, timerController);
-                    VariablesStorage.Deserialize(decoder);
-                    Log.Deserialize(decoder);
-
-                    if (!runtime.StoredPrograms().Any())
-                    {
-                        ScheduleParse(true);
-                    }
-                }
-                catch (Exception e)
-                {
-                    hasStoredData = false;
-                    Log.WriteFormat(LOG_CAT, LogLevel.Error, "state restoring failed: {0}", e.ToString());
-                }
-            }
-
-            if (decoder != null)
-            {
-                decoder.Dispose();
-            }
-
-            if (!hasStoredData)
-            {
-                LogLevels();
-                timerController = new TimerController();
-                runtime = new RuntimeTask(timerController);
-                VariablesStorage.Clear();
-
-                ScheduleParse(true);
-            }
-
+            return decoder;
         }
 
         private void ScheduleParse(bool runLoad)
@@ -349,48 +213,61 @@ namespace Script
 
         public void Save()
         {
+            IsolatedRun(() =>
+            {
+                Current = this;
+                Log.NewFrame();
+
+                var encoder = new Serializer()
+                    .Write((int)major)
+                    .Write((int)minor)
+                    .Write((int)patch);
+
+                timerController.Serialize(encoder);
+                runtime.Serialize(encoder);
+                VariablesStorage.Shared.Serialize(encoder);
+                Log.Serialize(encoder);
+
+
+                Storage = encoder.ToString();
+
+                Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "instructions: {0,5}/{1}", Runtime.CurrentInstructionCount,
+                    Runtime.MaxInstructionCount);
+            });
+        }
+
+        public void Main(string argument)
+        {
+            IsolatedRun(() =>
+            {
+                Log.NewFrame();
+
+                timerController.Update();
+
+                paramsRouter.Route(argument);
+
+                if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
+                {
+                    sch.EnqueueTask(runtime);
+                }
+
+                if (sch.HasTasks())
+                {
+                    sch.Run();
+                }
+
+                timerController.ContinueWait(sch.HasTasks());
+            });
+        }
+
+        public void IsolatedRun(Action work)
+        {
             if (lastException == null)
             {
                 try
                 {
-                    lastLine = 0;
                     Current = this;
-                    lastLine = 1;
-                    Log.NewFrame();
-                    lastLine = 2;
-
-                    var encoder = new Serializer()
-                        .Write((int)major)
-                        .Write((int)minor)
-                        .Write((int)patch);
-                    lastLine = 3;
-
-                    timerController.Serialize(encoder);
-                    lastLine = 4;
-                    runtime.Serialize(encoder);
-                    lastLine = 5;
-                    VariablesStorage.Shared.Serialize(encoder);
-                    lastLine = 6;
-                    Log.Serialize(encoder);
-                    lastLine = 7;
-
-
-                    Storage = encoder.ToString();
-                    lastLine = 8;
-
-                    Echo((Program.Current == null).ToString());
-                    lastLine = 9;
-
-                    Echo((Program.Current.Runtime == null).ToString());
-                    lastLine = 10;
-
-                    Echo((Program.Current.Runtime.CurrentInstructionCount == 0).ToString());
-                    lastLine = 11;
-
-                    Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "instructions: {0,5}/{1}", Program.Current.Runtime.CurrentInstructionCount,
-                        Program.Current.Runtime.MaxInstructionCount);
-                    lastLine = 12;
-
+                    work();
                     Current = null;
                 }
                 catch (Exception e)
@@ -406,47 +283,14 @@ namespace Script
             }
         }
 
-        const string LOG_CAT = "gen";
-
-        public void Main(string argument)
+        private void EchoException()
         {
-            if (lastException == null)
-            {
-                try
-                {
-                    Current = this;
-
-                    Log.NewFrame();
-
-                    timerController.Update();
-
-                    paramsRouter.Route(argument);
-
-                    if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
-                    {
-                        sch.EnqueueTask(runtime);
-                    }
-
-                    if (sch.HasTasks())
-                    {
-                        sch.Run();
-                    }
-
-                    timerController.ContinueWait(sch.HasTasks());
-
-                    Current = null;
-                }
-                catch (Exception e)
-                {
-                    lastException = e;
-                }
-            }
-
-            if (lastException != null)
-            {
-                EchoException();
-                return;
-            }
+            Echo("Exception handled!");
+            Echo("Please, make screenshot of this message and report the issue to developer");
+            Echo("To recover recompile the script");
+            Echo(lastException.Message);
+            Echo(lastException.StackTrace);
+            Echo(lastException.Message);
         }
 
         #endregion // ingame script end

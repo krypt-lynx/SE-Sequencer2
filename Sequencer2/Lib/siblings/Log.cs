@@ -84,12 +84,10 @@ namespace Script
             WriteInternal(string.Format(format, args));
         }
 
-        /* not used
         public static void WriteLine()
         {
             WriteInternal("");
         }
-        */
 
         private static void WriteInternal(string str)
         {
