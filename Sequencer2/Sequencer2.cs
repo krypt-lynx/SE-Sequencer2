@@ -1,4 +1,4 @@
-﻿#define NotUgly
+#define NotUgly
 #define Simulation
 
 using System;
@@ -78,35 +78,82 @@ namespace Script
         const uint minor = 1;
         const uint patch = 0;
 
+        Exception lastException = null;
+        int lastLine = -1;
         public Program()
         {
-            Current = this;
-            
-            LogLevels();
+            var test = Enum.GetValues(typeof(MatchingType)).Cast<MatchingType>();
 
-            Log.NewFrame();
 
-            Log.Write("To recompile sequencer script run the Programable Block with argument \"parse\"");
-            Log.Write("To reset sequencer script run the Programable Block with argument \"reset\"");
-
-            paramsRouter = new ParamsRouter();
-
-            paramsRouter.UnknownCase = UnknownCommand;
-            paramsRouter.Cases = new Dictionary<string, Action<string>>
+            if (lastException == null)
             {
-                { "start", StartProgram },
-                { "stop", StopProgram },
-                { "exec", ExecuteLine },
-                { "parse", ReloadScript },
-                { "reset", ResetState },
-                { "status", ShowStatus },
-            };
+                try
+                {
+                    Current = this;
 
-            Initialize();
+                    LogLevels();
 
-            sch.Run();
+                    Log.NewFrame();
 
-            Current = null;
+                    Log.Write("To recompile sequencer script run the Programable Block with argument \"parse\"");
+                    Log.Write("To reset sequencer script run the Programable Block with argument \"reset\"");
+
+                    paramsRouter = new ParamsRouter();
+
+                    paramsRouter.UnknownCase = UnknownCommand;
+                    paramsRouter.Cases = new Dictionary<string, Action<string>>
+                    { 
+                        { "start", StartProgram },
+                        { "stop", StopProgram },
+                        { "exec", ExecuteLine },
+                        { "parse", ReloadScript },
+                        { "reset", ResetState },
+                        { "status", ShowStatus },
+                        { "ping", Pong },
+                    };
+
+                    Initialize();
+
+                    sch.Run();
+
+                    Current = null;
+                }
+                catch (Exception e)
+                {
+                    lastException = e;
+                }
+            }
+
+            if (lastException != null)
+            {
+                EchoException();
+                return;
+            }
+        }
+
+        private void Pong(string arg)
+        {
+            long id;
+
+            if (long.TryParse(arg, out id))
+            {
+                var block = GridTerminalSystem.GetBlockWithId(id);
+                if (block != null)
+                {
+                    block.CustomData = "pong";
+                }
+            }
+        }
+
+        private void EchoException()
+        {
+            Echo("Exception handled!");
+            Echo("Please, make screenshot of this message and report the issue to developer");
+            Echo("To recover recompile the script");
+            Echo(lastException.Message);
+            Echo(lastException.StackTrace);
+            Echo(lastException.Message);
+            Echo("Last Line: " + lastLine.ToString());
         }
 
         private void ShowStatus(string obj)
@@ -302,53 +349,104 @@ namespace Script
 
         public void Save()
         {
-            Current = this;
-            Log.NewFrame();
+            if (lastException == null)
+            {
+                try
+                {
+                    lastLine = 0;
+                    Current = this;
+                    lastLine = 1;
+                    Log.NewFrame();
+                    lastLine = 2;
 
-            var encoder = new Serializer()
-                .Write((int)major)
-                .Write((int)minor)
-                .Write((int)patch);
+                    var encoder = new Serializer()
+                        .Write((int)major)
+                        .Write((int)minor)
+                        .Write((int)patch);
+                    lastLine = 3;
 
-            timerController.Serialize(encoder);
-            runtime.Serialize(encoder);
-            VariablesStorage.Shared.Serialize(encoder);
-            Log.Serialize(encoder);
+                    timerController.Serialize(encoder);
+                    lastLine = 4;
+                    runtime.Serialize(encoder);
+                    lastLine = 5;
+                    VariablesStorage.Shared.Serialize(encoder);
+                    lastLine = 6;
+                    Log.Serialize(encoder);
+                    lastLine = 7;
 
 
-            Storage = encoder.ToString();
+                    Storage = encoder.ToString();
+                    lastLine = 8;
 
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "instructions: {0,5}/{1}", Program.Current.Runtime.CurrentInstructionCount,
-                Program.Current.Runtime.MaxInstructionCount);
+                    Echo((Program.Current == null).ToString());
+                    lastLine = 9;
 
-            Current = null;
+                    Echo((Program.Current.Runtime == null).ToString());
+                    lastLine = 10;
+
+                    Echo((Program.Current.Runtime.CurrentInstructionCount == 0).ToString());
+                    lastLine = 11;
+
+                    Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "instructions: {0,5}/{1}", Program.Current.Runtime.CurrentInstructionCount,
+                        Program.Current.Runtime.MaxInstructionCount);
+                    lastLine = 12;
+
+                    Current = null;
+                }
+                catch (Exception e)
+                {
+                    lastException = e;
+                }
+            }
+
+            if (lastException != null)
+            {
+                EchoException();
+                return;
+            }
         }
 
         const string LOG_CAT = "gen";
 
         public void Main(string argument)
         {
-            Current = this;
-
-            Log.NewFrame();
-
-            timerController.Update();
-
-            paramsRouter.Route(argument);
-
-            if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
+            if (lastException == null)
             {
-                sch.EnqueueTask(runtime);
+                try
+                {
+                    Current = this;
+
+                    Log.NewFrame();
+
+                    timerController.Update();
+
+                    paramsRouter.Route(argument);
+
+                    if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
+                    {
+                        sch.EnqueueTask(runtime);
+                    }
+
+                    if (sch.HasTasks())
+                    {
+                        sch.Run();
+                    }
+
+                    timerController.ContinueWait(sch.HasTasks());
+
+                    Current = null;
+                }
+                catch (Exception e)
+                {
+                    lastException = e;
+                }
             }
 
-            if (sch.HasTasks())
+            if (lastException != null)
             {
-                sch.Run();
+                EchoException();
+                return;
             }
-
-            timerController.ContinueWait(sch.HasTasks());
-
-            Current = null;
         }
 
         #endregion // ingame script end

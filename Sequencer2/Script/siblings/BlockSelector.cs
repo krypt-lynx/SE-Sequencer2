@@ -53,7 +53,26 @@ namespace Script
                     }
                 case MatchingType.Type:
                     {
-                        Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x. .StartsWith(query));
+                        string[] parts = query.Split('|').Select(x => x.Trim()).ToArray();
+
+                        bool allTypes = parts[0] == "" || parts[0] == "*";
+                        string type = "My" + parts[0];
+
+                        bool allSubtypes = true;
+                        string subtype = "";
+
+                        if (parts.Length > 1)
+                        {
+                            allSubtypes = parts[1] == "*";
+                            subtype = parts[1];
+                        }
+
+                        Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, block =>
+                        {
+                            return (allTypes || block.GetType().Name == type) &&
+                                   (allSubtypes || block.BlockDefinition.SubtypeName == subtype);
+                        });
+
                         return;
                     }
             }

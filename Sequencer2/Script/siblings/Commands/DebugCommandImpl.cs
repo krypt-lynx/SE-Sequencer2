@@ -33,6 +33,10 @@ namespace Script
                     new ParamRef (ParamType.GroupType, true, MatchingType.Match),
                     new ParamRef (ParamType.String),
                 }, ListActions),
+                new CommandRef("listblocks", new ParamRef[] {
+                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.String),
+                }, ListBlocks),
             };
         }
 
@@ -131,8 +135,9 @@ namespace Script
                             break;
                     }
 
-                    Log.WriteFormat("\"{0}\" of type \"{1}\", current value is \"{2}\"", new object[] { prop.Id, prop.TypeName, value });
+                    Log.WriteFormat("\"{0}\" ({1}) = \"{2}\"", new object[] { prop.Id, prop.TypeName, value });
                 }
+                Log.WriteLine();
             }
 
             return null;
@@ -149,19 +154,44 @@ namespace Script
             List<ITerminalAction> actions = new List<ITerminalAction>();
             foreach (var block in blocks)
             {
-                Log.WriteFormat("Block \"{0}\" of type \"{1}\" contains actions:", new object[] { block.CustomName, block.GetType().Name });
+                Log.WriteFormat("block \"{0}\" of type \"{1}\" have actions:", new object[] { block.CustomName, block.GetType().Name });
 
                 block.GetActions(actions);
 
                 foreach (var action in actions)
                 {
-                    Log.WriteFormat("\"{0}\", description: \"{1}\"", new object[] { action.Id, action.Name });
+                    Log.WriteFormat("\"{0}\": {1}", new object[] { action.Id, action.Name });
                 }
+                Log.WriteLine();
             }
 
             return null;
         }
+
+        private static CommandResult ListBlocks(IList args)
+        {
+            ImplLogger.LogImpl("listactions", args);
+
+            List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>((MatchingType)args[0], (string)args[1], blocks);
+            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+
+
+            Log.Write("TypeName/SubtypeName \"Name\" [IntityId]");
+            Log.WriteLine();
+            foreach (var block in blocks)
+            {
+                Log.WriteFormat("{0}/{1} \"{2}\" [{3}]", new object[] {
+                    block.GetType().Name,
+                    block.BlockDefinition.SubtypeName,
+                    block.CustomName,
+                    block.EntityId} );
+            }
+
+            return null;
+        }
+
     }
- 
+
     #endregion // ingame script end
 }
