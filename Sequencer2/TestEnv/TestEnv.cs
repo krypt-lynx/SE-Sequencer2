@@ -310,9 +310,10 @@ namespace SETestEnv
     {
         private int simInstructionCount = 0;
 
-        public void SetInstructionCount(int count)
+        public void InitNewRun()
         {
-            simInstructionCount = count;
+            simInstructionCount = 0;
+            updateFrequency = updateFrequency & ~updateFrequency;
         }
 
         public int CurrentInstructionCount
@@ -380,16 +381,20 @@ namespace SETestEnv
             }
         }
 
+
+        private UpdateFrequency updateFrequency = UpdateFrequency.None;
         public UpdateFrequency UpdateFrequency
         {
             get
             {
-                throw new NotImplementedException();
+                return updateFrequency;
             }
 
             set
             {
-                throw new NotImplementedException();
+                updateFrequency = value;
+                Console2.ForegroundColor = ConsoleColor.Yellow;
+                Console2.WriteLine("new UpdateFrequency value: {0}", value);                
             }
         }
     }

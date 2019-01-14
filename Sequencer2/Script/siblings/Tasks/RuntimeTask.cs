@@ -17,7 +17,7 @@ namespace Script
         private Dictionary<string, SqProgram> Programs = new Dictionary<string, SqProgram>();
 
         private List<string> scheduledPrograms = new List<string>();
-        private Queue<SqProgram> replecments = new Queue<SqProgram>();
+        private Queue<SqProgram> replacements = new Queue<SqProgram>();
 
         private TimerController timerController;
 
@@ -96,8 +96,8 @@ namespace Script
 
         private void RetryRegisterPrograms()
         {
-            List<SqProgram> temp = new List<SqProgram>(replecments);
-            replecments.Clear();
+            List<SqProgram> temp = new List<SqProgram>(replacements);
+            replacements.Clear();
             RegisterPrograms(temp); // todo: fix messages
         }
 
@@ -190,7 +190,7 @@ namespace Script
                 if (scheduledPrograms.Contains(prog.Name))
                 {
                     Log.WriteFormat(LOG_CAT, LogLevel.Error, "Unable to replace program \"{0}\" because it executing. It will updated after termination", prog.Name);
-                    replecments.Enqueue(prog);
+                    replacements.Enqueue(prog);
                 }
                 else 
                 {
@@ -204,8 +204,7 @@ namespace Script
                     }
                     Programs[prog.Name] = prog;
                 }
-
-            }
+            }            
         }
 
         private void ScheduleWaitIfNeeded()
@@ -223,7 +222,7 @@ namespace Script
             }
         }
 
-        public void StartProgram(string arg, bool silent = false)
+        public bool StartProgram(string arg, bool silent = false)
         {
             if (Programs.ContainsKey(arg))
             {
@@ -231,6 +230,7 @@ namespace Script
                 {
                     Programs[arg].currentCommand = 0;
                     scheduledPrograms.Add(arg);
+                    return true;
                 }
                 else if (!silent)
                 {
@@ -244,6 +244,7 @@ namespace Script
                     Log.WriteFormat(LOG_CAT, LogLevel.Warning, "attempt to start unknown program \"{0}\", ignoring", arg);
                 }
             }
+            return false;
         }
 
         public void StopProgram(string arg)

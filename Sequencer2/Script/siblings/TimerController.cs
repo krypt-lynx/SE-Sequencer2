@@ -110,7 +110,7 @@ namespace Script
             this.delay = 0;
             this.timePassed = 0;
             StopTimer();
-        }
+        }    
     }
 
     #endregion // ingame script end

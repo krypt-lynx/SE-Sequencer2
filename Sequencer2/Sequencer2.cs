@@ -24,7 +24,7 @@ namespace Script
     {
         public override void RunMain(string argument)
         {
-            (this.Runtime as TestGridProgramRuntimeInfo).SetInstructionCount(0);
+            (this.Runtime as TestGridProgramRuntimeInfo).InitNewRun();
             Main(argument, UpdateType.Terminal);
         }
 
@@ -197,7 +197,10 @@ namespace Script
                     runtime.RegisterPrograms(r.Item1);
                     if (runLoad)
                     {
-                        runtime.StartProgram("_load", true);
+                        if (runtime.StartProgram("_load", true))
+                        {
+                            timerController.ScheduleStart(0);
+                        }
                     }
                 }
             };
@@ -217,7 +220,6 @@ namespace Script
                 timerController.Serialize(encoder);
                 runtime.Serialize(encoder);
                 VariablesStorage.Shared.Serialize(encoder);
-
 
                 Storage = encoder.ToString();
 
@@ -245,7 +247,7 @@ namespace Script
                 if (sch.HasTasks())
                 {
                     sch.Run();
-                }                
+                }
             });
         }
 

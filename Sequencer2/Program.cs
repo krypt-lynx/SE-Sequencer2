@@ -146,9 +146,16 @@ namespace console
 /repeat
 
 ";*/
+
+            
 owner.CustomData = @"
 @_load
 /echo test
+/start loop
+
+@loop
+/echo loop
+/repeat
 
 @test
 /stop return
