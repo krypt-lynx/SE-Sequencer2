@@ -8,11 +8,21 @@ using VRageMath;
 
 namespace Script
 {
+    struct ColorEntry
+    {
+        public int match;
+        public string tail;
+        public string src;
+        public uint color;
+    }
+
     #region ingame script start
 
     public static class ColorConverter
     {
         private static Dictionary<string, Color> ColorDict;
+
+      
 
         static ColorConverter()
         {
@@ -23,9 +33,9 @@ namespace Script
                 System.Reflection.BindingFlags.GetProperty |
                 System.Reflection.BindingFlags.Public)
               .Where(x => x.PropertyType == typeof(Color)).ToDictionary(k => k.Name.ToLower(), v => (Color)v.GetValue(null)) ;
+            var map = "abcdefghijklmnopqrstuvwxyz".Select((c, i) => new Tuple<char, int>(c, i)).ToDictionary(t => t.Item1, t => t.Item2);
 
-
-            List<Tuple<int, string, uint>> packed = new List<Tuple<int, string, uint>>();
+            List<ColorEntry> packed = new List<ColorEntry>();
 
             string prev = "";
             StringBuilder data = new StringBuilder();
@@ -35,46 +45,79 @@ namespace Script
 
             foreach (var key in klist)
             {
-                var matchesCount = key.Zip(prev, (l, r) => l == r).TakeWhile(x => x).Count();
+                var matchesCount = key
+                    .Select((x, i) => new Tuple<char, int>(x, i))
+                    .Zip(prev, (l, r) => (l.Item1 == r) && (l.Item2 < 7))
+                    .TakeWhile(x => x)
+                    .Count();
                 prev = key;
                 var tail = key.Substring(matchesCount);
                 var c = ColorDict[key].PackedValue;
-                packed.Add(new Tuple<int, string, uint>(
-                    matchesCount,
-                    tail,
-                    c
-                    ));
+                packed.Add(new ColorEntry {
+                    match = matchesCount,
+                    tail = tail,
+                    src = key,
+                    color = c
+                    });
 
-                data.Append((char)(0xe000 + ((c & 0xFFF000) >> 12)));
-                data.Append((char)(0xe000 + (c & 0x000FFF)));
-                data.Append((char)(0xe000 + matchesCount + (tail.Length << 4)));
-                data.Append(tail);
+           
 
                 // 2296
+                // 2043
             };
 
+            // v1:    1295
+            // v2:    897
+            // v3.-1: 898
+            // v3:    820
+            foreach (var entry in packed)
+            {
+                var first = entry.tail.First() - 'a';
+
+                var ch1 = (char)(0xe000 + ((entry.color & 0xFFF000) >> 12));
+                var ch2 = (char)(0xe000 + (entry.color & 0x000FFF));
+                var ch3 = (char)(0xe000 + first + (entry.match << 5) + (entry.tail.Length << 8));
+                
+                data.Append(ch1);
+                data.Append(ch2);
+                data.Append(ch3);
+                // data.Append(entry.tail);               
+
+
+                var pairs = entry.tail
+                    .Skip(entry.tail.Length % 2)
+                    .Select((c, i) => new Tuple<Char, int>(c, i / 2))
+                    .GroupBy(t => t.Item2, t => t.Item1)
+                    .Select(g => (g.Count() % 2 == 0 ? g : g.Concat('~'.Yield())).ToArray())
+                    .ToArray();
+
+                foreach (var pair in  pairs)
+                {
+                    var ch = (char)(0xe000 + ((pair[0] - 'a') << 6) + (pair[1] - 'a'));
+                 
+                    data.Append(ch);
+                }
+            }
+            
+            //*/
+            /*
+            dddd dmmm llll
+            ^^^^ ^^^^ ^^^^  
             */
+
             
             string data =
-"alicebluentiquewhitequamarinezurebeigeisquelackncheda" +
-"lmonduevioletrownurlywoodcadetbluehartreuseocolateoral" +
-"nflowerbluesilkrimsonyandarkbluecyangoldenrodrayeenk" +
-"hakimagentaolivegreenrangechidredsalmoneagreenlateblue" +
-"grayturquoisevioleteeppinkskyblueimgrayodgerbluefirebrick" +
-"loralwhiteorestgreenuchsiagainsborohostwhiteoldenrodray" +
-"eenyellowhoneydewtpinkindianredgovorykhakilavenderbl" +
-"ushwngreenemonchiffonightbluecoralyangoldenrodyellowraye" +
-"enpinksalmoneagreenkybluelategrayteelblueyellowmegree" +
-"nnenmagentaroonediumaquamarineblueorchidpurpleseagreen" +
-"latebluepringgreenturquoisevioletredidnightbluentcreamstyrose" +
-"occasinnavajowhiteyoldlaceivedrabrangeredchidpaleg" +
-"oldenrodreenturquoisevioletredpayawhipeachpuffruinklum" +
-"owderblueurpleredosybrownyalbluesaddlebrownlmonndybrown" +
-"eagreenshelliennalverkybluelatebluegraynowpringgreent" +
-"eelbluetanealhistleomatourquoisevioletwheatitesmoke" +
-"yellowgreen";
-            // I can trick keens size calculation even more :) 
-            // There is only 26 possible chars; fits into 5 bits. Unicode char can store 12 bits.
+                "" +
+                "" +
+                "" +
+                "" +
+                "" +
+                "" +
+                "" +
+                "" +
+                "" +
+                "";
+                    
 
             ColorDict = new Dictionary<string, Color>();
             StringBuilder key = new StringBuilder();
@@ -83,23 +126,23 @@ namespace Script
 
             while (i < dt.Length)
             {
-                uint hi = (uint)dt[i] - 0xe000; // At 0xe000 Unicode Private Use Area is located. Unicode leaves those chars is as.
-                i++;
-                uint lo = (uint)dt[i] - 0xe000;
-                i++;
-                int match = (dt[i] - 0xe000) % 16;
-                int len = (dt[i] - 0xe000) / 16;
-
+                uint hi = (uint)dt[i++] - 0xe000; // At 0xe000 Unicode Private Use Area is located. Unicode leaves those chars is as.
+                uint lo = (uint)dt[i++] - 0xe000;
+                int match = (dt[i] & 0xE0) >> 5;
+                int len = ((dt[i] & 0xF00) >> 8);
                 key.Remove(match, key.Length - match);
-                while (len > 0)
+
+                i += (len + 1) % 2;
+
+                for (; len > 0; len--)
                 {
-                    i++;
-                    key.Append(dt[i]);
-                    len--;
+                    key.Append((char)(((len % 2 == 1) ? (dt[i++] & 0x1F) : ((dt[i] & 0xFC0) >> 6)) + 'a'));   
                 }
-                i++;
                 ColorDict[key.ToString()] = new Color(0xFF000000 + (hi << 12) + lo);
             }
+            //*/
+            Color test;
+            TryParseColor("Red", out test);
         }
 
         static bool TryParseIntGroup(string str, out Color value)
