@@ -18,50 +18,46 @@ namespace Script
     // I don't want to write serializetion also! Lets try to use half measures...
 
 
-    class C
-    {
-        public static System.Globalization.CultureInfo I = System.Globalization.CultureInfo.InvariantCulture;
-    }
-
     public class Serializer
     {
         StringBuilder d = new StringBuilder();
         
+        void A<T>(T c) { d.Append(c); }
 
         public Serializer Write(int v)
         {
-            d.Append('i')
-             .Append(v.ToString(C.I))
-             .Append(';');
+            A('i');
+            A(v.ToString(C.I));
+            A(';');
 
             return this;
         }
 
         public Serializer Write(string v)
         {
-            d.Append('s')
-             .Append(v.Length.ToString(C.I))
-             .Append(',')
-             .Append(v.ToString(C.I))
-             .Append(';');
+            A('s');
+            A(v.Length.ToString(C.I));
+            A(',');
+            A(v.ToString(C.I));
+            A(';');
 
             return this;
         }
 
         public Serializer Write(bool v)
         {
-            d.Append('b')
-             .Append(v.ToString(C.I))
-             .Append(';');
+            A('b');
+            A(v.ToString(C.I));
+            A(';');
 
             return this;
         }
 
         public Serializer Write(double v)
         {
-            d.Append('d')
-             .Append(v.ToString(C.I))
-             .Append(';');
+            A('d');
+            A(v.ToString(C.I));
+            A(';');
 
             return this;
         }
@@ -96,7 +92,7 @@ namespace Script
         {
             T(t);
 
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
             while (e.MoveNext() && e.Current != ';')
             {
                 s.Append(e.Current);
@@ -107,7 +103,7 @@ namespace Script
 
         public int ReadInt()
         {
-            StringBuilder s = R('i');
+            var s = R('i');
 
             return int.Parse(s.ToString(), C.I);
         }
@@ -115,14 +111,14 @@ namespace Script
 
         public double ReadDouble()
         {
-            StringBuilder s = R('d');
+            var s = R('d');
 
             return double.Parse(s.ToString(), C.I);
         }
 
         internal bool ReadBool()
         {
-            StringBuilder s = R('b');
+            var s = R('b');
 
             return bool.Parse(s.ToString());
         }
@@ -131,7 +127,7 @@ namespace Script
         {
             T('s');
 
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
             while (e.MoveNext() && e.Current != ',')
             {
                 s.Append(e.Current);

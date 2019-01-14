@@ -64,6 +64,22 @@ namespace SETestEnv
             }
         }
 
+        public float MaxInput
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public float MaxOutput
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public float MaxStoredPower
         {
             get

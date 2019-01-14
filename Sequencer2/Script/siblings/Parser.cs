@@ -312,7 +312,7 @@ namespace Script
                 if (escapedValue.Length >= expectedEscapedSequenceLength)
                 {
                     uint ucharcode;
-                    uint.TryParse(escapedValue.ToString(), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out ucharcode);
+                    uint.TryParse(escapedValue.ToString(), System.Globalization.NumberStyles.HexNumber, C.I, out ucharcode);
                     entityValue.Append(ucharcode);
                     return ParserState.InTextArg;
                 }

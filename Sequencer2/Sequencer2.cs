@@ -25,7 +25,7 @@ namespace Script
         public override void RunMain(string argument)
         {
             (this.Runtime as TestGridProgramRuntimeInfo).SetInstructionCount(0);
-            Main(argument);
+            Main(argument, UpdateType.Terminal);
         }
 
 
@@ -68,8 +68,6 @@ namespace Script
 
         const string LOG_CAT = "gen";
 
-        public static MyGridProgram Current;
-
         ParamsRouter paramsRouter;
         TimerController timerController;
 
@@ -77,18 +75,16 @@ namespace Script
         RuntimeTask runtime;
 
         const uint major = 2;
-        const uint minor = 1;
+        const uint minor = 2;
         const uint patch = 0;
 
-        Exception lastException = null;
+        UpdateType paramertizedTypes = (UpdateType)0x1F; // .Terminal | .Trigger | .Antenna | .Mod | .Script;
 
         public Program()
         {
             IsolatedRun(() =>
             {
                 LogLevels();
-
-                Log.NewFrame();
 
                 Log.Write("To recompile sequencer script run the Programable Block with argument \"parse\"");
                 Log.Write("To reset sequencer script run the Programable Block with argument \"reset\"");
@@ -124,10 +120,10 @@ namespace Script
             {
                 try
                 {
+                    Log.Deserialize(decoder);
                     timerController = new TimerController(decoder);
                     runtime = new RuntimeTask(decoder, timerController);
                     VariablesStorage.Deserialize(decoder);
-                    Log.Deserialize(decoder);
 
                     if (!runtime.StoredPrograms().Any())
                     {
@@ -139,10 +135,10 @@ namespace Script
                     hasStoredData = false;
                     Log.WriteFormat(LOG_CAT, LogLevel.Error, "state restoring failed: {0}", e.ToString());
                 }
-                
+
                 decoder.Dispose();
             }
-            
+
             if (!hasStoredData)
             {
                 LogLevels();
@@ -215,18 +211,15 @@ namespace Script
         {
             IsolatedRun(() =>
             {
-                Current = this;
-                Log.NewFrame();
-
                 var encoder = new Serializer()
                     .Write((int)major)
                     .Write((int)minor)
                     .Write((int)patch);
 
+                Log.Serialize(encoder);
                 timerController.Serialize(encoder);
                 runtime.Serialize(encoder);
                 VariablesStorage.Shared.Serialize(encoder);
-                Log.Serialize(encoder);
 
 
                 Storage = encoder.ToString();
@@ -240,7 +233,6 @@ namespace Script
         {
             IsolatedRun(() =>
             {
-                Log.NewFrame();
 
                 timerController.Update();
 
@@ -258,39 +250,6 @@ namespace Script
 
                 timerController.ContinueWait(sch.HasTasks());
             });
-        }
-
-        public void IsolatedRun(Action work)
-        {
-            if (lastException == null)
-            {
-                try
-                {
-                    Current = this;
-                    work();
-                    Current = null;
-                }
-                catch (Exception e)
-                {
-                    lastException = e;
-                }
-            }
-
-            if (lastException != null)
-            {
-                EchoException();
-                return;
-            }
-        }
-
-        private void EchoException()
-        {
-            Echo("Exception handled!");
-            Echo("Please, make screenshot of this message and report the issue to developer");
-            Echo("To recover recompile the script");
-            Echo(lastException.Message);
-            Echo(lastException.StackTrace);
-            Echo(lastException.Message);
         }
 
         #endregion // ingame script end

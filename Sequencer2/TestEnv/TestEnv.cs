@@ -219,6 +219,11 @@ namespace SETestEnv
         {
             throw new NotImplementedException();
         }
+
+        public bool IsSameConstructAs(IMyCubeGrid other)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class TestBlockGroup : IMyBlockGroup
@@ -356,6 +361,35 @@ namespace SETestEnv
             get
             {
                 return new TimeSpan(0, 0, 0, 1);
+            }
+        }
+
+        public int MaxCallChainDepth
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int CurrentCallChainDepth
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public UpdateFrequency UpdateFrequency
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
             }
         }
     }

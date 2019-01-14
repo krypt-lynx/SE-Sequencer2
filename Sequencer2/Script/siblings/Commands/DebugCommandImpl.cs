@@ -47,7 +47,7 @@ namespace Script
             string cat = (string)args[0];
             double level = (double)args[1];
 
-            if (string.IsNullOrEmpty((string)args[0]))
+            if (string.IsNullOrEmpty(cat))
             {
                 Log.Write("LogLevels:");
                 foreach (var kvp in Log.LogLevels)
@@ -93,8 +93,11 @@ namespace Script
         {
             ImplLogger.LogImpl("listprops", args);
 
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
+
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>((MatchingType)args[0], (string)args[1], blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
             List<ITerminalProperty> props = new List<ITerminalProperty>();
@@ -147,8 +150,11 @@ namespace Script
         {
             ImplLogger.LogImpl("listactions", args);
 
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
+
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>((MatchingType)args[0], (string)args[1], blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
             List<ITerminalAction> actions = new List<ITerminalAction>();
@@ -172,8 +178,11 @@ namespace Script
         {
             ImplLogger.LogImpl("listactions", args);
 
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
+
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>((MatchingType)args[0], (string)args[1], blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
 

@@ -4,9 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-/* #override
- * IgnoreFile: true
- */
 namespace Script
 {
 
@@ -23,7 +20,7 @@ namespace Script
                 var block = Program.Current.GridTerminalSystem.GetBlockWithId(id);
                 if (block != null)
                 {
-                    block.CustomData = "pong";
+                    block.CustomData = string.Format("pong {0}", Program.Current.Me.EntityId);
                 }
             }
         }

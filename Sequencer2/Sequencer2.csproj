@@ -51,16 +51,14 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Sandbox.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Spiele\Steam Library\steamapps\common\SpaceEngineers\Bin64\Sandbox.Common.dll</HintPath>
+    <Reference Include="Sandbox.Common">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Sandbox.Game, Version=0.1.6040.30434, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Spiele\Steam Library\steamapps\common\SpaceEngineers\Bin64\Sandbox.Game.dll</HintPath>
+    <Reference Include="Sandbox.Game">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\Sandbox.Game.dll</HintPath>
     </Reference>
     <Reference Include="SpaceEngineers.Game">
-      <HintPath>D:\Spiele\Steam Library\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.Game.dll</HintPath>
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\SpaceEngineers.Game.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -70,22 +68,20 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="VRage.Game, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Spiele\Steam Library\steamapps\common\SpaceEngineers\Bin64\VRage.Game.dll</HintPath>
+    <Reference Include="VRage.Game">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.Game.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Spiele\Steam Library\steamapps\common\SpaceEngineers\Bin64\VRage.Library.dll</HintPath>
+    <Reference Include="VRage.Library">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.Library.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Spiele\Steam Library\steamapps\common\SpaceEngineers\Bin64\VRage.Math.dll</HintPath>
+    <Reference Include="VRage.Math">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\SpaceEngineers\Bin64\VRage.Math.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console2.cs" />
     <Compile Include="ConsoleFunctions.cs" />
+    <Compile Include="Lib\nested\Environment.cs" />
     <Compile Include="Lib\siblings\ExtraLinq.cs" />
     <Compile Include="Lib\siblings\VRageHash.cs" />
     <Compile Include="Lib\siblings\WatchDog.cs" />
@@ -152,9 +148,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Lib\nested\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="info.txt" />
   </ItemGroup>

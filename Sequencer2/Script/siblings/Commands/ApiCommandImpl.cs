@@ -54,13 +54,17 @@ namespace Script
         {
             ImplLogger.LogImpl("run", args);
 
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
+            string argument = (string)args[2];
+
             List<IMyProgrammableBlock> blocks = new List<IMyProgrammableBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyProgrammableBlock>((MatchingType)args[0], (string)args[1], blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyProgrammableBlock>(type, filter, blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
             foreach (var block in blocks)
             {
-                block .TryRun((string)args[2]);
+                block .TryRun(argument);
             }
 
             return null;
@@ -70,11 +74,14 @@ namespace Script
         {
             ImplLogger.LogImpl("action", args);
 
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
+            string action = (string)args[2];
+
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>((MatchingType)args[0], (string)args[1], blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
 
-            string action = (string)args[2];
 
             foreach (var block in blocks)
             {
@@ -97,12 +104,15 @@ namespace Script
         {
             ImplLogger.LogImpl("set", args);
 
-            List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>((MatchingType)args[0], (string)args[1], blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
-
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
             string prop = (string)args[2];
             string value = (string)args[3];
+
+            List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
+            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+
 
             // Boolean
             // StringBuilder
@@ -141,7 +151,7 @@ namespace Script
                         case PropType.Single:
                             {
                                 float s;
-                                if (float.TryParse(value, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out s))
+                                if (float.TryParse(value, System.Globalization.NumberStyles.Number, C.I, out s))
                                 {
                                     block.SetValue(prop, s);
                                 }
@@ -185,12 +195,15 @@ namespace Script
         {
             ImplLogger.LogImpl("text", args);
 
-            List<IMyTextPanel> blocks = new List<IMyTextPanel>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTextPanel>((MatchingType)args[0], (string)args[1], blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
-
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
             bool append = (bool)args[2];
             string text = (string)args[3];
+
+            List<IMyTextPanel> blocks = new List<IMyTextPanel>();
+            BlockSelector.GetBlocksOfTypeWithQuery<IMyTextPanel>(type, filter, blocks);
+            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+
 
             foreach (var block in blocks)
             {
@@ -200,14 +213,14 @@ namespace Script
             return null;
         }
 
-        public static CommandResult Transmit(IList args_)
+        public static CommandResult Transmit(IList args)
         {
-            ImplLogger.LogImpl("transmit", args_);
+            ImplLogger.LogImpl("transmit", args);
 
-            MatchingType matchingType = (MatchingType)args_[0];
-            string filter = (string)args_[1];
-            string targetString = (string)args_[2];
-            string message = (string)args_[3];
+            MatchingType matchingType = (MatchingType)args[0];
+            string filter = (string)args[1];
+            string targetString = (string)args[2];
+            string message = (string)args[3];
 
             List<IMyTerminalBlock> antennas = new List<IMyTerminalBlock>();
 

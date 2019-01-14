@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -144,7 +144,7 @@ namespace Script
                 case ParamType.Double:
                     {
                         double d;
-                        bool success = double.TryParse(value, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out d);
+                        bool success = double.TryParse(value, System.Globalization.NumberStyles.Number, C.I, out d);
                         result = d;
                         return success;
                     }
@@ -335,7 +335,6 @@ namespace Script
                 cmd.Serialize(encoder);
             }
         }
-    }
-
+    } 
     #endregion // ingame script end
 }

@@ -21,7 +21,7 @@ namespace Script
 
     public static class ListConverter
     {
-        delegate bool TryGet(string str, out long value); // TryGet<K, V>
+        delegate bool TryGet(string str, out long value); 
 
         static Dictionary<string, long> flightModes = new Dictionary<string, long> {
             { "patrol", 0 },
@@ -60,7 +60,7 @@ namespace Script
                 return true;
             }
 
-            if (long.TryParse(str, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out value))
+            if (long.TryParse(str, System.Globalization.NumberStyles.Number, C.I, out value))
             {
                 return true;
             }

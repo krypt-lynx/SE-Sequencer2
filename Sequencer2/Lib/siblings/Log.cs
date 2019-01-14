@@ -20,11 +20,10 @@ namespace Script
 
     enum LogLevel
     {
-        None,
+        None = 0,
         Error,
         Warning,
         Verbose,
-        SpamMeToDeath
     }
 
     class Log

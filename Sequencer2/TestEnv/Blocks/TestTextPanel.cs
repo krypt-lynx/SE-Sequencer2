@@ -105,6 +105,71 @@ namespace SETestEnv
 
         public string PrivateTitle { get; set; }
 
+        public float FontSize
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Color FontColor
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Color BackgroundColor
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public float ChangeInterval
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string Font
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public string GetPrivateTitle()
         {
             return PrivateTitle;
@@ -165,6 +230,11 @@ namespace SETestEnv
         }
 
         public void ReadPublicText(StringBuilder buffer, bool append = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetFonts(List<string> fonts)
         {
             throw new NotImplementedException();
         }

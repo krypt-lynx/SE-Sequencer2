@@ -59,5 +59,11 @@ namespace Script
         }
     }
     */
+
+    class C
+    {
+        public static System.Globalization.CultureInfo I = System.Globalization.CultureInfo.InvariantCulture;
+    }
+
     #endregion // ingame script end
 }

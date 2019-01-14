@@ -488,6 +488,27 @@ namespace SETestEnv
             }
         }
 
+        public bool ShowInInventory
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Vector3 ColorMaskHSV
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public TestBlock()
         {
 
@@ -508,6 +529,11 @@ namespace SETestEnv
         }
 
         public IMyInventory GetInventory(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsSameConstructAs(IMyTerminalBlock other)
         {
             throw new NotImplementedException();
         }
