@@ -16,7 +16,6 @@ namespace Script
         public const string LOG_CAT = "tmr";
 
         const float KeensMagicDelay = 0.016f;
-        const float MinTimerDelay = 1f;
         const float PresicionCheckDelay = 0.32f;
         public const float IgnoreDelayLessThen = 0.01f;
 
@@ -40,110 +39,33 @@ namespace Script
             ReinitTimer();
         }
 
-        public TimerController()
-        {
-
-        }
+        public TimerController() { }
 
         void ReinitTimer()
-        {
-            //Log.Write(timePassed);
-            //Log.Write(delay);
+        {        
             if (delay > 0)
             {
-                StartTimer(MinTimerDelay);
-                extraTime = MinTimerDelay;
-
-                Log.Write(LOG_CAT, LogLevel.Verbose, "Timer is recovered after script reload");
-                if (delay < MinTimerDelay)
-                {
-                    Log.Write(LOG_CAT, LogLevel.Warning, "Requared delay is smaller then possible at current point");
-                }
+                Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Update1;
             }
         }
 
-        bool TriggerTimer()
+        void StartTimer()
         {
-            if (Timer != null && Timer.IsFunctional)
-            {
-                Timer.ApplyAction("TriggerNow");
-                return true;
-            }
-            else
-            {
-                Log.Write(LOG_CAT, LogLevel.Error, "No timer or it not functional.");
-                return false;
-            }
+            Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Update1;
         }
 
-        bool StartTimer(float delay)
+        void StopTimer()
         {
-            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Trigger; delay {0}", delay);
-            if (Timer != null && Timer.IsFunctional)
-            {
-                Timer.SetValue("TriggerDelay", delay);
-                Timer.ApplyAction("Start");
-                return true;
-            }
-            else
-            {
-                Log.Write(LOG_CAT, LogLevel.Error, "No timer or it not functional.");
-                return false;
-            }
-        }
-
-        bool StopTimer()
-        {
-            if (Timer != null && Timer.IsFunctional)
-            {
-                Timer.ApplyAction("Stop");
-                return true;
-            }
-            else
-            {
-                Log.Write(LOG_CAT, LogLevel.Error, "No timer or it not functional.");
-                return false;
-            }
+            Program.Current.Runtime.UpdateFrequency = Program.Current.Runtime.UpdateFrequency & ~UpdateFrequency.Update1;
         }
         
-        IMyTimerBlock timer = null;
-
-        public IMyTimerBlock Timer
-        {
-            get
-            {
-                if (timer == null || !timer.IsFunctional)
-                {
-                    List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-                    Program.Current.GridTerminalSystem.GetBlocksOfType<IMyTimerBlock>(blocks, x => x.IsFunctional && x.CustomName == Program.TimerName);
-                    timer = blocks.FirstOrDefault() as IMyTimerBlock;
-                }
-                return timer;
-            }
-        }
-
         public void ScheduleStart(float delay)
         {
             // todo: test /waitticks
 
             this.delay = delay;
             this.timePassed = 0;
-        }
-
-        private void ScheduleStartInternal(bool forceTriggerNow)
-        {
-            /* // Because Keen. There is no way to measure delay in Save(), so, I need to log it each tick.
-            if (!forceTriggerNow && (delay > (MinTimerDelay + PresicionCheckDelay)))
-            {
-                StartTimer(delay - PresicionCheckDelay);
-            }
-            else
-            {
-                TriggerTimer();
-            }
-            */
-
-            TriggerTimer();
+            StartTimer();
         }
 
         public void Update()
@@ -152,30 +74,19 @@ namespace Script
 
             if (firstTick)
             {
-                if ((DateTime.Now - deserializationTime).Seconds < 0.25) // if TriggerNow actually was triggered. Rare thing, but happens
-                {
-                    Log.Write(LOG_CAT, LogLevel.Verbose, "TriggerNow ticked after game load");
-                    extraTime = 1.0f / 60;
-                }
+                extraTime = 1.0f / 60;            
                 firstTick = false;
             }
 
             delay -= (totalSeconds + extraTime);
             timePassed += (totalSeconds + extraTime);
             extraTime = 0;
-            Log.WriteFormat(LOG_CAT, LogLevel.SpamMeToDeath, "Delay now is {0}", delay); // The only idea how to avoid log spamming by timer. I need this data.
+
+            Log.WriteFormat(LOG_CAT, (LogLevel)10, "Delay now is {0}", delay); 
 
             if (delay < IgnoreDelayLessThen)
             {
                 delay = 0;
-            }
-        }
-
-        public void ContinueWait(bool forceTriggerNow)
-        {
-            if (forceTriggerNow || delay >= IgnoreDelayLessThen)
-            {
-                ScheduleStartInternal(forceTriggerNow);
             }
         }
 
@@ -198,6 +109,7 @@ namespace Script
         {
             this.delay = 0;
             this.timePassed = 0;
+            StopTimer();
         }
     }
 

@@ -35,10 +35,7 @@ namespace Script
          */
 
         #region ingame script start
-
-        // Name of the Timer, used by script.
-        public const string TimerName = "Sequencer Timer";
-
+            
         // Logging levels for all used categories. Those values is used if was not overrided using /loglevel command
         private static void LogLevels()
         {
@@ -229,14 +226,16 @@ namespace Script
             });
         }
 
-        public void Main(string argument)
+        public void Main(string argument, UpdateType updateSource)
         {
             IsolatedRun(() =>
             {
-
                 timerController.Update();
 
-                paramsRouter.Route(argument);
+                if ((updateSource | paramertizedTypes) != 0)
+                {
+                    paramsRouter.Route(argument);
+                }
 
                 if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
                 {
@@ -246,9 +245,7 @@ namespace Script
                 if (sch.HasTasks())
                 {
                     sch.Run();
-                }
-
-                timerController.ContinueWait(sch.HasTasks());
+                }                
             });
         }
 
