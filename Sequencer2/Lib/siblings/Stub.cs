@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Script
 {
     /* #override
-     * Squeeze: true
+     * Minify: true
      */
 
     #region ingame script start

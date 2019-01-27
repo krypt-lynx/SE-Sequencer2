@@ -98,7 +98,7 @@ namespace Script
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
             BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            ImplLogger.LogBlocks(blocks);
 
             List<ITerminalProperty> props = new List<ITerminalProperty>();
             foreach (var block in blocks)
@@ -155,7 +155,7 @@ namespace Script
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
             BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            ImplLogger.LogBlocks(blocks);
 
             List<ITerminalAction> actions = new List<ITerminalAction>();
             foreach (var block in blocks)
@@ -176,14 +176,14 @@ namespace Script
 
         private static CommandResult ListBlocks(IList args)
         {
-            ImplLogger.LogImpl("listactions", args);
+            ImplLogger.LogImpl("listblocks", args);
 
             MatchingType type = (MatchingType)args[0];
             string filter = (string)args[1];
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
             BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            ImplLogger.LogBlocks(blocks);
 
 
             Log.Write("TypeName/SubtypeName \"Name\" [IntityId]");

@@ -82,12 +82,6 @@ namespace Script
             return new CommandResult { Action = CommandAction.Stop, Data = (string)args[0] };
         }
 
-        public static CommandResult WaitUntil(IList args)
-        {
-            ImplLogger.LogImpl("waituntil", args);
-            return null;
-        }
-
         internal static CommandResult SetVar(IList args)
         {
             ImplLogger.LogImpl("setvar", args);
@@ -114,7 +108,6 @@ namespace Script
 
         internal static CommandResult Load(IList args)
         {
-
             Parser parser = new Parser((string)args[0]);
             parser.Parse(() => false);
 
@@ -127,7 +120,6 @@ namespace Script
                 Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "exception during parsing: {0}", parser.ErrorMessage);
                 return null;
             }
-
         }
 
         internal static CommandResult Unload(IList args)

@@ -18,12 +18,9 @@ namespace Script
             variables = new Dictionary<string, double>();
 
             int count = decoder.ReadInt();
-            for (int i = 0; i < count; i++)
+            while (count-- > 0)
             {
-                string key = decoder.ReadString();
-                double value = decoder.ReadDouble();
-
-                variables[key] = value;
+                variables[decoder.ReadString()] = decoder.ReadDouble();
             }
         }
 
@@ -33,8 +30,9 @@ namespace Script
 
             foreach (var kvp in variables)
             {
-                encoder.Write(kvp.Key);
-                encoder.Write(kvp.Value);
+                encoder
+                    .Write(kvp.Key)
+                    .Write(kvp.Value);
             }
         }
 

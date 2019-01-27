@@ -9,7 +9,7 @@ namespace Script
     // check git history for unminified version
 
     /* #override
-     * Squeeze: true
+     * Minify: true
      */
 
     #region ingame script start

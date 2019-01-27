@@ -1,4 +1,4 @@
-﻿// Sequencer v2.1.1
+﻿// Sequencer v2.2
 // http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
 /* 
 
@@ -18,14 +18,6 @@ Capabilities:
 
 Installation:
  - Install Programmable block ("Sequencer")
- - Install Timer Block
- - Rename Timer Block to "Sequencer Timer"
- - Set Timer delay to 1 second
- - [recommended] Make in silent
- - Make Timer block to run actions:
-   - Sequencer - "Run" with empty argument
-   - Self - "Trigger Now"
-   - Self - "Start"
  - Load Sequencer v2 script in "Sequencer"
  - Put your code into Custom Data of "Sequencer"
    - Every time then code changed you need to run "Sequencer" with "reset" or "parse" argument
@@ -88,6 +80,7 @@ Filter types:
  Contains
  Head
  Group
+ Type
 
  default is Match
 
@@ -96,6 +89,12 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 
 
 changelog:
+
+2.2
++ "type" filter (experimental)
++ use of builtin pb timer (timer block no longer used)
+* /u character sequence parsing fixed
+* other bugixes and optimizations
 
 2.1.1
 * bugixes and optimizations

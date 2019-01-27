@@ -19,7 +19,7 @@ namespace Publish
                 { Opt.Key.StripEmptyLines, Opt.Value.No },
                 { Opt.Key.TrimComments, Opt.Value.Yes },
                 { Opt.Key.ForceLocalNotImplementedException, Opt.Value.Yes },  // Unaccurate!
-                { Opt.Key.Squeeze, Opt.Value.No } // Very unaccurate!
+                { Opt.Key.Minify, Opt.Value.No } // Very unaccurate!
         });
 
         class Opt
@@ -32,7 +32,7 @@ namespace Publish
                 StripEmptyLines,
                 TrimComments,
                 ForceLocalNotImplementedException,
-                Squeeze,
+                Minify,
                 IgnoreFile
             }
 
@@ -159,10 +159,25 @@ namespace Publish
             int blockEndPos = script.ToString().LastIndexOf("}");
             script = script.Remove(blockEndPos, 1);
 
+           
+        
+            string path = Path.Combine(appRoot, "length.txt");
+            int oldLength = 0;
+            if (File.Exists(path))
+            {
+                var str = File.ReadAllText(path);
+                int.TryParse(str, out oldLength);
+            }
+
+            int dl = script.Length - oldLength;
+            string dlStr = dl >= 0 ? "+" + dl.ToString() : dl.ToString();
 
             Console.WriteLine("Done!");
-            Console.WriteLine("Script length: {0}/100000", script.Length.ToString());
+            Console.WriteLine("Script length: {0}/100000 ({1})", script.Length.ToString(), dlStr);
+            File.WriteAllText(path, script.Length.ToString());
+
             System.Windows.Forms.Clipboard.SetText(script);
+
             Console.ReadKey();
         }
 
@@ -264,7 +279,7 @@ namespace Publish
 
             string scriptPart = string.Join("\n", newLines);
 
-            if (mergedOptions.Allowed(Opt.Key.Squeeze)) // todo: regex
+            if (mergedOptions.Allowed(Opt.Key.Minify)) // todo: regex
             {
                 SqueezeWhitespaces(ref scriptPart, " ");
                 SqueezeWhitespaces(ref scriptPart, "\n");

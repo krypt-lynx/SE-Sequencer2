@@ -59,8 +59,8 @@ namespace Script
             string argument = (string)args[2];
 
             List<IMyProgrammableBlock> blocks = new List<IMyProgrammableBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyProgrammableBlock>(type, filter, blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
+            ImplLogger.LogBlocks(blocks);
 
             foreach (var block in blocks)
             {
@@ -79,8 +79,8 @@ namespace Script
             string action = (string)args[2];
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
+            ImplLogger.LogBlocks(blocks);
 
 
             foreach (var block in blocks)
@@ -110,15 +110,15 @@ namespace Script
             string value = (string)args[3];
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
+            ImplLogger.LogBlocks(blocks);
 
 
             // Boolean
             // StringBuilder
             // Single
-            // Int64 (list item hash, collent key-hash pairs?)
-            // Color (need color parser)
+            // Int64
+            // Color
 
             foreach (var block in blocks)
             {
@@ -201,8 +201,8 @@ namespace Script
             string text = (string)args[3];
 
             List<IMyTextPanel> blocks = new List<IMyTextPanel>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTextPanel>(type, filter, blocks);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
+            ImplLogger.LogBlocks(blocks);
 
 
             foreach (var block in blocks)
@@ -225,8 +225,8 @@ namespace Script
             List<IMyTerminalBlock> antennas = new List<IMyTerminalBlock>();
 
             List<IMyRadioAntenna> radioAntennas = new List<IMyRadioAntenna>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyRadioAntenna>(matchingType, filter, radioAntennas);
-            Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", radioAntennas.Count);
+            BlockSelector.GetBlocksOfTypeWithQuery(matchingType, filter, radioAntennas);
+            ImplLogger.LogBlocks(antennas);
 
             //get most powerful radio antenna
             IMyRadioAntenna mostPowerfulAntenna = null;
@@ -248,7 +248,7 @@ namespace Script
 
             //--------get all laser antennas
             List<IMyLaserAntenna> laserAntennas = new List<IMyLaserAntenna>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyLaserAntenna>(matchingType, filter, laserAntennas);
+            BlockSelector.GetBlocksOfTypeWithQuery(matchingType, filter, laserAntennas);
             Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Verbose, "{0} block(s) found", laserAntennas.Count);
 
             foreach (IMyLaserAntenna antenna in laserAntennas)
@@ -282,6 +282,9 @@ namespace Script
                         break;
                     case MatchingType.Group:
                         warning = string.Format("No antennas in group \"{0}\" are currently able to transmit.", filter);
+                        break;
+                    case MatchingType.Type:
+                        warning = string.Format("No antennas of type \"{0}\" are currently able to transmit.", filter);
                         break;
                 }
 

@@ -53,7 +53,7 @@ namespace Script
                     }
                 case MatchingType.Type:
                     {
-                        string[] parts = query.Split('|').Select(x => x.Trim()).ToArray();
+                        string[] parts = query.Split("|/:, ".ToCharArray()).Select(x => x.Trim()).ToArray();
 
                         bool allTypes = parts[0] == "" || parts[0] == "*";
                         string type = "My" + parts[0];
@@ -67,7 +67,7 @@ namespace Script
                             subtype = parts[1];
                         }
 
-                        Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, block =>
+                        Program.Current.GridTerminalSystem.GetBlocksOfType(blocks, block =>
                         {
                             return (allTypes || block.GetType().Name == type) &&
                                    (allSubtypes || block.BlockDefinition.SubtypeName == subtype);

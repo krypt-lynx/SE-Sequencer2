@@ -19,6 +19,11 @@ namespace Script
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "/{0}", name);
             Log.Write(LOG_CAT, LogLevel.Verbose, string.Join(" ", args.Cast<object>().Select(x => string.Format("\"{0}\"", x.ToString().Replace("\"", "\"\"")))));
         }
+
+        public static void LogBlocks(IList blocks)
+        {
+            Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+        }
     }
 
     #endregion // ingame script end

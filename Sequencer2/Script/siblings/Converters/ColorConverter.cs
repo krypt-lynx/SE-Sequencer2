@@ -15,18 +15,19 @@ namespace Script
         public string src;
         public uint color;
     }
-
+    /* #override
+     * Minify: true
+     */
     #region ingame script start
 
     public static class ColorConverter
     {
-        private static Dictionary<string, Color> ColorDict;
+        private static Dictionary<string, Color> Colors;
 
       
 
         static ColorConverter()
-        {
-            /*
+        {   /*
             // Generator
 
             ColorDict = typeof(Color).GetProperties(System.Reflection.BindingFlags.Static |
@@ -99,14 +100,16 @@ namespace Script
                 }
             }
             
-            //*/
-            /*
-            dddd dmmm llll
-            ^^^^ ^^^^ ^^^^  
+                        
+            // 70331/100000
+            // 69964/100000
+
+            // dddd dmmm llll
+            // ^^^^ ^^^^ ^^^^  
             */
 
-            
-            string data =
+
+            var dt = (
                 "" +
                 "" +
                 "" +
@@ -116,33 +119,26 @@ namespace Script
                 "" +
                 "" +
                 "" +
-                "";
-                    
+                ""
+                    ).Select(x => (uint)x & 0xFFF).ToArray();
 
-            ColorDict = new Dictionary<string, Color>();
-            StringBuilder key = new StringBuilder();
-            char[] dt = data.ToCharArray();
+            Colors = new Dictionary<string, Color>();
+            StringBuilder k = new StringBuilder();
             int i = 0;
 
             while (i < dt.Length)
             {
-                uint hi = (uint)dt[i++] - 0xe000; // At 0xe000 Unicode Private Use Area is located. Unicode leaves those chars is as.
-                uint lo = (uint)dt[i++] - 0xe000;
-                int match = (dt[i] & 0xE0) >> 5;
-                int len = ((dt[i] & 0xF00) >> 8);
-                key.Remove(match, key.Length - match);
-
-                i += (len + 1) % 2;
-
-                for (; len > 0; len--)
+                uint c = 0xFF000000 + (dt[i++] << 12) + dt[i++];
+                int m = (int)(dt[i] & 0xE0) >> 5;
+                int l = (int)dt[i] >> 8;
+                k.Remove(m, k.Length - m);
+                
+                for (i += (l + 1) % 2; l > 0; l--)
                 {
-                    key.Append((char)(((len % 2 == 1) ? (dt[i++] & 0x1F) : ((dt[i] & 0xFC0) >> 6)) + 'a'));   
+                    k.Append((char)(((l % 2 == 1 ? dt[i++] : dt[i] >> 6) & 0x1F) + 'a'));   
                 }
-                ColorDict[key.ToString()] = new Color(0xFF000000 + (hi << 12) + lo);
+                Colors[k.ToString()] = new Color(c);
             }
-            //*/
-            Color test;
-            TryParseColor("Red", out test);
         }
 
         static bool TryParseIntGroup(string str, out Color value)
@@ -177,9 +173,9 @@ namespace Script
             bool success = true;
             str = str.ToLower();
 
-            if (ColorDict.ContainsKey(str))
+            if (Colors.ContainsKey(str))
             {
-                value = ColorDict[str];
+                value = Colors[str];
             }
             else
             {

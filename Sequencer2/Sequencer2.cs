@@ -145,26 +145,22 @@ namespace Script
 
                 ScheduleParse(true);
             }
-
         }
 
         Deserializer TryInitStorageDecoder()
-        {
+        {             
             Deserializer decoder = null;
 
             if (!string.IsNullOrEmpty(Storage))
             {
                 decoder = new Deserializer(Storage);
-                uint mj = 0;
-                uint mn = 0;
-                uint pt = 0;
-                uint ver = 0;
+                uint mj = 0, mn = 0, pt = 0, ver = 0;
                 try
                 {
                     mj = (uint)decoder.ReadInt();
                     mn = (uint)decoder.ReadInt();
                     pt = (uint)decoder.ReadInt();
-                    ver = (mj << 20) + (mn << 10) + pt;
+                    ver = Version(mj, mn, pt);
                 }
                 catch
                 {
@@ -174,7 +170,7 @@ namespace Script
                     ver = 0;
                 }
 
-                if (ver != (major << 20) + (minor << 10) + patch)
+                if (ver != Version(major, minor, patch))
                 {
                     decoder.Dispose();
                     decoder = null;
@@ -184,6 +180,11 @@ namespace Script
             }
 
             return decoder;
+        }
+
+        uint Version(uint minor, uint major, uint patch)
+        {
+            return (major << 20) + (minor << 10) + patch;
         }
 
         private void ScheduleParse(bool runLoad)
@@ -255,7 +256,4 @@ namespace Script
     }
 
 }
-
-
-
 

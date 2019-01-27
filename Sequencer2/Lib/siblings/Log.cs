@@ -119,9 +119,10 @@ namespace Script
         {
             if (decoder.ReadBool())
             {
-                int count = decoder.ReadInt();
                 LogLevels = new Dictionary<string, LogLevel>();
-                for (int i = 0; i < count; i++)
+
+                int count = decoder.ReadInt();
+                while (count-- > 0)
                 {
                     LogLevels[decoder.ReadString()] = (LogLevel)decoder.ReadInt();
                 }
@@ -136,8 +137,9 @@ namespace Script
                 encoder.Write(LogLevels.Count);
                 foreach (var kvp in LogLevels)
                 {
-                    encoder.Write(kvp.Key);
-                    encoder.Write((int)kvp.Value);
+                    encoder
+                        .Write(kvp.Key)
+                        .Write((int)kvp.Value);
                 }
             }
         }

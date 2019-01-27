@@ -47,7 +47,6 @@ namespace Script
             Echo("To recover recompile the script");
             Echo(lastException.Message);
             Echo(lastException.StackTrace);
-            Echo(lastException.Message);
         }
 
         #endregion // ingame script end

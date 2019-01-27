@@ -53,16 +53,17 @@ namespace Script
         {
             this.timerController = timerController;
             lastProgramId = decoder.ReadInt();
-            int count = decoder.ReadInt();
+
             scheduledPrograms = new List<string>();
-            for (int i = 0; i < count; i++)
+            int count = decoder.ReadInt();
+            while(count-- > 0)
             {
                 scheduledPrograms.Add(decoder.ReadString());
             }
 
-            count = decoder.ReadInt();
             Programs = new Dictionary<string, SqProgram>();
-            for (int i = 0; i < count; i++)
+            count = decoder.ReadInt();
+            while (count-- > 0)
             {
                 SqProgram prog = new SqProgram(decoder);
                 Programs[prog.Name] = prog;
@@ -268,7 +269,7 @@ namespace Script
             return Programs.Values.Select(x => x.Name);
         }
 
-        public IEnumerable<string> Startedrograms()
+        public IEnumerable<string> StartedPrograms()
         {
             return scheduledPrograms;
         }

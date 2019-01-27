@@ -30,7 +30,7 @@ namespace Script
                 Log.WriteFormat("\"{0}\"", programName);
             }
             Log.Write("Started methods:");
-            foreach (var programName in runtime.Startedrograms())
+            foreach (var programName in runtime.StartedPrograms())
             {
                 Log.WriteFormat("\"{0}\"", programName);
             }
@@ -66,30 +66,16 @@ namespace Script
 
         private void StartProgram(string arg)
         {
-            if (runtime != null)
+            runtime.StartProgram(arg.Trim());
+            if (!runtime.IsEnqueued)
             {
-                runtime.StartProgram(arg.Trim());
-                if (!runtime.IsEnqueued)
-                {
-                    sch.EnqueueTask(runtime);
-                }
-            }
-            else
-            {
-                Log.Write("Script is not initialized");
+                sch.EnqueueTask(runtime);
             }
         }
 
         private void StopProgram(string arg)
         {
-            if (runtime != null)
-            {
-                runtime.StopProgram(arg.Trim());
-            }
-            else
-            {
-                Log.Write("Script is not initialized");
-            }
+            runtime.StopProgram(arg.Trim());
         }
 
         private void ResetState(string arg)

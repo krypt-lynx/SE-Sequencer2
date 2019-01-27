@@ -192,8 +192,9 @@ namespace Script
             Impl = Commands.CmdDefs[Cmd].Implementation;
             _cycle = decoder.ReadInt();
 
-            int count = decoder.ReadInt();
             Args = new List<object>();
+            int count = decoder.ReadInt();
+
             for (int i = 0; i < count; i++)
             {
                 ParamRef paramRef = Commands.CmdDefs[Cmd].Arguments[i];
@@ -240,9 +241,8 @@ namespace Script
         public void Serialize(Serializer encoder)
         {
             encoder.Write(Cmd)
-                   .Write(_cycle);
-
-            encoder.Write(Args.Count);
+                   .Write(_cycle)
+                   .Write(Args.Count);
 
             for (int i = 0; i < Args.Count; i++)
             {
@@ -315,7 +315,7 @@ namespace Script
             int count = decoder.ReadInt();
             Commands = new List<SqCommand>(count);
 
-            for (int i = 0; i < count; i++)
+            while (count-- > 0)
             {
                 Commands.Add(new SqCommand(decoder));
             }
