@@ -45,6 +45,7 @@ namespace Script
             Echo("Exception handled!");
             Echo("Please, make screenshot of this message and report the issue to developer");
             Echo("To recover recompile the script");
+            Echo(lastException.GetType().Name);
             Echo(lastException.Message);
             Echo(lastException.StackTrace);
         }

@@ -182,7 +182,7 @@ namespace Script
             return decoder;
         }
 
-        uint Version(uint minor, uint major, uint patch)
+        uint Version(uint major, uint minor, uint patch)
         {
             return (major << 20) + (minor << 10) + patch;
         }
