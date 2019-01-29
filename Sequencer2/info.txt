@@ -64,7 +64,7 @@ Commands:
  /stop [method]
  /load [code]
  /unload [method]
- /setvar variable
+ /setvar variable value
  /switch variable method1 method2 ...
 
  /echo [text]
