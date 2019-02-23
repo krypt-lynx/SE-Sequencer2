@@ -68,7 +68,6 @@ namespace Script
                 Programs[prog.Name] = prog;
             }
 
-
             count = decoder.ReadInt();
             while (count-- > 0)
             {
