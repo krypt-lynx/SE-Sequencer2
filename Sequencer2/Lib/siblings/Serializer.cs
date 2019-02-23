@@ -68,11 +68,20 @@ namespace Script
             return this;
         }
 
+        public Serializer Write(uint v)
+        {
+            A('u');
+            A(v.ToString(C.I));
+            A(';');
+
+            return this;
+        }
 
         public override string ToString()
         {
             return d.ToString();
         }
+
     }
 
     public class Deserializer : IDisposable
@@ -114,6 +123,12 @@ namespace Script
             return int.Parse(s.ToString(), C.I);
         }
 
+        internal uint ReadUInt()
+        {
+            var s = R('u');
+
+            return uint.Parse(s.ToString(), C.I);
+        }
 
         public double ReadDouble()
         {

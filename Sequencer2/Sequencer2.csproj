@@ -82,7 +82,9 @@
     <Compile Include="Console2.cs" />
     <Compile Include="ConsoleFunctions.cs" />
     <Compile Include="Lib\nested\Environment.cs" />
+    <Compile Include="Lib\siblings\ControlModule.cs" />
     <Compile Include="Lib\siblings\ExtraLinq.cs" />
+    <Compile Include="Lib\siblings\Version.cs" />
     <Compile Include="Lib\siblings\VRageHash.cs" />
     <Compile Include="Lib\siblings\WatchDog.cs" />
     <Compile Include="Program.cs" />

@@ -1,4 +1,5 @@
-﻿using Sandbox.ModAPI.Ingame;
+﻿#define Simulation
+using Sandbox.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace Script
 {
     partial class Program 
     {
+#if !Simulation
+
         #region ingame script start
 
         Exception lastException = null;
@@ -51,6 +54,19 @@ namespace Script
         }
 
         #endregion // ingame script end
+
+#else
+        public static MyGridProgram Current;
+        public void IsolatedRun(Action work)
+        {
+            Current = this;
+            Log.NewFrame();
+
+            work();
+
+            Current = null;
+        }
+#endif
     }
 
 }

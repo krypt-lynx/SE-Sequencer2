@@ -1,4 +1,3 @@
-#define NotUgly
 #define Simulation
 
 using System;
@@ -40,7 +39,7 @@ namespace Script
 
         #region ingame script start
             
-        // Logging levels for all used categories. Those values is used if was not overrided using /loglevel command
+        // Logging levels for all used categories. Those values are used if was not overrided using /loglevel command
         private static void LogLevels()
         {
             Log.LogLevels = new Dictionary<string, LogLevel>
@@ -76,9 +75,7 @@ namespace Script
         RuntimeTask runtime;
 
         const string uti = "name.krypt.sequencer2";
-        const uint major = 2;
-        const uint minor = 2;
-        const uint patch = 1;
+        Version ver = new Version(2, 2, 1);
 
         UpdateType paramertizedTypes = (UpdateType)0x1F; // .Terminal | .Trigger | .Antenna | .Mod | .Script;
 
@@ -160,38 +157,25 @@ namespace Script
             {
                 decoder = new Deserializer(Storage);
                 string storedUti = null;
-                int storedVer = 0;
+                Version storedVer = null;
                 try
                 {
                     storedUti = decoder.ReadString();
-                    storedVer = decoder.ReadInt();
+                    storedVer = new Version(decoder.ReadUInt());
                 }
                 catch { }
 
                 if (storedUti != uti ||
-                    storedVer != PackVersion(major, minor, patch))
+                    storedVer != ver)
                 {
                     decoder.Dispose();
                     decoder = null;
 
-                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}), skipping state restore", UnpackVersion(storedVer));
+                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, $"stored data incompitable format ({ver} expected, {storedVer?.ToString() ?? "unknown"} found), skipping state restore");
                 }
             }
 
             return decoder;
-        }
-
-        int PackVersion(uint major, uint minor, uint patch)
-        {
-            return (int)((major << 20) + (minor << 10) + patch);
-        }
-
-        private string UnpackVersion(int ver)
-        {
-            return string.Format("{0}.{1}.{2}",
-                (ver >> 20) & 0x3FF,
-                (ver >> 10) & 0x3FF,
-                ver & 0x3FF);
         }
 
         private void ScheduleParse(bool runLoad)
@@ -221,7 +205,7 @@ namespace Script
             {
                 var encoder = new Serializer()
                     .Write(uti)
-                    .Write(PackVersion(major, minor, patch));
+                    .Write(ver.Packed);
 
                 Log.Serialize(encoder);
                 timerController.Serialize(encoder);
@@ -241,10 +225,6 @@ namespace Script
         {
             IsolatedRun(() =>
             {
-                
-                var inputs = Me.GetValue<Dictionary<string, object>>("ControlModule.Inputs");
-                Log.Write(inputs?.ToString() ?? "nil");
-
                 timerController.Update();
 
                 if ((updateSource | paramertizedTypes) != 0)

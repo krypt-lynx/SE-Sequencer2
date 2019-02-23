@@ -15,7 +15,8 @@ namespace Script
     public enum SqCapablities
     {
         None = 0,
-        Timer = 1
+        Timer = 1,
+        ControlModule = 2,
     }
 
 
