@@ -35,12 +35,18 @@ namespace Script
 
         public Serializer Write(string v)
         {
-            A('s');
-            A(v.Length.ToString(C.I));
-            A(',');
-            A(v.ToString(C.I));
-            A(';');
-
+            if (v == null)
+            {
+                A("s,;");
+            }
+            else
+            {
+                A('s');
+                A(v.Length.ToString(C.I));
+                A(',');
+                A(v.ToString(C.I));
+                A(';');
+            }
             return this;
         }
 
@@ -131,6 +137,12 @@ namespace Script
             while (e.MoveNext() && e.Current != ',')
             {
                 s.Append(e.Current);
+            }
+
+            if (s.Length == 0)
+            {
+                e.MoveNext();
+                return null;
             }
             int l = int.Parse(s.ToString(), C.I);
 

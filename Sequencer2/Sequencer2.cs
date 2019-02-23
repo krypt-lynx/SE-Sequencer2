@@ -18,10 +18,14 @@ using SpaceEngineers.Game.ModAPI.Ingame;
 using SETestEnv;
 using System.Linq;
 
+
 namespace Script
 {
+    
+
     partial class Program : TestGridProgram
     {
+
         public override void RunMain(string argument)
         {
             (this.Runtime as TestGridProgramRuntimeInfo).InitNewRun();
@@ -71,9 +75,10 @@ namespace Script
         Scheduler sch;
         RuntimeTask runtime;
 
+        const string uti = "name.krypt.sequencer2";
         const uint major = 2;
         const uint minor = 2;
-        const uint patch = 0;
+        const uint patch = 1;
 
         UpdateType paramertizedTypes = (UpdateType)0x1F; // .Terminal | .Trigger | .Antenna | .Mod | .Script;
 
@@ -154,37 +159,39 @@ namespace Script
             if (!string.IsNullOrEmpty(Storage))
             {
                 decoder = new Deserializer(Storage);
-                uint mj = 0, mn = 0, pt = 0, ver = 0;
+                string storedUti = null;
+                int storedVer = 0;
                 try
                 {
-                    mj = (uint)decoder.ReadInt();
-                    mn = (uint)decoder.ReadInt();
-                    pt = (uint)decoder.ReadInt();
-                    ver = Version(mj, mn, pt);
+                    storedUti = decoder.ReadString();
+                    storedVer = decoder.ReadInt();
                 }
-                catch
-                {
-                    mj = 0;
-                    mn = 0;
-                    pt = 0;
-                    ver = 0;
-                }
+                catch { }
 
-                if (ver != Version(major, minor, patch))
+                if (storedUti != uti ||
+                    storedVer != PackVersion(major, minor, patch))
                 {
                     decoder.Dispose();
                     decoder = null;
 
-                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}.{1}.{2}), skipping state restore", mj, mn, pt);
+                    Log.WriteFormat(LOG_CAT, LogLevel.Warning, "stored data incompitable format found ({0}), skipping state restore", UnpackVersion(storedVer));
                 }
             }
 
             return decoder;
         }
 
-        uint Version(uint major, uint minor, uint patch)
+        int PackVersion(uint major, uint minor, uint patch)
         {
-            return (major << 20) + (minor << 10) + patch;
+            return (int)((major << 20) + (minor << 10) + patch);
+        }
+
+        private string UnpackVersion(int ver)
+        {
+            return string.Format("{0}.{1}.{2}",
+                (ver >> 20) & 0x3FF,
+                (ver >> 10) & 0x3FF,
+                ver & 0x3FF);
         }
 
         private void ScheduleParse(bool runLoad)
@@ -213,9 +220,8 @@ namespace Script
             IsolatedRun(() =>
             {
                 var encoder = new Serializer()
-                    .Write((int)major)
-                    .Write((int)minor)
-                    .Write((int)patch);
+                    .Write(uti)
+                    .Write(PackVersion(major, minor, patch));
 
                 Log.Serialize(encoder);
                 timerController.Serialize(encoder);
@@ -229,10 +235,16 @@ namespace Script
             });
         }
 
+
+
         public void Main(string argument, UpdateType updateSource)
         {
             IsolatedRun(() =>
             {
+                
+                var inputs = Me.GetValue<Dictionary<string, object>>("ControlModule.Inputs");
+                Log.Write(inputs?.ToString() ?? "nil");
+
                 timerController.Update();
 
                 if ((updateSource | paramertizedTypes) != 0)
@@ -251,7 +263,6 @@ namespace Script
                 }
             });
         }
-
         #endregion // ingame script end
     }
 
