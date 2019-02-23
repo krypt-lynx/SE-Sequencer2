@@ -56,7 +56,9 @@ namespace Script
         #endregion // ingame script end
 
 #else
+        Exception lastException = null;
         public static MyGridProgram Current;
+
         public void IsolatedRun(Action work)
         {
             Current = this;

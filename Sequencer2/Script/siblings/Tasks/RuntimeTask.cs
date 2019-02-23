@@ -26,14 +26,21 @@ namespace Script
         public void Serialize(Serializer encoder)
         {
             encoder.Write(lastProgramId);
+
+            encoder.Write(Programs.Count);
+            foreach (var prog in Programs.Values)
+            {
+                prog.Serialize(encoder);
+            }
+
             encoder.Write(scheduledPrograms.Count);
             foreach (var prog in scheduledPrograms)
             {
                 encoder.Write(prog);
             }
 
-            encoder.Write(Programs.Count);
-            foreach (var prog in Programs.Values)
+            encoder.Write(replacements.Count);
+            foreach (var prog in replacements)
             {
                 prog.Serialize(encoder);
             }
@@ -54,19 +61,25 @@ namespace Script
             this.timerController = timerController;
             lastProgramId = decoder.ReadInt();
 
-            scheduledPrograms = new List<string>();
             int count = decoder.ReadInt();
-            while(count-- > 0)
-            {
-                scheduledPrograms.Add(decoder.ReadString());
-            }
-
-            Programs = new Dictionary<string, SqProgram>();
-            count = decoder.ReadInt();
             while (count-- > 0)
             {
                 SqProgram prog = new SqProgram(decoder);
                 Programs[prog.Name] = prog;
+            }
+
+
+            count = decoder.ReadInt();
+            while (count-- > 0)
+            {
+                scheduledPrograms.Add(decoder.ReadString());
+            }
+
+            count = decoder.ReadInt();
+            while (count-- > 0)
+            {
+                SqProgram prog = new SqProgram(decoder);
+                replacements.Enqueue(prog);
             }
         }
 
