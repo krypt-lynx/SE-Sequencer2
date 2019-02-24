@@ -101,6 +101,7 @@
     <Compile Include="Script\siblings\Commands\TestCommandImpl.cs" />
     <Compile Include="Script\siblings\Converters\ColorConverter.cs" />
     <Compile Include="Lib\siblings\Serializer.cs" />
+    <Compile Include="Script\siblings\SqCommand.cs" />
     <Compile Include="Script\siblings\Tasks\RuntimeTask.cs" />
     <Compile Include="Script\siblings\Commands\ExecFlowCommandImpl.cs" />
     <Compile Include="Script\siblings\BlockSelector.cs" />

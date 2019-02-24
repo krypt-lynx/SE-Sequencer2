@@ -11,7 +11,7 @@ namespace Script
 {
     #region ingame script start
 
-    class TimerController
+    class TimerController : ISerializable
     {
         public const string LOG_CAT = "tmr";
 
@@ -31,10 +31,10 @@ namespace Script
                    .Write(delay);
         }
 
-        public TimerController(Deserializer decoder)
+        public void Deserialize(Deserializer decoder)
         {
-            timePassed = (float)decoder.ReadDouble();
-            delay = (float)decoder.ReadDouble();
+            timePassed = decoder.ReadFloat();
+            delay = decoder.ReadFloat();
 
             ReinitTimer();
         }

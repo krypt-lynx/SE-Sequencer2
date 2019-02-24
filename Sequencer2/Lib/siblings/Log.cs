@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,9 +28,36 @@ namespace Script
 
     class Log
     {
-        public static Dictionary<string, LogLevel> LogLevels = null;
+        public class Data : ISerializable
+        {
+            public SD<string, LogLevel> LogLevels = null;
+            public bool insertNewFrameSeparator = false;
+
+            public void Deserialize(Deserializer decoder)
+            {
+                LogLevels = decoder.ReadObject<SD<string, LogLevel>>();
+            }
+
+            public void Serialize(Serializer encoder)
+            {
+                encoder.Write(LogLevels);
+            }
+        }
+
+        public static Data D = new Data();
         const string NewFrameSeparator = "--------------------------------------";
-        static bool insertNewFrameSeparator = false;
+
+        public static SD<string, LogLevel> LogLevels
+        {
+            get
+            {
+                return D.LogLevels;
+            }
+            set
+            {
+                D.LogLevels = value;
+            }
+        }
 
         public static void Write(string logcat, LogLevel level, object anObject)
         {
@@ -44,7 +71,7 @@ namespace Script
         private static bool IsAllowed(string logcat, LogLevel level)
         {
             LogLevel currentLevel = LogLevel.None;
-            bool isAllowed = LogLevels == null || ((LogLevels?.TryGetValue(logcat, out currentLevel) ?? false) && level <= currentLevel);
+            bool isAllowed = D.LogLevels == null || ((D.LogLevels?.TryGetValue(logcat, out currentLevel) ?? false) && level <= currentLevel);
             return isAllowed;
         }
 
@@ -96,9 +123,9 @@ namespace Script
                 var dServer = Program.Current.GridTerminalSystem.GetBlockWithName("DebugSrv") as IMyProgrammableBlock;
                 if (dServer != null)
                 {
-                    if (insertNewFrameSeparator)
+                    if (D.insertNewFrameSeparator)
                     {
-                        insertNewFrameSeparator = false;
+                        D.insertNewFrameSeparator = false;
                         dServer.TryRun("L" + NewFrameSeparator);
                     }
                     dServer.TryRun("L" + str);
@@ -112,36 +139,7 @@ namespace Script
 
         internal static void NewFrame()
         {
-            insertNewFrameSeparator = true;
-        }
-
-        internal static void Deserialize(Deserializer decoder)
-        {
-            if (decoder.ReadBool())
-            {
-                LogLevels = new Dictionary<string, LogLevel>();
-
-                int count = decoder.ReadInt();
-                while (count-- > 0)
-                {
-                    LogLevels[decoder.ReadString()] = (LogLevel)decoder.ReadInt();
-                }
-            }
-        }
-
-        internal static void Serialize(Serializer encoder)
-        {
-            encoder.Write(LogLevels != null);
-            if (LogLevels != null)
-            {
-                encoder.Write(LogLevels.Count);
-                foreach (var kvp in LogLevels)
-                {
-                    encoder
-                        .Write(kvp.Key)
-                        .Write((int)kvp.Value);
-                }
-            }
+            D.insertNewFrameSeparator = true;
         }
     }
 

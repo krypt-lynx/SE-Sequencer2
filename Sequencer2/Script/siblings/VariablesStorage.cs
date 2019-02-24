@@ -9,20 +9,9 @@ namespace Script
 
     #region ingame script start
 
-    class VariablesStorage
+    class VariablesStorage : ISerializable
     {
         public VariablesStorage() { }
-
-        public VariablesStorage(Deserializer decoder)
-        {
-            variables = new Dictionary<string, double>();
-
-            int count = decoder.ReadInt();
-            while (count-- > 0)
-            {
-                variables[decoder.ReadString()] = decoder.ReadDouble();
-            }
-        }
 
         public void Serialize(Serializer encoder)
         {
@@ -36,9 +25,13 @@ namespace Script
             }
         }
 
-        public static void Deserialize(Deserializer decoder)
+        public void Deserialize(Deserializer decoder)
         {
-            _shared = new VariablesStorage(decoder);
+            int count = decoder.ReadInt();
+            while (count-- > 0)
+            {
+                variables[decoder.ReadString()] = decoder.ReadDouble();
+            }
         }
 
         static VariablesStorage _shared = new VariablesStorage();

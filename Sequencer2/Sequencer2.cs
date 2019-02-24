@@ -42,7 +42,7 @@ namespace Script
         // Logging levels for all used categories. Those values are used if was not overrided using /loglevel command
         private static void LogLevels()
         {
-            Log.LogLevels = new Dictionary<string, LogLevel>
+            Log.LogLevels = new SD<string, LogLevel>
             {
                 { Scheduler.LOG_CAT,        LogLevel.Warning },
                 { Parser.LOG_CAT,           LogLevel.Warning },
@@ -119,10 +119,10 @@ namespace Script
             {
                 try
                 {
-                    Log.Deserialize(decoder);
-                    timerController = new TimerController(decoder);
-                    runtime = new RuntimeTask(decoder, timerController);
-                    VariablesStorage.Deserialize(decoder);
+                    decoder.ReadObject(Log.D);
+                    decoder.ReadObject(timerController = new TimerController());
+                    decoder.ReadObject(runtime = new RuntimeTask(timerController));
+                    decoder.ReadObject(VariablesStorage.Shared);
 
                     if (!runtime.StoredPrograms().Any())
                     {
@@ -205,12 +205,11 @@ namespace Script
             {
                 var encoder = new Serializer()
                     .Write(uti)
-                    .Write(ver.Packed);
-
-                Log.Serialize(encoder);
-                timerController.Serialize(encoder);
-                runtime.Serialize(encoder);
-                VariablesStorage.Shared.Serialize(encoder);
+                    .Write(ver.Packed)
+                    .Write(Log.D)
+                    .Write(timerController)
+                    .Write(runtime)
+                    .Write(VariablesStorage.Shared);
 
                 Storage = encoder.ToString();
 

@@ -10,14 +10,14 @@ namespace Script
     #region ingame script start
 
 
-    class RuntimeTask : YieldTask<bool>
+    class RuntimeTask : YieldTask<bool>, ISerializable
     {
         public const string LOG_CAT = "exe";
 
-        private Dictionary<string, SqProgram> Programs = new Dictionary<string, SqProgram>();
+        private SD<string, SqProgram> Programs = new SD<string, SqProgram>();
 
-        private List<string> scheduledPrograms = new List<string>();
-        private Queue<SqProgram> replacements = new Queue<SqProgram>();
+        private SL<string> scheduledPrograms = new SL<string>();
+        private SQ<SqProgram> replacements = new SQ<SqProgram>();
 
         private TimerController timerController;
 
@@ -26,24 +26,17 @@ namespace Script
         public void Serialize(Serializer encoder)
         {
             encoder.Write(lastProgramId);
-
-            encoder.Write(Programs.Count);
-            foreach (var prog in Programs.Values)
-            {
-                prog.Serialize(encoder);
-            }
-
-            encoder.Write(scheduledPrograms.Count);
-            foreach (var prog in scheduledPrograms)
-            {
-                encoder.Write(prog);
-            }
-
-            encoder.Write(replacements.Count);
-            foreach (var prog in replacements)
-            {
-                prog.Serialize(encoder);
-            }
+            encoder.Write(Programs);
+            encoder.Write(scheduledPrograms);
+            encoder.Write(replacements);
+        }
+        
+        public void Deserialize(Deserializer decoder)
+        {
+            lastProgramId = decoder.ReadInt();
+            decoder.ReadObject(Programs);
+            decoder.ReadObject(scheduledPrograms);
+            decoder.ReadObject(replacements);            
         }
 
         public int GenerateProgramId()
@@ -55,33 +48,7 @@ namespace Script
         {
             this.timerController = timerController;
         }
-
-        public RuntimeTask(Deserializer decoder, TimerController timerController) : base("Runtime")
-        {
-            this.timerController = timerController;
-            lastProgramId = decoder.ReadInt();
-
-            int count = decoder.ReadInt();
-            while (count-- > 0)
-            {
-                SqProgram prog = new SqProgram(decoder);
-                Programs[prog.Name] = prog;
-            }
-
-            count = decoder.ReadInt();
-            while (count-- > 0)
-            {
-                scheduledPrograms.Add(decoder.ReadString());
-            }
-
-            count = decoder.ReadInt();
-            while (count-- > 0)
-            {
-                SqProgram prog = new SqProgram(decoder);
-                replacements.Enqueue(prog);
-            }
-        }
-
+        
         public override IEnumerator<bool> DoWork()
         {
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Time passed: {0}", timerController.TimePassed());
