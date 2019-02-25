@@ -172,7 +172,7 @@ owner.CustomData = @"
 /text ""Test Result LCD"" """" 
 /set Rotor Velocity -6 
 /wait 5.1
-/set Rotor Velocity 0 
+/set group Rotor Velocity 0 
 #/test1 Rotor ""Test Result LCD"" 
 
 @info

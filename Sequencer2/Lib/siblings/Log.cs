@@ -30,12 +30,12 @@ namespace Script
     {
         public class Data : ISerializable
         {
-            public SD<string, LogLevel> LogLevels = null;
+            public Dictionary<string, LogLevel> LogLevels = null;
             public bool insertNewFrameSeparator = false;
 
             public void Deserialize(Deserializer decoder)
             {
-                LogLevels = decoder.ReadObject<SD<string, LogLevel>>();
+                LogLevels = decoder.ReadDictionary(LogLevels);
             }
 
             public void Serialize(Serializer encoder)
@@ -47,7 +47,7 @@ namespace Script
         public static Data D = new Data();
         const string NewFrameSeparator = "--------------------------------------";
 
-        public static SD<string, LogLevel> LogLevels
+        public static Dictionary<string, LogLevel> LogLevels
         {
             get
             {

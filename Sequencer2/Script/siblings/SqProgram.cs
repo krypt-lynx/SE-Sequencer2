@@ -40,14 +40,7 @@ namespace Script
             Name = decoder.ReadString();
             TimeToWait = decoder.ReadFloat();
             _cycle = decoder.ReadInt();
-
-            int count = decoder.ReadInt();
-            Commands = new List<SqCommand>(count);
-
-            while (count-- > 0)
-            {
-                Commands.Add(new SqCommand(decoder));
-            }
+            Commands = decoder.ReadList(Commands, () => new SqCommand());            
         }
 
         public void Serialize(Serializer encoder)
@@ -55,14 +48,8 @@ namespace Script
             encoder.Write(currentCommand)
                 .Write(Name)
                 .Write(TimeToWait)
-                .Write(_cycle);
-
-            encoder.Write(Commands.Count);
-
-            foreach (var cmd in Commands)
-            {
-                cmd.Serialize(encoder);
-            }
+                .Write(_cycle)
+                .Write(Commands);            
         }
     } 
    

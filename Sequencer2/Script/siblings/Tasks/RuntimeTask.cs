@@ -14,10 +14,10 @@ namespace Script
     {
         public const string LOG_CAT = "exe";
 
-        private SD<string, SqProgram> Programs = new SD<string, SqProgram>();
+        private Dictionary<string, SqProgram> Programs = new Dictionary<string, SqProgram>();
 
-        private SL<string> scheduledPrograms = new SL<string>();
-        private SQ<SqProgram> replacements = new SQ<SqProgram>();
+        private List<string> scheduledPrograms = new List<string>();
+        private Queue<SqProgram> replacements = new Queue<SqProgram>();
 
         private TimerController timerController;
 
@@ -34,9 +34,9 @@ namespace Script
         public void Deserialize(Deserializer decoder)
         {
             lastProgramId = decoder.ReadInt();
-            decoder.ReadObject(Programs);
-            decoder.ReadObject(scheduledPrograms);
-            decoder.ReadObject(replacements);            
+            decoder.ReadDictionary(Programs, null, () => new SqProgram() );
+            decoder.ReadList(scheduledPrograms);
+            decoder.ReadQueue(replacements, () => new SqProgram() ); // <-- because Queue is not an ICollection<T>...            
         }
 
         public int GenerateProgramId()

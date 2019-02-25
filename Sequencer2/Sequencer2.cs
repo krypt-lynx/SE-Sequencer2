@@ -42,7 +42,7 @@ namespace Script
         // Logging levels for all used categories. Those values are used if was not overrided using /loglevel command
         private static void LogLevels()
         {
-            Log.LogLevels = new SD<string, LogLevel>
+            Log.LogLevels = new Dictionary<string, LogLevel>
             {
                 { Scheduler.LOG_CAT,        LogLevel.Warning },
                 { Parser.LOG_CAT,           LogLevel.Warning },

@@ -170,7 +170,7 @@ namespace Script
     }
 
 
-    public class SqCommand
+    public class SqCommand : ISerializable
     {
         public string Cmd;
         public IList Args;
@@ -179,58 +179,12 @@ namespace Script
         public int _cycle = 0;
 
         public SqCommand() { }
+
         public SqCommand(string cmd, IList args, Func<IList, CommandResult> impl)
         {
             Cmd = cmd;
             Args = args;
             Impl = impl;
-        }
-
-        public SqCommand(Deserializer decoder)
-        {
-            Cmd = decoder.ReadString();
-            Impl = Commands.CmdDefs[Cmd].Implementation;
-            _cycle = decoder.ReadInt();
-
-            Args = new List<object>();
-            int count = decoder.ReadInt();
-
-            for (int i = 0; i < count; i++)
-            {
-                ParamRef paramRef = Commands.CmdDefs[Cmd].Arguments[i];
-
-                int argCount = paramRef.Aggregative ? decoder.ReadInt() : 1;
-
-                List<object> args = new List<object>();
-                for (int j = 0; j < argCount; j++)
-                {
-                    switch (paramRef.Type)
-                    {
-                        case ParamType.Bool:
-                            args.Add(decoder.ReadBool());
-                            break;
-                        case ParamType.Double:
-                            args.Add(decoder.ReadDouble());
-                            break;
-                        case ParamType.GroupType:
-                            args.Add((MatchingType)decoder.ReadInt());
-                            break;
-                        case ParamType.String:
-                            args.Add(decoder.ReadString());
-                            break;
-                    }
-                }
-
-                if (paramRef.Aggregative)
-                {
-                    Args.Add(args);
-                }
-                else
-                {
-                    Args.Add(args.First());
-                }
-            }
-
         }
 
         public override string ToString()
@@ -242,39 +196,15 @@ namespace Script
         {
             encoder.Write(Cmd)
                    .Write(_cycle)
-                   .Write(Args.Count);
+                   .Write(Args);
+        }
 
-            for (int i = 0; i < Args.Count; i++)
-            {
-                ParamRef paramRef = Commands.CmdDefs[Cmd].Arguments[i];
-
-                IList list = paramRef.Aggregative ? (IList)Args[i] : new object[] { Args[i] };
-
-                if (paramRef.Aggregative)
-                {
-                    encoder.Write(list.Count);
-                }
-
-                foreach (var arg in list)
-                {
-                    switch (paramRef.Type)
-                    {
-                        case ParamType.Bool:
-                            encoder.Write((bool)arg);
-                            break;
-                        case ParamType.Double:
-                            encoder.Write((double)arg);
-                            break;
-                        case ParamType.GroupType:
-                            encoder.Write((int)(MatchingType)arg);
-                            break;
-                        case ParamType.String:
-                            encoder.Write((string)arg);
-                            break;
-                    }
-                }
-            }
-
+        public void Deserialize(Deserializer decoder)
+        {
+            Cmd = decoder.ReadString();
+            Impl = Commands.CmdDefs[Cmd].Implementation;
+            _cycle = decoder.ReadInt();
+            Args = decoder.ReadList(new List<object>(),null,() => (typeof(MatchingType)));            
         }
 
         internal CommandResult Run()
