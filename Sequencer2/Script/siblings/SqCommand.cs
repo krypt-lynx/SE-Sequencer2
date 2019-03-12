@@ -195,16 +195,15 @@ namespace Script
         public void Serialize(Serializer enc)
         {
             var map = new Dictionary<Type, Action<object>> {
-                       { typeof(string), (i) => enc.Write(0).Write((string)i) },
-                       { typeof(bool), (i) => enc.Write(1).Write((bool)i) },
-                       { typeof(double), (i) => enc.Write(2).Write((double)i) },
-                       { typeof(MatchingType), (i) => enc.Write(3).Write((MatchingType)i) },
+                       { typeof(string), (i) => enc.Write((string)i) },
+                       { typeof(bool), (i) => enc.Write((bool)i) },
+                       { typeof(double), (i) => enc.Write((double)i) },
+                       { typeof(MatchingType), (i) => enc.Write((MatchingType)i) },
                    };
 
             enc.Write(Cmd)
                .Write(_cycle)
                .Write(Args, (object i) => {
-
                    map[i.GetType()](i);
                });
         }
@@ -219,9 +218,10 @@ namespace Script
                     };
 
             Cmd = dec.ReadString();
-            Impl = Commands.CmdDefs[Cmd].Implementation;
+            var def = Commands.CmdDefs[Cmd];
+            Impl = def.Implementation;
             _cycle = dec.ReadInt();
-            Args = dec.ReadCollection(() => new List<object>(), () => map[dec.ReadInt()]());
+            Args = dec.ReadCollection(() => new List<object>(), (o) => o.Add(map[(int)def.Arguments[o.Count].Type]()));
         }
 
         internal CommandResult Run()

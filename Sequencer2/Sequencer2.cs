@@ -75,7 +75,7 @@ namespace Script
         RuntimeTask runtime;
 
         const string uti = "name.krypt.sequencer2";
-        Version ver = new Version(2, 2, 1);
+        Version ver = new Version(2, 2, 2);
 
         UpdateType paramertizedTypes = (UpdateType)0x1F; // .Terminal | .Trigger | .Antenna | .Mod | .Script;
 

@@ -11,7 +11,7 @@ namespace Script
 
     public enum ParamType
     {
-        String,
+        String = 0,
         Bool,
         Double,
         GroupType
