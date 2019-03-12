@@ -310,9 +310,28 @@ namespace SETestEnv
     {
         private int simInstructionCount = 0;
 
+        int ticksPassed = 0;
+
         public void InitNewRun()
         {
             simInstructionCount = 0;
+            if ((updateFrequency & (UpdateFrequency.Once | UpdateFrequency.Update1)) != 0)
+            {
+                ticksPassed = 1;
+            }
+            else if ((updateFrequency & UpdateFrequency.Update10) != 0)
+            {
+                ticksPassed = 10;
+            }
+            else if ((updateFrequency & UpdateFrequency.Update100) != 0)
+            {
+                ticksPassed = 100;
+            }
+            else
+            {
+                ticksPassed = 60;
+            }
+
             updateFrequency = updateFrequency & ~updateFrequency;
         }
 
@@ -361,7 +380,7 @@ namespace SETestEnv
         {
             get
             {
-                return new TimeSpan(0, 0, 0, 1);
+                return new TimeSpan(0, 0, 0, 0, ticksPassed * 17);
             }
         }
 

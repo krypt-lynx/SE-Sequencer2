@@ -14,9 +14,7 @@ namespace Script
     class TimerController : ISerializable
     {
         public const string LOG_CAT = "tmr";
-
-        const float KeensMagicDelay = 0.016f;
-        const float PresicionCheckDelay = 0.32f;
+        
         public const float IgnoreDelayLessThen = 0.01f;
 
         float timePassed = 0;
@@ -42,22 +40,9 @@ namespace Script
         public TimerController() { }
 
         void ReinitTimer()
-        {        
+        {
+            UpdateFrequencyFlags();
             Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Once;
-            if (delay > 0)
-            {
-                Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Update1;
-            }
-        }
-
-        void StartTimer()
-        {
-            Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Update1;
-        }
-
-        void StopTimer()
-        {
-            Program.Current.Runtime.UpdateFrequency = Program.Current.Runtime.UpdateFrequency & ~UpdateFrequency.Update1;
         }
         
         public void ScheduleStart(float delay)
@@ -66,7 +51,7 @@ namespace Script
 
             this.delay = delay;
             this.timePassed = 0;
-            StartTimer();
+            UpdateFrequencyFlags();
         }
 
         public void Update()
@@ -89,6 +74,24 @@ namespace Script
             {
                 delay = 0;
             }
+
+            UpdateFrequencyFlags();
+        }
+
+        void UpdateFrequencyFlags()
+        {
+            if (delay >= 3.33)
+            {
+                Program.Current.Runtime.UpdateFrequency = UpdateFrequency.Update100;
+            }
+            else if (delay > 0.3)
+            {
+                Program.Current.Runtime.UpdateFrequency = UpdateFrequency.Update10;
+            }
+            else if (delay > 0)
+            {
+                Program.Current.Runtime.UpdateFrequency = UpdateFrequency.Update1;
+            }
         }
 
         public float TimePassed()
@@ -100,17 +103,12 @@ namespace Script
         {
             return delay <= 0;
         }
-
-        public bool IsInterupted()
-        {
-            return false;
-        }
-
+        
         internal void CancelStart()
         {
             this.delay = 0;
             this.timePassed = 0;
-            StopTimer();
+            UpdateFrequencyFlags();
         }    
     }
 

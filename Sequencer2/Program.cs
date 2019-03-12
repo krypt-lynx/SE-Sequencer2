@@ -155,6 +155,7 @@ owner.CustomData = @"
 
 @loop
 /echo loop
+/wait 5
 /repeat
 
 @test
