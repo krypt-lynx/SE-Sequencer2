@@ -43,6 +43,7 @@ namespace Script
 
         void ReinitTimer()
         {        
+            Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Once;
             if (delay > 0)
             {
                 Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Update1;
