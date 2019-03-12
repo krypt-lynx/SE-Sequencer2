@@ -26,17 +26,17 @@ namespace Script
         public void Serialize(Serializer encoder)
         {
             encoder.Write(lastProgramId);
-            encoder.Write(Programs);
-            encoder.Write(scheduledPrograms);
-            encoder.Write(replacements);
+            encoder.Write(Programs, i => encoder.Write(i.Key).Write(i.Value));
+            encoder.Write(scheduledPrograms, i => encoder.Write(i));
+            encoder.Write(replacements, (SqProgram p) => encoder.Write(p));
         }
         
-        public void Deserialize(Deserializer decoder)
+        public void Deserialize(Deserializer dec)
         {
-            lastProgramId = decoder.ReadInt();
-            decoder.ReadDictionary(Programs, null, () => new SqProgram() );
-            decoder.ReadList(scheduledPrograms);
-            decoder.ReadQueue(replacements, () => new SqProgram() ); // <-- because Queue is not an ICollection<T>...            
+            lastProgramId = dec.ReadInt();
+            dec.ReadCollection(() => Programs, () => new KeyValuePair<string, SqProgram>(dec.ReadString(), dec.ReadObject<SqProgram>()));
+            dec.ReadCollection(() => scheduledPrograms, () => dec.ReadString());
+            dec.ReadCollection(() => replacements, (c) => c.Enqueue(dec.ReadObject<SqProgram>()));
         }
 
         public int GenerateProgramId()

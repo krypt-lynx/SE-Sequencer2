@@ -35,12 +35,15 @@ namespace Script
 
             public void Deserialize(Deserializer decoder)
             {
-                LogLevels = decoder.ReadDictionary(LogLevels);
+                LogLevels = decoder.ReadCollection(
+                    () => LogLevels, 
+                    () => new KeyValuePair<string, LogLevel>(decoder.ReadString(), decoder.ReadEnum<LogLevel>())
+                );
             }
 
             public void Serialize(Serializer encoder)
             {
-                encoder.Write(LogLevels);
+                encoder.Write(LogLevels, i => encoder.Write(i.Key).Write(i.Value));
             }
         }
 

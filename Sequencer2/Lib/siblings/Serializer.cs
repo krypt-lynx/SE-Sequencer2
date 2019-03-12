@@ -34,11 +34,6 @@ namespace Script
         public Serializer Write(string v)
         {
             A('s');
-            return WriteStringInternal(v);
-        }
-
-        public Serializer WriteStringInternal(string v)
-        {
             if (v == null)
             {
                 A(";");
@@ -106,7 +101,7 @@ namespace Script
             return this;
         }
 
-        public Serializer Write(ICollection v)
+        public Serializer Write<T, C>(C v, Action<T> item) where C : ICollection
         {
             A('c');
             if (v != null)
@@ -115,7 +110,7 @@ namespace Script
                 Write(v.Count);
                 foreach (var i in v)
                 {
-                    Write(i);
+                    item((T)i);
                 }
                 A('}');
             }
@@ -123,56 +118,23 @@ namespace Script
             return this;
         }
 
-        public Serializer Write<K, V>(Dictionary<K, V> v)
+        public Serializer Write<T>(ICollection<T> v, Action<T> item)
         {
             A('c');
             if (v != null)
             {
                 A('{');
                 Write(v.Count);
-                foreach (var kvp in v)
+                foreach (var i in v)
                 {
-                    Write(kvp.Key);
-                    Write(kvp.Value);
+                    item(i);
                 }
                 A('}');
             }
             A(';');
             return this;
-        }
-
-        public Serializer Write(object v)
-        {
-            var cases = new Dictionary<Type, Action> {
-                { typeof(int), () => Write((int)v) },
-                { typeof(string), () => Write((string)v) },
-                { typeof(bool), () => Write((bool)v) },
-                { typeof(double), () => Write((double)v) },
-                { typeof(float), () => Write((float)v) },
-                { typeof(uint), () => Write((uint)v) },
-            };             
-
-            var type = v.GetType();
-
-            if (v is Enum)
-            {
-                Write(v as Enum);
-            } else if (v is ISerializable)
-            {
-                Write((ISerializable)v);
-            } else if (cases.ContainsKey(type))
-            {
-                cases[type]();
-            }
-            else 
-            {
-                throw new UnsupportedOperationException();
-            }
-
-            return this;
-        }
+        }        
   
-        //public Ser
         public override string ToString()
         {
             return d.ToString();
@@ -189,11 +151,10 @@ namespace Script
             d = s; 
             e = s.GetEnumerator();
         }
-
-        bool a = false; // Automatic type resolving
+        
         void T(char t) // TestType
         {
-            if (!a && (!e.MoveNext() || e.Current != t))
+            if (!e.MoveNext() || e.Current != t)
             {
                 throw new InvalidFormatException($"expected '{t}' got '{e.Current}'");
             }
@@ -250,11 +211,6 @@ namespace Script
         public string ReadString()
         {
             T('s');
-            return ReadStringInternal();
-        }
-
-        public string ReadStringInternal()
-        {
             var s = new StringBuilder();
             while (e.MoveNext() && e.Current != ',' && e.Current != ';')
             {
@@ -278,27 +234,13 @@ namespace Script
 
             return s.ToString();
         }
-        
-        private object ReadEnum(Func<Type> t)
+
+        public TEnum ReadEnum<TEnum>()
         {
             var v = R('e');
-            return Enum.ToObject(t.Invoke(), ulong.Parse(v.ToString(), C.I));
+            return (TEnum)Enum.ToObject(typeof(TEnum), ulong.Parse(v.ToString(), C.I));
         }
-
-        private bool TryReadEnum<TEnum>(out object e)
-        {
-            try
-            {
-                var v = R('e');
-                e = Enum.ToObject(typeof(TEnum), ulong.Parse(v.ToString(), C.I));
-                return true;
-            } catch
-            {
-                e = null;
-                return false;
-            }            
-        }
-
+        
         public S ReadObject<S>() where S : ISerializable, new()
         {
             S o = new S();
@@ -314,80 +256,7 @@ namespace Script
             e.MoveNext();
             return o;
         }
-
-        public T Read<T>(Func<Type> innerType = null) {
-            var cases = new Dictionary<Type, Func<object>> {
-                { typeof(int), () => ReadInt() },
-                { typeof(string), () => ReadString() },
-                { typeof(bool), () => ReadBool() },
-                { typeof(double), () => ReadDouble() },
-                { typeof(float), () => ReadFloat() },
-                { typeof(uint), () => ReadUInt() },
-            };
-
-            var type = typeof(T);
-            object t = null;
-
-            if (type == typeof(object))
-            {
-                t = ReadAuto<T>(innerType);
-            } else if (cases.ContainsKey(type))
-            {
-                t = cases[type]();
-            }/*
-            else if (typeof(ISerializable).IsAssignableFrom(type)) // <-- there
-            {
-                throw new InvalidOperationException();
-
-                ISerializable test = default(T) as ISerializable;
-                ReadObject(test);
-             // 
-             // t = ReadObject(new T()); // <-- and cast it there somehow 
-            }*/
-            else //if (type.IsEnum) // ???
-            {
-                bool r = TryReadEnum<T>(out t);
-                if (!r)
-                {
-                    throw new InvalidCastException();
-                }
-                //t = ReadEnum<T>();
-            }
-            /*else
-            {
-                throw new InvalidCastException();
-            }*/
-
-            return (T)t;
-        }
-
-        public object ReadAuto<T>(Func<Type> t = null)
-        {
-            e.MoveNext();
-            var typeCode = e.Current;
-            var cases = new Dictionary<char, Func<object>> {
-                { 'i' , () => ReadInt() },
-                { 'u' , () => ReadUInt() },
-                { 'd' , () => ReadDouble() },
-                { 'f' , () => ReadFloat() },
-                { 'b' , () => ReadBool() },
-                { 's' , () => ReadString() },
-                { 'e' , () => ReadEnum(t) },
-                // 'o'
-                // 'c'
-            };
-
-            if (!cases.ContainsKey(typeCode))
-            {
-                throw new UnsupportedOperationException();
-            }
-            a = true;
-            var result = cases[typeCode]();
-            a = false;
-            return result;
-        }
-
-
+        
         public void Dispose()
         {
             e.Dispose();
@@ -395,68 +264,37 @@ namespace Script
             d = null;
         }
 
-        bool ReadCollection(Action clean, Action readItem)
+        public C ReadCollection<C, T>(Func<C> c, Func<T> i) where C : ICollection<T>
+        {
+            return ReadCollection(() => {
+                var o = c();
+                o.Clear();
+                return o;
+            }, (o) => o.Add(i()));
+        }
+
+        public C ReadCollection<C>(Func<C> c, Action<C> i)
         {
             T('c');
             e.MoveNext();
             if (e.Current != '{')
             {
-                return false;
+                return default(C);
             }
 
-            clean();
+            var o = c();
 
             int count = ReadInt();
             while (count-- > 0)
             {
-                readItem();
+                i(o);
             }
             e.MoveNext();
             e.MoveNext();
 
-            return true;
-        }
-
-        public Dictionary<K, V> ReadDictionary<K, V>(Dictionary<K, V> o, Func<K> createKey = null, Func<V> createValue = null, Func<Type> innerType = null)
-        {
-            return ReadCollection(() =>
-            {
-                o?.Clear();
-                o = o ?? new Dictionary<K, V>();
-            }, () =>
-            {
-                K k = createKey != null ? (K)ReadObject((ISerializable)createKey()) : Read<K>(innerType);
-                V v = createValue != null ? (V)ReadObject((ISerializable)createValue()) : Read<V>(innerType);
-                o[k] = v;
-            }) ? o : null;
-        }
-
-        internal List<T> ReadList<T>(List<T> o, Func<T> createItem = null, Func<Type> innerType = null)
-        {
-            return ReadCollection(() =>
-            {
-                o?.Clear();
-                o = o ?? new List<T>();
-            }, () =>
-            {
-                o.Add(createItem != null ? (T)ReadObject((ISerializable)createItem()) : Read<T>(innerType));
-            }) ? o : null;
-        }
-
-        internal Queue<T> ReadQueue<T>(Queue<T> o, Func<T> createItem = null)
-        {
-            return ReadCollection(() =>
-            {
-                o?.Clear();
-                o = o ?? new Queue<T>();
-            }, () =>
-            {
-                o.Enqueue(createItem != null ? (T)ReadObject((ISerializable)createItem()) : Read<T>());
-            }) ? o : null;
+            return o;
         }
     }
-
-    class UnsupportedOperationException : Exception { }
 
     class InvalidFormatException : Exception
     {

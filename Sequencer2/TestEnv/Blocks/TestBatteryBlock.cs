@@ -16,6 +16,19 @@ namespace SETestEnv
 {
     class TestBatteryBlock : TestBlock, IMyBatteryBlock
     {
+        public ChargeMode ChargeMode
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public float CurrentInput
         {
             get

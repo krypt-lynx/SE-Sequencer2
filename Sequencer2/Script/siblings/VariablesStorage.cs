@@ -15,12 +15,15 @@ namespace Script
 
         public void Serialize(Serializer encoder)
         {
-            encoder.Write(variables);            
+            encoder.Write(variables, i => encoder.Write(i.Key).Write(i.Value));            
         }
 
         public void Deserialize(Deserializer decoder)
         {
-            decoder.ReadDictionary(variables);
+            variables = decoder.ReadCollection(
+                () => variables,
+                () => new KeyValuePair<string, double>(decoder.ReadString(), decoder.ReadDouble())
+            );
         }
 
         static VariablesStorage _shared = new VariablesStorage();

@@ -192,19 +192,36 @@ namespace Script
             return Cmd + " " + string.Join(" ", Args.Cast<object>().Select(x => String.Format("\"{0}\"", x)));
         }
 
-        public void Serialize(Serializer encoder)
+        public void Serialize(Serializer enc)
         {
-            encoder.Write(Cmd)
-                   .Write(_cycle)
-                   .Write(Args);
+            var map = new Dictionary<Type, Action<object>> {
+                       { typeof(string), (i) => enc.Write(0).Write((string)i) },
+                       { typeof(bool), (i) => enc.Write(1).Write((bool)i) },
+                       { typeof(double), (i) => enc.Write(2).Write((double)i) },
+                       { typeof(MatchingType), (i) => enc.Write(3).Write((MatchingType)i) },
+                   };
+
+            enc.Write(Cmd)
+               .Write(_cycle)
+               .Write(Args, (object i) => {
+
+                   map[i.GetType()](i);
+               });
         }
 
-        public void Deserialize(Deserializer decoder)
+        public void Deserialize(Deserializer dec)
         {
-            Cmd = decoder.ReadString();
+            var map = new List<Func<object>> {
+                       { () => dec.ReadString() },
+                       { () => dec.ReadBool() },
+                       { () => dec.ReadDouble() },
+                       { () => dec.ReadEnum<MatchingType>() },
+                    };
+
+            Cmd = dec.ReadString();
             Impl = Commands.CmdDefs[Cmd].Implementation;
-            _cycle = decoder.ReadInt();
-            Args = decoder.ReadList(new List<object>(),null,() => (typeof(MatchingType)));            
+            _cycle = dec.ReadInt();
+            Args = dec.ReadCollection(() => new List<object>(), () => map[dec.ReadInt()]());
         }
 
         internal CommandResult Run()
