@@ -18,7 +18,7 @@ namespace Script
 
     public class Serializer
     {
-        StringBuilder d = new StringBuilder();
+        StringBuilder d = new StringBuilder("v2;");
         
         void A<T>(T c) { d.Append(c); }
 
@@ -146,10 +146,16 @@ namespace Script
         string d;
         IEnumerator<char> e;
 
-        public Deserializer(string s)
+        public Deserializer() { }
+
+        public void Init(string s)
         {
             d = s; 
             e = s.GetEnumerator();
+            if (R('v').ToString() != "2")
+            {
+                throw new InvalidFormatException("invalid string format");
+            }
         }
         
         void T(char t) // TestType
