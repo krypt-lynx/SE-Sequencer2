@@ -155,12 +155,11 @@ namespace Script
 
             if (!string.IsNullOrEmpty(Storage))
             {
-                decoder = new Deserializer();
                 string storedUti = null;
                 Version storedVer = null;
                 try
                 {
-                    decoder.Init(Storage);
+                    decoder = new Deserializer(Storage);
                     storedUti = decoder.ReadString();
                     storedVer = new Version(decoder.ReadUInt());
                 }

@@ -7,19 +7,18 @@ using System.Threading.Tasks;
 
 namespace Script
 {
-    // check git history for unminified version
 
     /* #override
      * Minify: true
      */
 
     #region ingame script start
-                
+
 
     public class Serializer
     {
-        StringBuilder d = new StringBuilder("v2;");
-        
+        StringBuilder d = new StringBuilder();
+
         void A<T>(T c) { d.Append(c); }
 
         public Serializer Write(int v)
@@ -101,40 +100,44 @@ namespace Script
             return this;
         }
 
-        public Serializer Write<T, C>(C v, Action<T> item) where C : ICollection
+        public Serializer Write<T>(ICollection v, Action<T> item)
         {
-            A('c');
             if (v != null)
             {
-                A('{');
+                A("c{");
                 Write(v.Count);
                 foreach (var i in v)
                 {
                     item((T)i);
                 }
-                A('}');
+                A("};");
             }
-            A(';');
+            else
+            {
+                A("c;");
+            }
             return this;
         }
 
         public Serializer Write<T>(ICollection<T> v, Action<T> item)
         {
-            A('c');
             if (v != null)
             {
-                A('{');
+                A("c{");
                 Write(v.Count);
                 foreach (var i in v)
                 {
                     item(i);
                 }
-                A('}');
+                A("};");
             }
-            A(';');
+            else
+            {
+                A("c;");
+            }
             return this;
-        }        
-  
+        }
+
         public override string ToString()
         {
             return d.ToString();
@@ -143,21 +146,15 @@ namespace Script
 
     public class Deserializer : IDisposable
     {
-        string d;
         IEnumerator<char> e;
 
         public Deserializer() { }
 
-        public void Init(string s)
+        public Deserializer(string s)
         {
-            d = s; 
             e = s.GetEnumerator();
-            if (R('v').ToString() != "2")
-            {
-                throw new InvalidFormatException("invalid string format");
-            }
         }
-        
+
         void T(char t) // TestType
         {
             if (!e.MoveNext() || e.Current != t)
@@ -246,40 +243,44 @@ namespace Script
             var v = R('e');
             return (TEnum)Enum.ToObject(typeof(TEnum), ulong.Parse(v.ToString(), C.I));
         }
-        
+
         public S ReadObject<S>() where S : ISerializable, new()
         {
             S o = new S();
             return ReadObject(o);
         }
-        
-        public S ReadObject<S>(S o) where S : ISerializable
+
+        public T ReadObject<T>(T o) where T : ISerializable
         {
-            T('o');
+            this.T('o');
             e.MoveNext();
             o.Deserialize(this);
             e.MoveNext();
             e.MoveNext();
             return o;
         }
-        
+
         public void Dispose()
         {
             e.Dispose();
             e = null;
-            d = null;
         }
 
         public C ReadCollection<C, T>(Func<C> c, Func<T> i) where C : ICollection<T>
         {
-            return ReadCollection(() => {
+            return ReadCollection((s) => {
                 var o = c();
                 o.Clear();
                 return o;
-            }, (o) => o.Add(i()));
+            }, (o, k) => o.Add(i()));
         }
 
         public C ReadCollection<C>(Func<C> c, Action<C> i)
+        {
+            return ReadCollection(s => c(), (o, k) => i(o));
+        }
+
+        public C ReadCollection<C>(Func<int, C> c, Action<C, int> i)
         {
             T('c');
             e.MoveNext();
@@ -288,12 +289,13 @@ namespace Script
                 return default(C);
             }
 
-            var o = c();
-
             int count = ReadInt();
-            while (count-- > 0)
+
+            var o = c(count);
+
+            for (int k = 0; k < count; k++)
             {
-                i(o);
+                i(o, k);
             }
             e.MoveNext();
             e.MoveNext();
@@ -312,6 +314,6 @@ namespace Script
         void Serialize(Serializer encoder);
         void Deserialize(Deserializer decoder);
     }
-    
+
     #endregion // ingame script end
 }
