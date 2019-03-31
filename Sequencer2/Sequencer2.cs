@@ -44,12 +44,12 @@ namespace Script
         {
             Log.LogLevels = new Dictionary<string, LogLevel>
             {
-                { Scheduler.LOG_CAT,        LogLevel.Verbose },
-                { Parser.LOG_CAT,           LogLevel.Verbose },
-                { Program.LOG_CAT,          LogLevel.Verbose },
-                { RuntimeTask.LOG_CAT,      LogLevel.Verbose },
-                { ImplLogger.LOG_CAT,       LogLevel.Verbose },
-                { TimerController.LOG_CAT,  LogLevel.Verbose },
+                { Scheduler.LOG_CAT,           LogLevel.Warning },
+                { Parser.LOG_CAT,                 LogLevel.Warning },
+                { Program.LOG_CAT,              LogLevel.Warning },
+                { RuntimeTask.LOG_CAT,      LogLevel.Warning },
+                { ImplLogger.LOG_CAT,          LogLevel.Warning },
+                { TimerController.LOG_CAT,   LogLevel.Warning },
             };
         }
 
@@ -230,9 +230,16 @@ namespace Script
                     paramsRouter.Route(argument);
                 }
 
-                if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
+                if (updateSource != UpdateType.Script)
                 {
-                    sch.EnqueueTask(runtime);
+                    if ((runtime?.HaveWork() ?? false) && timerController.Timeout() && !runtime.IsEnqueued)
+                    {
+                        sch.EnqueueTask(runtime);
+                    }
+                }
+                else
+                {
+                    timerController.ScheduleImmidiate();
                 }
 
                 if (sch.HasTasks())

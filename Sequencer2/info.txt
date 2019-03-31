@@ -1,4 +1,4 @@
-﻿// Sequencer v2.2.1
+﻿// Sequencer v2.2.2
 // http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
 /* 
 
@@ -89,6 +89,10 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 
 
 changelog:
+
+2.2.2
+* update handling improvements
+* runtime rework
 
 2.2.1
 * save/load serialization fix

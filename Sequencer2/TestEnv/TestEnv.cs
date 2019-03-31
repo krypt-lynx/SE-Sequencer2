@@ -292,7 +292,7 @@ namespace SETestEnv
 
         public IMyTerminalBlock GetBlockWithId(long id)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public IMyTerminalBlock GetBlockWithName(string name)
