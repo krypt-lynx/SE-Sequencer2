@@ -82,7 +82,7 @@ namespace Script
             return int.MaxValue;
         }
     }
-
+    /*
     abstract class YieldTask<T> : Task
     {
         public Action Done;
@@ -115,11 +115,17 @@ namespace Script
                 work = null;
                 Done?.Invoke();
             }
+            else
+            {
+                Interupted();
+            }
 
             return done;
         }
-
+        
         abstract public IEnumerator<T> DoWork();
+
+        public virtual void Interupted() { }
 
         public override string TypeCode()
         {
@@ -131,7 +137,7 @@ namespace Script
             return int.MaxValue;
         }
     }
-
+    */
     abstract class FastTask<T> : Task<T>
     {
         public override bool Run()

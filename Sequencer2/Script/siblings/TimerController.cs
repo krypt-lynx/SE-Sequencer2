@@ -20,29 +20,34 @@ namespace Script
         float timePassed = 0;
         float delay = 0;
         float extraTime = 0;
+        bool scheduled = false;
         bool firstTick = true;
         DateTime deserializationTime = DateTime.Now;
 
         public void Serialize(Serializer encoder)
         {
             encoder.Write(timePassed)
-                   .Write(delay);
+                   .Write(delay)
+                   .Write(scheduled);
         }
 
         public void Deserialize(Deserializer decoder)
         {
             timePassed = decoder.ReadFloat();
             delay = decoder.ReadFloat();
+            scheduled = decoder.ReadBool();
 
             ReinitTimer();
         }
 
-        public TimerController() { }
+        public TimerController()
+        {
+
+        }
 
         void ReinitTimer()
         {
             UpdateFrequencyFlags();
-            Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Once;
         }
         
         public void ScheduleStart(float delay)
@@ -51,10 +56,16 @@ namespace Script
 
             this.delay = delay;
             this.timePassed = 0;
+            scheduled = true;
             UpdateFrequencyFlags();
         }
 
-        public void Update()
+        public void ScheduleImmidiate()
+        {
+            Program.Current.Runtime.UpdateFrequency |= UpdateFrequency.Once;
+        }
+
+        public void UpdateBefore()
         {
             var totalSeconds = (float)Program.Current.Runtime.TimeSinceLastRun.TotalSeconds;
 
@@ -75,23 +86,39 @@ namespace Script
                 delay = 0;
             }
 
+        }
+
+        public void UpdateAfter()
+        {
             UpdateFrequencyFlags();
         }
 
+
         void UpdateFrequencyFlags()
         {
-            if (delay >= 3.33)
+            var otherFlags = Program.Current.Runtime.UpdateFrequency & ~(UpdateFrequency.Update1 | UpdateFrequency.Update10 | UpdateFrequency.Update100);
+            UpdateFrequency result;
+            if (scheduled)
             {
-                Program.Current.Runtime.UpdateFrequency = UpdateFrequency.Update100;
-            }
-            else if (delay > 0.3)
+                if (delay >= 3.33)
+                {
+                    result = otherFlags | UpdateFrequency.Update100;
+                }
+                else if (delay > 0.3)
+                {
+                    result = otherFlags | UpdateFrequency.Update10;
+                }
+                else 
+                {
+                    result = otherFlags | UpdateFrequency.Update1;
+                }
+            } 
+            else
             {
-                Program.Current.Runtime.UpdateFrequency = UpdateFrequency.Update10;
+                result = otherFlags;
             }
-            else if (delay > 0)
-            {
-                Program.Current.Runtime.UpdateFrequency = UpdateFrequency.Update1;
-            }
+
+            Program.Current.Runtime.UpdateFrequency = result;
         }
 
         public float TimePassed()
@@ -106,8 +133,9 @@ namespace Script
         
         internal void CancelStart()
         {
-            this.delay = 0;
-            this.timePassed = 0;
+            delay = 0;
+            timePassed = 0;
+            scheduled = false;
             UpdateFrequencyFlags();
         }    
     }

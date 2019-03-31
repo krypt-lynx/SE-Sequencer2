@@ -40,7 +40,7 @@ namespace Script
             };
         }
 
-        internal static CommandResult LogLevel_(IList args)
+        internal static void LogLevel_(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("loglevel", args);
 
@@ -75,21 +75,16 @@ namespace Script
                         Log.LogLevels[cat] = (LogLevel)level;
                     }
                 }
-            }
-
-            return null;
+            }            
         }
 
-        internal static CommandResult Echo(IList args)
+        internal static void Echo(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("echo", args);
-
             Log.Write((string)args[0]);
-
-            return null;
         }
 
-        internal static CommandResult ListProps(IList args)
+        internal static void ListProps(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("listprops", args);
 
@@ -142,11 +137,9 @@ namespace Script
                 }
                 Log.WriteLine();
             }
-
-            return null;
         }
 
-        internal static CommandResult ListActions(IList args)
+        internal static void ListActions(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("listactions", args);
 
@@ -169,12 +162,10 @@ namespace Script
                     Log.WriteFormat("\"{0}\": {1}", new object[] { action.Id, action.Name });
                 }
                 Log.WriteLine();
-            }
-
-            return null;
+            }            
         }
 
-        private static CommandResult ListBlocks(IList args)
+        private static void ListBlocks(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("listblocks", args);
 
@@ -195,9 +186,7 @@ namespace Script
                     block.BlockDefinition.SubtypeName,
                     block.CustomName,
                     block.EntityId} );
-            }
-
-            return null;
+            }            
         }
 
     }

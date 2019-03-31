@@ -29,7 +29,7 @@ namespace Script
         }
 
 
-        internal static CommandResult Test1(IList args)
+        internal static void Test1(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("test1", args);
 
@@ -42,8 +42,6 @@ namespace Script
             IMyTextPanel Text = lcds.FirstOrDefault();
 
             Text?.WritePublicText(Rotor?.Angle.ToString() ?? "<null>", true);
-
-            return null;
         }
     }
 

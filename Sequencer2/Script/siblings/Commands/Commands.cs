@@ -33,18 +33,18 @@ namespace Script
         }
     }
 
-    public struct CommandRef
+    struct CommandRef
     {
         public string Name;
         public ParamRef[] Arguments;
-        public Func<IList, CommandResult> Implementation;
+        public Action<IList, IMethodContext> Implementation;
         public int OptionalCount;
         public bool Aggregative; // aggregative parameter must be last one
         public SqRequirements Requirements;
         public bool IsWait;
         public bool Hidden;
 
-        public CommandRef(string name, ParamRef[] arguments, Func<IList, CommandResult> implementation,
+        public CommandRef(string name, ParamRef[] arguments, Action<IList, IMethodContext> implementation,
             SqRequirements requirements = SqRequirements.None, bool isWait = false, bool hidden = false)
         {
             Name = name;

@@ -16,6 +16,7 @@ namespace Script
 
         Exception lastException = null;
         public static MyGridProgram Current;
+        bool tryWriteErrorOnce = true;
 
         public void IsolatedRun(Action work)
         {
@@ -45,12 +46,28 @@ namespace Script
 
         private void EchoException()
         {
-            Echo("Exception handled!");
-            Echo("Please, make screenshot of this message and report the issue to developer");
-            Echo("To recover recompile the script");
-            Echo(lastException.GetType().Name);
-            Echo(lastException.Message);
-            Echo(lastException.StackTrace);
+            try
+            {
+                WE("Exception handled!");
+                WE("Please, make screenshot of this message and report the issue to developer");
+                WE("To recover recompile the script");
+                WE(lastException.GetType().Name);
+                WE(lastException.Message);
+                WE(lastException.StackTrace);
+            }
+            catch { }
+            tryWriteErrorOnce = false;
+        }
+
+        void WE(string message)
+        {
+            if (tryWriteErrorOnce)
+            {
+                Log.Write(message);
+            } else
+            {
+                Echo(message);
+            }
         }
 
         #endregion // ingame script end

@@ -170,17 +170,17 @@ namespace Script
     }
 
 
-    public class SqCommand : ISerializable
+    class SqCommand : ISerializable
     {
         public string Cmd;
         public IList Args;
-        public Func<IList, CommandResult> Impl;
+        public Action<IList, IMethodContext> Impl;
 
         public int _cycle = 0;
 
         public SqCommand() { }
 
-        public SqCommand(string cmd, IList args, Func<IList, CommandResult> impl)
+        public SqCommand(string cmd, IList args, Action<IList, IMethodContext> impl)
         {
             Cmd = cmd;
             Args = args;
@@ -199,13 +199,16 @@ namespace Script
                        { typeof(bool), (i) => enc.Write((bool)i) },
                        { typeof(double), (i) => enc.Write((double)i) },
                        { typeof(MatchingType), (i) => enc.Write((MatchingType)i) },
-                   };
+            };
+
+            map[typeof(List<object>)] = (i) => enc.Write((IList<object>)i, (object j) =>
+                            {
+                                map[j.GetType()](j);
+                            });
 
             enc.Write(Cmd)
                .Write(_cycle)
-               .Write(Args, (object i) => {
-                   map[i.GetType()](i);
-               });
+               .Write(Args, (object i) => map[i.GetType()](i));
         }
 
         public void Deserialize(Deserializer dec)
@@ -221,12 +224,26 @@ namespace Script
             var def = Commands.CmdDefs[Cmd];
             Impl = def.Implementation;
             _cycle = dec.ReadInt();
-            Args = dec.ReadCollection(() => new List<object>(), (o) => o.Add(map[(int)def.Arguments[o.Count].Type]()));
+            Args = dec.ReadCollection(() => new List<object>(), (o) =>
+            {
+                var argDef = def.Arguments[o.Count];
+                if (argDef.Aggregative)
+                {
+                    o.Add(dec.ReadCollection(
+                        () => new List<object>(),
+                        () => map[(int)argDef.Type]()
+                    ));
+                }
+                else
+                {
+                    o.Add(map[(int)argDef.Type]());
+                }
+            });
         }
 
-        internal CommandResult Run()
+        internal void Run(IMethodContext context)
         {
-            return Impl(Args);
+            Impl(Args, context);
         }
     }
 

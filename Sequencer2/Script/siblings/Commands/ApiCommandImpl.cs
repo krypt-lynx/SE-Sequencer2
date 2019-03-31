@@ -50,7 +50,7 @@ namespace Script
             };
         }
 
-        public static CommandResult Run(IList args)
+        public static void Run(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("run", args);
 
@@ -64,13 +64,11 @@ namespace Script
 
             foreach (var block in blocks)
             {
-                block .TryRun(argument);
+                block.TryRun(argument);
             }
-
-            return null;
         }
 
-        public static CommandResult Action(IList args)
+        public static void Action(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("action", args);
 
@@ -93,14 +91,10 @@ namespace Script
                 {
                     Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "block \"{0}\" does not support action \"{1}\", ignoring", block.CustomName, action);
                 }
-            }
-
-            return null;
+            }            
         }
 
-
-
-        public static CommandResult Set(IList args)
+        public static void Set(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("set", args);
 
@@ -188,10 +182,9 @@ namespace Script
                     Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "block \"{0}\" does not have property \"{1}\", ignoring", block.CustomName, prop);
                 }
             }
-
-            return null;
         }
-        internal static CommandResult Text(IList args)
+
+        public static void Text(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("text", args);
 
@@ -209,11 +202,9 @@ namespace Script
             {
                 block.WritePublicText(text, append);
             }
-
-            return null;
         }
 
-        public static CommandResult Transmit(IList args)
+        public static void Transmit(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("transmit", args);
 
@@ -290,8 +281,6 @@ namespace Script
 
                 Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, warning);
             }
-
-            return null;
         }
     }
 

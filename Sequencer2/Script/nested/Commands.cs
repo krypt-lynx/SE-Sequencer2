@@ -57,9 +57,8 @@ namespace Script
                     prog.Commands.Add(new SqCommand("unload", new object[] { tempName }, ExecFlowCommandImpl.Unload)); // todo:
                     prog.Name = tempName;
                     runtime.RegisterPrograms(new SqProgram[] { prog });
-                    StartProgram(tempName);
+                    runtime.StartProgram(tempName);
                 }
-
             };
             sch.EnqueueTask(parse);
         }
@@ -67,10 +66,6 @@ namespace Script
         private void StartProgram(string arg)
         {
             runtime.StartProgram(arg.Trim());
-            if (!runtime.IsEnqueued)
-            {
-                sch.EnqueueTask(runtime);
-            }
         }
 
         private void StopProgram(string arg)

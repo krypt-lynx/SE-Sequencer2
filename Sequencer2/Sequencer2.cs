@@ -44,12 +44,12 @@ namespace Script
         {
             Log.LogLevels = new Dictionary<string, LogLevel>
             {
-                { Scheduler.LOG_CAT,        LogLevel.Warning },
-                { Parser.LOG_CAT,           LogLevel.Warning },
-                { Program.LOG_CAT,          LogLevel.Warning },
-                { RuntimeTask.LOG_CAT,      LogLevel.Warning },
-                { ImplLogger.LOG_CAT,       LogLevel.Warning },
-                { TimerController.LOG_CAT,  LogLevel.Warning },
+                { Scheduler.LOG_CAT,        LogLevel.Verbose },
+                { Parser.LOG_CAT,           LogLevel.Verbose },
+                { Program.LOG_CAT,          LogLevel.Verbose },
+                { RuntimeTask.LOG_CAT,      LogLevel.Verbose },
+                { ImplLogger.LOG_CAT,       LogLevel.Verbose },
+                { TimerController.LOG_CAT,  LogLevel.Verbose },
             };
         }
 
@@ -104,6 +104,10 @@ namespace Script
                 Initialize();
 
                 sch.Run();
+                if (sch.HasTasks())
+                {
+                    timerController.ScheduleImmidiate();
+                }
             });
         }
 
@@ -123,11 +127,6 @@ namespace Script
                     decoder.ReadObject(timerController = new TimerController());
                     decoder.ReadObject(runtime = new RuntimeTask(timerController));
                     decoder.ReadObject(VariablesStorage.Shared);
-
-                    if (!runtime.StoredPrograms().Any())
-                    {
-                        ScheduleParse(true);
-                    }
                 }
                 catch (Exception e)
                 {
@@ -224,7 +223,7 @@ namespace Script
         {
             IsolatedRun(() =>
             {
-                timerController.Update();
+                timerController.UpdateBefore();
 
                 if ((updateSource | paramertizedTypes) != 0)
                 {
@@ -239,7 +238,14 @@ namespace Script
                 if (sch.HasTasks())
                 {
                     sch.Run();
+
+                    if (sch.HasTasks())
+                    {
+                        timerController.ScheduleImmidiate();
+                    }
                 }
+
+                timerController.UpdateAfter();
             });
         }
         #endregion // ingame script end

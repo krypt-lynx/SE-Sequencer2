@@ -10,18 +10,25 @@ namespace Script
     #region ingame script start
 
 
-    class RuntimeTask : YieldTask<bool>, ISerializable
+    interface IMethodContext
+    {
+        void Wait(int seconds);
+        void Goto(int line);
+        void Set(string name, double value);
+        double Get(string name);
+
+        RuntimeTask Runtime { get; }
+    }
+
+    class RuntimeTask : InterruptibleTask<Stub>, ISerializable
     {
         public const string LOG_CAT = "exe";
 
-        private Dictionary<string, SqProgram> Programs = new Dictionary<string, SqProgram>();
-
-        private List<string> scheduledPrograms = new List<string>();
-        private Queue<SqProgram> replacements = new Queue<SqProgram>();
 
         private TimerController timerController;
 
-        int lastProgramId = 0;
+
+        //*** Serialization
 
         public void Serialize(Serializer encoder)
         {
@@ -34,33 +41,68 @@ namespace Script
         public void Deserialize(Deserializer dec)
         {
             lastProgramId = dec.ReadInt();
-            dec.ReadCollection(() => Programs, () => new KeyValuePair<string, SqProgram>(dec.ReadString(), dec.ReadObject<SqProgram>()));
+            dec.ReadCollection(() => Programs, () => {
+                var key = dec.ReadString();
+                var value = dec.ReadObject<SqProgram>();
+                value.Runtime = this;
+                return new KeyValuePair<string, SqProgram>(key, value);
+            });
             dec.ReadCollection(() => scheduledPrograms, () => dec.ReadString());
             dec.ReadCollection(() => replacements, (c) => c.Enqueue(dec.ReadObject<SqProgram>()));
         }
 
-        public int GenerateProgramId()
-        {
-            return ++lastProgramId;
-        }
+        //*** Sheduller Task
+
 
         public RuntimeTask(TimerController timerController) : base("Runtime")
         {
+            priority = 3;
             this.timerController = timerController;
         }
-        
-        public override IEnumerator<bool> DoWork()
+
+        IEnumerator<bool> work = null;
+
+        public override bool DoWork()
+        {
+            if (work == null)
+            {
+                work = Runloop();
+            }
+
+            bool done = false;
+
+            while (!Timeout() && !done)
+            {
+                done = !work.MoveNext();
+            }
+
+            if (done)
+            {
+                work.Dispose();
+                work = null;
+            }
+
+            UpdateTimer();
+
+            return done;
+        }
+
+        public IEnumerator<bool> Runloop()
         {
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Time passed: {0}", timerController.TimePassed());
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Have {0} program(s) to run", scheduledPrograms.Count);
 
+            foreach (var key in scheduledPrograms)
+            {
+                var program = Programs[key];
+                program.TimeToWait = Math.Max(0, program.TimeToWait - timerController.TimePassed());
+                // attempting to substract passed time from just added task. Can be a problem in future.
+            }
 
             foreach (var key in new List<string>(scheduledPrograms))
             {
                 var program = Programs[key];
 
-                program.TimeToWait = Math.Max(0, program.TimeToWait - timerController.TimePassed());
-                // attempting to substract passed time from just added task. Can be a problem in future.
                 foreach (var stub in ExecuteProgram(program))
                 {
                     yield return false;
@@ -69,9 +111,23 @@ namespace Script
 
             RetryRegisterPrograms();
 
-            ScheduleWaitIfNeeded();
+            //ScheduleWaitIfNeeded();
 
             yield return true;
+        }
+        
+        //*** Runtime
+
+        int lastProgramId = 0;
+
+        private Dictionary<string, SqProgram> Programs = new Dictionary<string, SqProgram>();
+
+        private List<string> scheduledPrograms = new List<string>();
+        private Queue<SqProgram> replacements = new Queue<SqProgram>();
+
+        public int GenerateProgramId()
+        {
+            return ++lastProgramId;
         }
 
         private void RetryRegisterPrograms()
@@ -110,46 +166,13 @@ namespace Script
                     cmd._cycle = program._cycle;
                 }
 
-                var result = cmd.Run();
+                /*var result =*/
+                cmd.Run(program);
+                program.currentCommand++;
 
-                switch (result?.Action ?? CommandAction.None)
+                if (program.TimeToWait > TimerController.IgnoreDelayLessThen)
                 {
-                    case CommandAction.Start:
-                        StartProgram((string)result.Data);
-                        program.currentCommand++;
-                        break;
-                    case CommandAction.Stop:
-                        StopProgram((string)result.Data);
-                        program.currentCommand++;
-                        break;
-                    case CommandAction.RemoveMethods:
-                        foreach (var name in (string[])result.Data)
-                        {
-                            StopProgram(name);
-                            Programs.Remove(name);
-                        }
-                        program.currentCommand++;
-                        break;
-                    case CommandAction.AddMethods:
-                        RegisterPrograms((IEnumerable<SqProgram>)result.Data);
-                        program.currentCommand++;
-                        break;
-                    case CommandAction.None:
-                        program.currentCommand++;
-                        break;
-                    case CommandAction.Wait:
-                        float waitseconds = (float)result.Data;
-                        program.currentCommand++;
-                        if (waitseconds > 0)
-                        {
-                            program.TimeToWait = waitseconds;
-                            goto pause; // achievement unlocked: use goto
-                        }
-
-                        break;
-                    case CommandAction.Repeat:
-                        program.currentCommand = 0;
-                        break;
+                    goto pause; // achievement unlocked: use goto
                 }
 
                 yield return false;
@@ -183,11 +206,12 @@ namespace Script
                         Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "Program \"{0}\" was added", prog.Name);
                     }
                     Programs[prog.Name] = prog;
+                    prog.Runtime = this;
                 }
             }            
         }
 
-        private void ScheduleWaitIfNeeded()
+        private void UpdateTimer()
         {
             if (scheduledPrograms.Count == 0)
             {
@@ -210,6 +234,7 @@ namespace Script
                 {
                     Programs[arg].currentCommand = 0;
                     scheduledPrograms.Add(arg);
+                    UpdateTimer();
                     return true;
                 }
                 else if (!silent)
@@ -235,12 +260,18 @@ namespace Script
                 scheduledPrograms.Remove(arg);
 
                 RetryRegisterPrograms();
-                ScheduleWaitIfNeeded();
+                UpdateTimer();
             }
             else
             {
                 Log.WriteFormat(LOG_CAT, LogLevel.Warning, "attempt to stop unknown program \"{0}\", ignoring", arg);
             }
+        }
+
+        public void UnloadProgram(string name)
+        {
+            StopProgram(name);
+            Programs.Remove(name);            
         }
 
         public IEnumerable<string> StoredPrograms()

@@ -8,13 +8,15 @@ using VRageMath;
 
 namespace Script
 {
+    /*
     struct ColorEntry
     {
         public int match;
         public string tail;
         public string src;
         public uint color;
-    }
+    }*/
+
     /* #override
      * Minify: true
      */

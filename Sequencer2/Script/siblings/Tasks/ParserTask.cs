@@ -16,6 +16,7 @@ namespace Script
 
 		public ParserTask(string src) : base("ParserTask")
         {
+            priority = 2;
             parser = new Parser(src);
         }
 

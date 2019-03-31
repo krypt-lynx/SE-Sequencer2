@@ -52,79 +52,78 @@ namespace Script
         }
 
 
-        public static CommandResult Wait(IList args)
+        public static void Wait(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("wait", args);
-            return new CommandResult { Action = CommandAction.Wait, Data = (float)(double)args[0]};
+            context.Wait((int)(double)args[0]);
         }
 
-        public static CommandResult WaitTicks(IList args)
+        public static void WaitTicks(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("waitticks", args);
-            return new CommandResult { Action = CommandAction.Wait, Data = (float)((double)args[0] * 60) };
+            context.Wait((int)(((double)args[0])/ 60));
         }
 
-        public static CommandResult Repeat(IList args)
+        public static void Repeat(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("repeat", args);
-            return new CommandResult { Action = CommandAction.Repeat };
+            context.Goto(0);
         }
 
-        public static CommandResult Start(IList args)
+        public static void Start(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("start", args);
-            return new CommandResult { Action = CommandAction.Start, Data = (string)args[0] };
+            context.Runtime.StartProgram((string)args[0]);            
         }
 
-        public static CommandResult Stop(IList args)
+        public static void Stop(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("stop", args);
-            return new CommandResult { Action = CommandAction.Stop, Data = (string)args[0] };
+            context.Runtime.StopProgram((string)args[0]);
         }
 
-        internal static CommandResult SetVar(IList args)
+        public static void SetVar(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("setvar", args);
-            VariablesStorage.Shared.SetVariable((string)args[0], (double)args[1]);
-            return null;
+            context.Set((string)args[0], (double)args[1]);
         }
 
-        internal static CommandResult Switch(IList args)
+        public static void Switch(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("switch", args);
-            int var = (int)(VariablesStorage.Shared.GetVariable((string)args[0]) ?? 0);
+            int var = (int)(context.Get((string)args[0]));
             IList cases = (IList)args[1];
 
             if (var < 0 || var >= cases.Count)
             {
                 Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "Value {0} is out of bounds (0..{1})", var, cases.Count);
-                return null;
             }
             else
             {
-                return new CommandResult { Action = CommandAction.Start, Data = (string)cases[var] };
+                context.Runtime.StartProgram((string)cases[var]);
             }
         }
 
-        internal static CommandResult Load(IList args)
+        internal static void Load(IList args, IMethodContext context)
         {
+            ImplLogger.LogImpl("load", args);
             Parser parser = new Parser((string)args[0]);
             parser.Parse(() => false);
 
             if (parser.Finalize())
             {
-                return new CommandResult { Action = CommandAction.AddMethods, Data = parser.Programs };
+                context.Runtime.RegisterPrograms(parser.Programs);
             }
             else
             {
                 Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, "exception during parsing: {0}", parser.ErrorMessage);
-                return null;
             }
         }
 
-        internal static CommandResult Unload(IList args)
+        internal static void Unload(IList args, IMethodContext context)
         {
-            return new CommandResult { Action = CommandAction.RemoveMethods, Data = new string[] { (string)args[0] } };
+            ImplLogger.LogImpl("unload", args);
+            context.Runtime.UnloadProgram((string)args[0]);        
         }
     }
 

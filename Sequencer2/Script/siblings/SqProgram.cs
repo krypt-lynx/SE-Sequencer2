@@ -10,7 +10,7 @@ namespace Script
 
     #region ingame script start
 
-    public class SqProgram : ISerializable
+    class SqProgram : IMethodContext, ISerializable 
     {
         public int currentCommand = 0;
         public string Name;
@@ -25,6 +25,8 @@ namespace Script
                 return currentCommand != 0; //todo?
             }
         }
+
+        public RuntimeTask Runtime { get; set; }
 
         public SqProgram(string name, IEnumerable<SqCommand> commands)
         {
@@ -50,6 +52,27 @@ namespace Script
                 .Write(TimeToWait)
                 .Write(_cycle)
                 .Write(Commands, i => encoder.Write(i));            
+        }
+
+        public void Wait(int seconds)
+        {
+            //System.Diagnostics.Debug.Assert(TimeToWait == 0);
+            TimeToWait = seconds;
+        }
+
+        public void Goto(int line)
+        {
+            currentCommand = line - 1; // todo: remove -1
+        }
+
+        public void Set(string name, double value)
+        {
+            VariablesStorage.Shared.SetVariable(name, value);
+        }
+
+        public double Get(string name)
+        {
+            return VariablesStorage.Shared.GetVariable(name) ?? 0;
         }
     } 
    

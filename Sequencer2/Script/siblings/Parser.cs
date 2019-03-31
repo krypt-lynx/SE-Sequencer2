@@ -105,7 +105,7 @@ namespace Script
 
         public bool Parse(Func<bool> timeout)
         {
-
+            Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing started");
             while ((state != ParserState.SyntaxError) && (nextPos < chars.Length))
             {
                 ch = chars[nextPos];
@@ -128,6 +128,7 @@ namespace Script
                     return false;
                 }                        
             }
+            Log.Write(LOG_CAT, LogLevel.Verbose, "Parsing finished");
             return true;
         }
 
