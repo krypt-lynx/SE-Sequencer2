@@ -14,7 +14,7 @@ namespace Script
     {
         public int currentCommand = 0;
         public string Name;
-        public float TimeToWait = 0;
+        public double TimeToWait = 0;
         public int _cycle = 0;
 
         public List<SqCommand> Commands;
@@ -54,7 +54,7 @@ namespace Script
                 .Write(Commands, i => encoder.Write(i));            
         }
 
-        public void Wait(int seconds)
+        public void Wait(double seconds)
         {
             //System.Diagnostics.Debug.Assert(TimeToWait == 0);
             TimeToWait = seconds;

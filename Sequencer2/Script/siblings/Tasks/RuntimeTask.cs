@@ -12,7 +12,7 @@ namespace Script
 
     interface IMethodContext
     {
-        void Wait(int seconds);
+        void Wait(double seconds);
         void Goto(int line);
         void Set(string name, double value);
         double Get(string name);
