@@ -55,13 +55,13 @@ namespace Script
         public static void Wait(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("wait", args);
-            context.Wait((int)(double)args[0]);
+            context.Wait((double)args[0]);
         }
 
         public static void WaitTicks(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("waitticks", args);
-            context.Wait((int)(((double)args[0])/ 60));
+            context.Wait(((double)args[0])/ 60);
         }
 
         public static void Repeat(IList args, IMethodContext context)

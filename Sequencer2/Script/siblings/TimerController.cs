@@ -17,9 +17,9 @@ namespace Script
         
         public const float IgnoreDelayLessThen = 0.01f;
 
-        float timePassed = 0;
-        float delay = 0;
-        float extraTime = 0;
+        double timePassed = 0;
+        double delay = 0;
+        double extraTime = 0;
         bool scheduled = false;
         bool firstTick = true;
         DateTime deserializationTime = DateTime.Now;
@@ -33,8 +33,8 @@ namespace Script
 
         public void Deserialize(Deserializer decoder)
         {
-            timePassed = decoder.ReadFloat();
-            delay = decoder.ReadFloat();
+            timePassed = decoder.ReadDouble();
+            delay = decoder.ReadDouble();
             scheduled = decoder.ReadBool();
 
             ReinitTimer();
@@ -50,7 +50,7 @@ namespace Script
             UpdateFrequencyFlags();
         }
         
-        public void ScheduleStart(float delay)
+        public void ScheduleStart(double delay)
         {
             // todo: test /waitticks
 
@@ -121,7 +121,7 @@ namespace Script
             Program.Current.Runtime.UpdateFrequency = result;
         }
 
-        public float TimePassed()
+        public double TimePassed()
         {
             return timePassed;
         }

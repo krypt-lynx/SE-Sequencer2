@@ -12,7 +12,7 @@ namespace Script
 
     interface IMethodContext
     {
-        void Wait(int seconds);
+        void Wait(double seconds);
         void Goto(int line);
         void Set(string name, double value);
         double Get(string name);
@@ -51,7 +51,7 @@ namespace Script
             dec.ReadCollection(() => replacements, (c) => c.Enqueue(dec.ReadObject<SqProgram>()));
         }
 
-        //*** Sheduller Task
+        //*** Scheduller Task
 
 
         public RuntimeTask(TimerController timerController) : base("Runtime")
