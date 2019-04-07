@@ -40,7 +40,7 @@ namespace Script
         {
             currentCommand = decoder.ReadInt();
             Name = decoder.ReadString();
-            TimeToWait = decoder.ReadFloat();
+            TimeToWait = decoder.ReadDouble();
             _cycle = decoder.ReadInt();
             Commands = decoder.ReadCollection(() => new List<SqCommand>(), () => decoder.ReadObject<SqCommand>());            
         }

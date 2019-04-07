@@ -90,6 +90,9 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 
 changelog:
 
+2.2.4
+* deserialization fix
+
 2.2.3
 * wait intervals quantized to whole numbers fixed
 
