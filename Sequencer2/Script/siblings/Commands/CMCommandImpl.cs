@@ -27,6 +27,11 @@ namespace Script
         //List<Tuple<string, InputEvent, string>> actions = new List<Tuple<string, InputEvent, string>>();
         Dictionary<string, Dictionary<InputEvent, HashSet<string>>> actions = new Dictionary<string, Dictionary<InputEvent, HashSet<string>>>();
 
+        public bool IsAvailable()
+        {
+            return true;
+        }
+
         public bool HasBindings()
         {
             return actions.Count > 0;

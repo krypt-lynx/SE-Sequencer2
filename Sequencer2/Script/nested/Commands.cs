@@ -53,8 +53,7 @@ namespace Script
                 {
                     string tempName = "_run_" + runtime.GenerateProgramId().ToString();
 
-
-                    prog.Commands.Add(new SqCommand("unload", new object[] { tempName }, ExecFlowCommandImpl.Unload)); // todo:
+                    prog.Commands.Add(Commands.CmdDefs["unload"].Materialize(new object[] { tempName })); // todo:
                     prog.Name = tempName;
                     runtime.RegisterPrograms(new SqProgram[] { prog });
                     runtime.StartProgram(tempName);

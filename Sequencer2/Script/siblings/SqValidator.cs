@@ -25,7 +25,7 @@ namespace Script
         None = 0,
         Timer = 1,
         Wait = 2,
-        ControlModule = 3,
+        ControlModule = 4,
     }
 
     class SqValidator
@@ -42,7 +42,8 @@ namespace Script
 
         private void Validate(SqProgram program, SqRequirements capabilities, List<string> messages)
         {
-            bool hasTimer = (capabilities & SqRequirements.Timer) == SqRequirements.Timer;
+            //bool hasTimer = (capabilities & SqRequirements.Timer) == SqRequirements.Timer;
+            bool hasCM = (capabilities & SqRequirements.ControlModule) == SqRequirements.ControlModule;
 
             var repeatPos = program.Commands.FindIndex(x => x.Cmd == "repeat");
             if (repeatPos != -1 && repeatPos != program.Commands.Count - 1)
@@ -55,10 +56,21 @@ namespace Script
                 Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "Where is no any wait command before /repeat in @{0}. Script will wait 1 tock to prevent \"Script Too Complex\" exception", program.Name);
             }
 
-            if (!hasTimer && program.Commands.Any(x => Commands.CmdDefs[x.Cmd].IsWait))
+            /*
+            SqCommand cmd = null;
+            if (!hasTimer && (cmd = program.Commands.FirstOrDefault(x => (Commands.CmdDefs[x.Cmd].Requirements & SqRequirements.Timer) != 0)) != null)
             {
-                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "@{0} contains wait command, but where is no timer to execute it", program.Name);
+                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "@{0} contains /{1} command, but where is no timer to execute it", program.Name, cmd.Cmd);
+            }*/
+
+            SqCommand cmd = null;
+            if (!hasCM && (cmd = program.Commands.FirstOrDefault(x => (Commands.CmdDefs[x.Cmd].Requirements & SqRequirements.ControlModule) != 0)) != null)
+            {
+                Log.WriteFormat(Parser.LOG_CAT, LogLevel.Warning, "@{0} contains /{1} command, but Control Module mod is not loaded", program.Name, cmd.Cmd);
             }
+
+            // if (!hasCM && program.Commands)
+
         }
     }
 

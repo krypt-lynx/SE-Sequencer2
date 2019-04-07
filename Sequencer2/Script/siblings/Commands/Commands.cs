@@ -34,7 +34,7 @@ namespace Script
         }
     }
 
-    struct CommandRef
+    class CommandRef
     {
         public string Name;
         public ParamRef[] Arguments;
@@ -58,6 +58,10 @@ namespace Script
             Hidden = hidden;
         }
         
+        public SqCommand Materialize(IList args)
+        {
+            return new SqCommand(Name, args, Implementation);
+        }
     }
 
     public enum CommandAction

@@ -61,10 +61,7 @@ namespace Script
                 return false;
             }
 
-            command = new SqCommand();
-            command.Cmd = cmd;
-            command.Args = new List<object>();
-            command.Impl = def.Implementation;
+            command = def.Materialize(new List<object>());
 
             int allowedOptional = args.Count - def.Arguments.Length + def.OptionalCount + (def.Aggregative ? 1 : 0);
 
