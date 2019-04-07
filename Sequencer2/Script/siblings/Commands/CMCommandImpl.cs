@@ -181,16 +181,16 @@ namespace Script
         public void Deserialize(Deserializer decoder)
         {
             actions = decoder.ReadCollection(
-                () => new Dictionary<string, Dictionary<InputEvent, HashSet<string>>>(),
-                () => new KeyValuePair<string, Dictionary<InputEvent, HashSet<string>>>(
-                    decoder.ReadString(),
-                    decoder.ReadCollection(
-                        () => new Dictionary<InputEvent, HashSet<string>>(),
-                        () => new KeyValuePair<InputEvent, HashSet<string>>(
-                            decoder.ReadEnum<InputEvent>(),
-                            decoder.ReadCollection(
-                                () => new HashSet<string>(),
-                                () => decoder.ReadString()
+                ()  => new Dictionary<string, Dictionary<InputEvent, HashSet<string>>>(),
+                (d) => new KeyValuePair<string, Dictionary<InputEvent, HashSet<string>>>(
+                    d.ReadString(),
+                    d.ReadCollection(
+                        ()  => new Dictionary<InputEvent, HashSet<string>>(),
+                        (e) => new KeyValuePair<InputEvent, HashSet<string>>(
+                            e.ReadEnum<InputEvent>(),
+                            e.ReadCollection(
+                                ()  => new HashSet<string>(),
+                                (f) => f.ReadString()
                             )))));
         }
     }

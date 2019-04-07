@@ -42,7 +42,7 @@ namespace Script
             Name = decoder.ReadString();
             TimeToWait = decoder.ReadDouble();
             _cycle = decoder.ReadInt();
-            Commands = decoder.ReadCollection(() => new List<SqCommand>(), () => decoder.ReadObject<SqCommand>());            
+            Commands = decoder.ReadCollection(() => new List<SqCommand>(), (d) => d.ReadObject<SqCommand>());            
         }
 
         public void Serialize(Serializer encoder)

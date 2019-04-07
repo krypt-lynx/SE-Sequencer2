@@ -230,14 +230,14 @@ namespace Script
             var def = Commands.CmdDefs[Cmd];
             Impl = def.Implementation;
             _cycle = dec.ReadInt();
-            Args = dec.ReadCollection(() => new List<object>(), (o) =>
+            Args = dec.ReadCollection(() => new List<object>(), (d, o) =>
             {
                 var argDef = def.Arguments[o.Count];
                 if (argDef.Aggregative)
                 {
                     o.Add(dec.ReadCollection(
-                        () => new List<object>(),
-                        () => map[(int)argDef.Type]()
+                        ()  => new List<object>(),
+                        (e) => map[(int)argDef.Type]()
                     ));
                 }
                 else

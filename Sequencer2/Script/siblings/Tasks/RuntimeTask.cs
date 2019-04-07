@@ -41,14 +41,14 @@ namespace Script
         public void Deserialize(Deserializer dec)
         {
             lastProgramId = dec.ReadInt();
-            dec.ReadCollection(() => Programs, () => {
-                var key = dec.ReadString();
-                var value = dec.ReadObject<SqProgram>();
+            dec.ReadCollection(() => Programs, (d) => {
+                var key = d.ReadString();
+                var value = d.ReadObject<SqProgram>();
                 value.Runtime = this;
                 return new KeyValuePair<string, SqProgram>(key, value);
             });
-            dec.ReadCollection(() => scheduledPrograms, () => dec.ReadString());
-            dec.ReadCollection(() => replacements, (c) => c.Enqueue(dec.ReadObject<SqProgram>()));
+            dec.ReadCollection(() => scheduledPrograms, (d) => d.ReadString());
+            dec.ReadCollection(() => replacements, (d, c) => c.Enqueue(d.ReadObject<SqProgram>()));
         }
 
         //*** Scheduller Task

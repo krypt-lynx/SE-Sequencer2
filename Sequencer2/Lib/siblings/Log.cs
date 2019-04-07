@@ -36,8 +36,8 @@ namespace Script
             public void Deserialize(Deserializer decoder)
             {
                 LogLevels = decoder.ReadCollection(
-                    () => LogLevels, 
-                    () => new KeyValuePair<string, LogLevel>(decoder.ReadString(), decoder.ReadEnum<LogLevel>())
+                    ()  => LogLevels, 
+                    (d) => new KeyValuePair<string, LogLevel>(d.ReadString(), d.ReadEnum<LogLevel>())
                 );
             }
 

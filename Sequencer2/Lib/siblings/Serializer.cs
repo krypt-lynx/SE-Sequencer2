@@ -266,21 +266,21 @@ namespace Script
             e = null;
         }
 
-        public C ReadCollection<C, T>(Func<C> c, Func<T> i) where C : ICollection<T>
+        public C ReadCollection<C, T>(Func<C> c, Func<Deserializer, T> i) where C : ICollection<T>
         {
             return ReadCollection((s) => {
                 var o = c();
                 o.Clear();
                 return o;
-            }, (o, k) => o.Add(i()));
+            }, (d, o, k) => o.Add(i(d)));
         }
 
-        public C ReadCollection<C>(Func<C> c, Action<C> i)
+        public C ReadCollection<C>(Func<C> c, Action<Deserializer, C> i)
         {
-            return ReadCollection(s => c(), (o, k) => i(o));
+            return ReadCollection(s => c(), (d, o, k) => i(d, o));
         }
 
-        public C ReadCollection<C>(Func<int, C> c, Action<C, int> i)
+        public C ReadCollection<C>(Func<int, C> c, Action<Deserializer, C, int> i)
         {
             T('c');
             e.MoveNext();
@@ -295,7 +295,7 @@ namespace Script
 
             for (int k = 0; k < count; k++)
             {
-                i(o, k);
+                i(this, o, k);
             }
             e.MoveNext();
             e.MoveNext();

@@ -21,8 +21,8 @@ namespace Script
         public void Deserialize(Deserializer decoder)
         {
             variables = decoder.ReadCollection(
-                () => variables,
-                () => new KeyValuePair<string, double>(decoder.ReadString(), decoder.ReadDouble())
+                ()  => variables,
+                (d) => new KeyValuePair<string, double>(d.ReadString(), d.ReadDouble())
             );
         }
 
