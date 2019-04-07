@@ -24,7 +24,8 @@ namespace Script
     {
         None = 0,
         Timer = 1,
-        Wait = 2
+        Wait = 2,
+        ControlModule = 3,
     }
 
     class SqValidator

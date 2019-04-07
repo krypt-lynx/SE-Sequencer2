@@ -74,7 +74,7 @@ namespace Script
 
 #else
         Exception lastException = null;
-        public static MyGridProgram Current;
+        public static Program Current;
 
         public void IsolatedRun(Action work)
         {

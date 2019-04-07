@@ -151,6 +151,10 @@ namespace console
 #this program will called after ""cold"" start 
 @_load 
 /start enable_broadcast 
+/cm_addInput c.forward test
+
+@test
+/echo :input test
 
 #vtol
    
@@ -370,7 +374,11 @@ owner.CustomData = @"
 /listprops ""Sequencer Timer""
 /listactions ""Sequencer Timer""
 ";*/
-
+            owner.SetProperty(new TestProp<string>("ControlModule.AddInput", ""));
+            owner.SetProperty(new TestProp<string>("ControlModule.RemoveInput", ""));
+            owner.SetProperty(new TestProp<int>("ControlModule.InputCheck", 0));
+            owner.SetProperty(new TestProp<int>("ControlModule.InputState", 0));
+            
             Script.Program.FutureOwner = owner;
   
             var test = new Script.Program();

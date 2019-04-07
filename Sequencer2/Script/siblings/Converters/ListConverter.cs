@@ -16,7 +16,8 @@ namespace Script
         StringBuilder,
         Single,
         Int64,
-        Color
+        Color,
+        String,
     }
 
     public static class ListConverter

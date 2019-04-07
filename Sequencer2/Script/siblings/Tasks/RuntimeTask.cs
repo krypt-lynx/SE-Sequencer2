@@ -51,7 +51,7 @@ namespace Script
             dec.ReadCollection(() => replacements, (c) => c.Enqueue(dec.ReadObject<SqProgram>()));
         }
 
-        //*** Sheduller Task
+        //*** Scheduller Task
 
 
         public RuntimeTask(TimerController timerController) : base("Runtime")

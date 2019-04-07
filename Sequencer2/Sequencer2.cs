@@ -44,12 +44,13 @@ namespace Script
         {
             Log.LogLevels = new Dictionary<string, LogLevel>
             {
-                { Scheduler.LOG_CAT,           LogLevel.Warning },
-                { Parser.LOG_CAT,                 LogLevel.Warning },
-                { Program.LOG_CAT,              LogLevel.Warning },
-                { RuntimeTask.LOG_CAT,      LogLevel.Warning },
-                { ImplLogger.LOG_CAT,          LogLevel.Warning },
-                { TimerController.LOG_CAT,   LogLevel.Warning },
+                { Scheduler.LOG_CAT,       LogLevel.Warning },
+                { Parser.LOG_CAT,          LogLevel.Warning },
+                { Program.LOG_CAT,         LogLevel.Warning },
+                { RuntimeTask.LOG_CAT,     LogLevel.Warning },
+                { ImplLogger.LOG_CAT,      LogLevel.Warning },
+                { TimerController.LOG_CAT, LogLevel.Warning },
+                { CMMapper.LOG_CAT,        LogLevel.Verbose },
             };
         }
 
@@ -143,6 +144,7 @@ namespace Script
                 timerController = new TimerController();
                 runtime = new RuntimeTask(timerController);
                 VariablesStorage.Clear();
+                CMMapper.Shared.Clear();
 
                 ScheduleParse(true);
             }
@@ -223,6 +225,13 @@ namespace Script
         {
             IsolatedRun(() =>
             {
+                if (updateSource == UpdateType.Mod)
+                {
+                    CMMapper.Shared.HandleInputs(runtime);
+                  //  argument = ""
+                }
+                //Log.Write($"main: args: {argument}; source {updateSource}");
+
                 timerController.UpdateBefore();
 
                 if ((updateSource | paramertizedTypes) != 0)

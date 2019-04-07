@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="Script\nested\Commands.cs" />
     <Compile Include="Script\siblings\Commands\ApiCommandImpl.cs" />
+    <Compile Include="Script\siblings\Commands\CMCommandImpl.cs" />
     <Compile Include="Script\siblings\Commands\ImplLogger.cs" />
     <Compile Include="Script\siblings\Commands\DebugCommandImpl.cs" />
     <Compile Include="Script\siblings\Commands\TestCommandImpl.cs" />

@@ -19,7 +19,7 @@ namespace Script
         private void ShowStatus(string obj)
         {
             Log.Write("Status:");
-            Log.Write("Sheduller tasks:");
+            Log.Write("Scheduller tasks:");
             foreach (var task in sch.AllTasks())
             {
                 Log.Write(task.DisplayName());

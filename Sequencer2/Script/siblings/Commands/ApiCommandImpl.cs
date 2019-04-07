@@ -119,8 +119,8 @@ namespace Script
                 // todo: redo
                 var propDef = block.GetProperty(prop);
 
-                List<ITerminalProperty> props = new List<ITerminalProperty>();
-                block.GetProperties(props);
+             //   List<ITerminalProperty> props = new List<ITerminalProperty>();
+             //   block.GetProperties(props);
 
                 PropType propType;
 
@@ -140,6 +140,11 @@ namespace Script
                         case PropType.StringBuilder:
                             {
                                 block.SetValue(prop, new StringBuilder(value));
+                                break;
+                            }
+                        case PropType.String:
+                            {
+                                block.SetValue(prop, value);
                                 break;
                             }
                         case PropType.Single:

@@ -14,7 +14,8 @@ namespace Script
         String = 0,
         Bool,
         Double,
-        GroupType
+        GroupType,
+        InputAction,
     }
 
     public struct ParamRef
@@ -88,6 +89,7 @@ namespace Script
             cmdDefs_.AddRange(ExecFlowCommandImpl.Defs());
             cmdDefs_.AddRange(ApiCommandImpl.Defs());
             cmdDefs_.AddRange(DebugCommandImpl.Defs());
+            cmdDefs_.AddRange(CMCommandImpl.Defs());
             //cmdDefs_.AddRange(TestCommandImpl.Defs()); // todo: Remove before release!
 
             CmdDefs = cmdDefs_.ToDictionary(x => x.Name);

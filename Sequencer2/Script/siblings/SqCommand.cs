@@ -155,6 +155,13 @@ namespace Script
                         result = g;
                         return success;
                     }
+                case ParamType.InputAction:
+                    {
+                        InputEvent a;
+                        bool success = Enum.TryParse(value, true, out a);
+                        result = a;
+                        return success;
+                    }
                 case ParamType.String:
                     {
                         result = value;
@@ -199,6 +206,7 @@ namespace Script
                        { typeof(bool), (i) => enc.Write((bool)i) },
                        { typeof(double), (i) => enc.Write((double)i) },
                        { typeof(MatchingType), (i) => enc.Write((MatchingType)i) },
+                       { typeof(InputEvent), (i) => enc.Write((InputEvent)i) },
             };
 
             map[typeof(List<object>)] = (i) => enc.Write((IList<object>)i, (object j) =>
@@ -218,6 +226,7 @@ namespace Script
                        { () => dec.ReadBool() },
                        { () => dec.ReadDouble() },
                        { () => dec.ReadEnum<MatchingType>() },
+                       { () => dec.ReadEnum<InputEvent>() },
                     };
 
             Cmd = dec.ReadString();
