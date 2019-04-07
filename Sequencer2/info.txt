@@ -97,33 +97,5 @@ changelog:
 * update handling improvements
 * runtime rework
 
-2.2.1
-* save/load serialization fix
-
-2.2
-+ "type" filter (experimental)
-+ use of builtin pb timer (timer block no longer used)
-* /u character sequence parsing fixed
-* other bugixes and optimizations
-
-2.1.1
-* bugixes and optimizations
-
-2.1.0
-! order of /transmit and /text arguments is switched
-+ "status" argument
-+ "Too Complex Exception" presention now actually working. 
-* Invalid type syntax error message fixed
-* script now trying to reparse script it have no parsed code
-
-2.0.2
-* Diagnostic message format
-
-2.0.1
-* color parsing fix
-
-2.0
-+ initial release
-
 */
 
