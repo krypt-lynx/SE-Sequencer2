@@ -17,7 +17,7 @@ namespace Script
         {
             Log.Write(LOG_CAT, LogLevel.Verbose, "--------");
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "/{0}", name);
-            Log.Write(LOG_CAT, LogLevel.Verbose, string.Join(" ", args.Cast<object>().Select(x => string.Format("\"{0}\"", x.ToString().Replace("\"", "\"\"")))));
+            Log.Write(LOG_CAT, LogLevel.Verbose, string.Join(" ", args.Cast<object>().Select(x => string.Format("\"{0}\"", (x ?? "<null>").ToString().Replace("\"", "\"\"")))));
         }
 
         public static void LogBlocks(IList blocks)

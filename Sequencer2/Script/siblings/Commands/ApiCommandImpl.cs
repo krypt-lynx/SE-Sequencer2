@@ -13,6 +13,13 @@ namespace Script
 
     #region ingame script start
 
+    enum DataPermision
+    {
+        DontAllowPB = 0,
+        AllowPB,
+        AllowSelf,
+    }
+
     class ApiCommandImpl
     {
 
@@ -20,33 +27,40 @@ namespace Script
         {
             return new CommandRef[] {
                 new CommandRef("run", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // arg
                 }, Run),
                 new CommandRef("action", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // action
                 }, Action),
                 new CommandRef("set", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // prop
                     new ParamRef (ParamType.String), // value
                 }, Set),
                  new CommandRef("text", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.Bool, true, false), // append
                     new ParamRef (ParamType.String), // value
                 }, Text),
                 new CommandRef("transmit", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String, true, "default"), // MyTransmitTarget
                     new ParamRef (ParamType.String), // value
                 }, Transmit),
+                new CommandRef("data", new ParamRef[] {
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
+                    new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.Bool, true, false), // append
+                    new ParamRef (ParamType.DataPermision, true, DataPermision.DontAllowPB), // self overwrite protection
+                    new ParamRef (ParamType.String), // value
+                }, Data)
             };
         }
 
@@ -280,6 +294,41 @@ namespace Script
                 }
 
                 Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, warning);
+            }
+        }
+
+
+        public static void Data(IList args, IMethodContext context)
+        {
+            ImplLogger.LogImpl("customdata", args);
+
+            var type = (MatchingType)args[0];
+            var filter = (string)args[1];
+            var append = (bool)args[2];
+            var permision = (DataPermision)args[3];
+            var value = (string)args[4];
+
+            List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
+            ImplLogger.LogBlocks(blocks);
+
+
+            foreach (var block in blocks)
+            {
+                if (block is IMyProgrammableBlock && permision < DataPermision.AllowPB)
+                {
+                    Log.Write(ImplLogger.LOG_CAT, LogLevel.Error, "permition AllowPB required to overwrite programmable block's data");
+                    Log.Write(ImplLogger.LOG_CAT, LogLevel.Error, $"skipping \"{block.CustomName}\"");
+                    continue;
+                }
+                if (block == Program.Current.Me && permision < DataPermision.AllowSelf)
+                {
+                    Log.Write(ImplLogger.LOG_CAT, LogLevel.Error, "permition AllowSelf required to overwrite user script");
+                    Log.Write(ImplLogger.LOG_CAT, LogLevel.Error, $"skipping \"{block.CustomName}\" (this is me)");
+                    continue;
+                }
+
+                block.CustomData = append ? (block.CustomData + value) : value;
             }
         }
     }

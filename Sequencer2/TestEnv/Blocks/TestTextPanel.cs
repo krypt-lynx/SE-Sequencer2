@@ -170,6 +170,163 @@ namespace SETestEnv
             }
         }
 
+        ShowTextOnScreenFlag IMyTextPanel.ShowOnScreen
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public byte BackgroundAlpha
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public TextAlignment Alignment
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string Script
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public ContentType ContentType
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Vector2 SurfaceSize
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Vector2 TextureSize
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool PreserveAspectRatio
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public float TextPadding
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public Color ScriptBackgroundColor
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        Color IMyTextSurface.ScriptForegroundColor
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        string IMyTextSurface.Name
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        string IMyTextSurface.DisplayName
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        bool IMyFunctionalBlock.Enabled
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public string GetPrivateTitle()
         {
             return PrivateTitle;
@@ -235,6 +392,156 @@ namespace SETestEnv
         }
 
         public void GetFonts(List<string> fonts)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IMyTextPanel.WritePublicTitle(string value, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IMyTextPanel.GetPublicTitle()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IMyTextPanel.WritePrivateText(string value, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IMyTextPanel.GetPrivateText()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IMyTextPanel.WritePrivateTitle(string value, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IMyTextPanel.GetPrivateTitle()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextPanel.ShowPrivateTextOnScreen()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IMyTextPanel.WritePublicText(string value, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IMyTextPanel.GetPublicText()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IMyTextPanel.WritePublicText(StringBuilder value, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextPanel.ReadPublicText(StringBuilder buffer, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextPanel.ShowPublicTextOnScreen()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextPanel.ShowTextureOnScreen()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextPanel.SetShowOnScreen(ShowTextOnScreenFlag set)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IMyTextSurface.WriteText(string value, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IMyTextSurface.GetText()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IMyTextSurface.WriteText(StringBuilder value, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.ReadText(StringBuilder buffer, bool append)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.AddImageToSelection(string id, bool checkExistence)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.AddImagesToSelection(List<string> ids, bool checkExistence)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.RemoveImageFromSelection(string id, bool removeDuplicates)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.RemoveImagesFromSelection(List<string> ids, bool removeDuplicates)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.ClearImagesFromSelection()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.GetSelectedImages(List<string> output)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.GetFonts(List<string> fonts)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.GetSprites(List<string> sprites)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyTextSurface.GetScripts(List<string> scripts)
+        {
+            throw new NotImplementedException();
+        }
+
+        MySpriteDrawFrame IMyTextSurface.DrawFrame()
+        {
+            throw new NotImplementedException();
+        }
+
+        Vector2 IMyTextSurface.MeasureStringInPixels(StringBuilder text, string font, float scale)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IMyFunctionalBlock.RequestEnable(bool enable)
         {
             throw new NotImplementedException();
         }

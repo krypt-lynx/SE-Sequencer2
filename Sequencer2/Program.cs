@@ -20,7 +20,7 @@ namespace console
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo("en-US");
 
             TestProgrammableBlock owner = new TestProgrammableBlock();
-            owner.CustomName = "Sequenser";
+            owner.CustomName = "Sequencer";
             /*    owner.CustomData = @"
     ##usetimer :timer 1
 
@@ -146,11 +146,17 @@ namespace console
             /repeat
 
             ";*/
-
+            
             owner.CustomData = @"
 #this program will called after ""cold"" start 
 @_load 
 /start enable_broadcast 
+
+
+@lcd_inventory
+/data ""Text panel[LCD]"" :Mass * 100 M;Cargo;InvListX;echo;echo;echo;echo;echo;echo
+@lcd_power
+/data ""Text panel[LCD]"" :Power
 
 #vtol
    

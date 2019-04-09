@@ -11,6 +11,7 @@ using VRage.Game.GUI.TextPanel;
 using VRage.Game.ModAPI.Ingame;
 using VRage.ObjectBuilders;
 using VRageMath;
+using VRage.Utils;
 
 namespace SETestEnv
 {
@@ -38,7 +39,7 @@ namespace SETestEnv
         //TestTerminalProperty<float>(id, 0.6f);
     }
 
-    abstract class TestBlock : IMyTerminalBlock, IMySlimBlock
+    abstract class TestBlock : IMyTerminalBlock, IMySlimBlock, IMyTextSurfaceProvider
     {
         public TestCubeGrid OwnerGrid { get; internal set; }
         private Dictionary<string, TestProp> properties = new Dictionary<string, TestProp>();
@@ -261,7 +262,7 @@ namespace SETestEnv
 
         public void GetProperties(List<ITerminalProperty> resultList, Func<ITerminalProperty, bool> collect = null)
         {
-            throw new NotImplementedException();
+            resultList.Clear();            
         }
 
         public ITerminalProperty GetProperty(string id)
@@ -537,6 +538,22 @@ namespace SETestEnv
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region IMyTextSurfaceProvider
+
+        public int SurfaceCount { get { return 0; } }
+
+        public MyStringHash SkinSubtypeId
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public IMyTextSurface GetSurface(int index) { return null; }
 
         #endregion
     }

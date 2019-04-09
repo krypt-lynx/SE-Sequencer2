@@ -14,7 +14,8 @@ namespace Script
         String = 0,
         Bool,
         Double,
-        GroupType
+        MatchingType,
+        DataPermision,
     }
 
     public struct ParamRef

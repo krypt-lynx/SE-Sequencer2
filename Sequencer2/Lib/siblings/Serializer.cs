@@ -119,6 +119,25 @@ namespace Script
             return this;
         }
 
+        public Serializer Write<T>(IList v, Action<int, T> item)
+        {
+            if (v != null)
+            {
+                A("c{");
+                Write(v.Count);
+                for (int i = 0; i < v.Count; i++)
+                {
+                    item(i, (T)v[i]);
+                }
+                A("};");
+            }
+            else
+            {
+                A("c;");
+            }
+            return this;
+        }
+
         public Serializer Write<T>(ICollection<T> v, Action<T> item)
         {
             if (v != null)
