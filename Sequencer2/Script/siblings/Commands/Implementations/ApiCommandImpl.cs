@@ -157,6 +157,11 @@ namespace Script
                                 block.SetValue(prop, new StringBuilder(value));
                                 break;
                             }
+                        case PropType.String:
+                            {
+                                block.SetValue(prop, value);
+                                break;
+                            }
                         case PropType.Single:
                             {
                                 float s;

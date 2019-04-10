@@ -92,6 +92,10 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 
 changelog:
 
+2.2.x
+* /text - support for surfaces
+* blocks enumeration fix
+
 2.2.5
 + /data command (write to Custom Data)
 
