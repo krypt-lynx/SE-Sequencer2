@@ -134,9 +134,6 @@ namespace Script
                 // todo: redo
                 var propDef = block.GetProperty(prop);
 
-                List<ITerminalProperty> props = new List<ITerminalProperty>();
-                block.GetProperties(props);
-
                 PropType propType;
 
                 if (propDef != null && Enum.TryParse(propDef.TypeName, out propType))

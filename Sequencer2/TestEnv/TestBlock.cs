@@ -12,6 +12,7 @@ using VRage.Game.ModAPI.Ingame;
 using VRage.ObjectBuilders;
 using VRageMath;
 using VRage.Utils;
+using System.Linq;
 
 namespace SETestEnv
 {
@@ -262,13 +263,14 @@ namespace SETestEnv
 
         public void GetProperties(List<ITerminalProperty> resultList, Func<ITerminalProperty, bool> collect = null)
         {
-            resultList.Clear();            
+            resultList.Clear();
+            resultList.AddRange(properties.Values.Select(x => x.Prop()));         
         }
 
         public ITerminalProperty GetProperty(string id)
         {
-            var prop = this.properties[id];
-            return prop.Prop();
+            var prop = this.properties.ContainsKey(id) ? this.properties[id] : null;
+            return prop?.Prop();
         }
 
         public MyRelationsBetweenPlayerAndBlock GetUserRelationToOwner(long playerId)

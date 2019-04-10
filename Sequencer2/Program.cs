@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VRageMath;
 using ConsoleClassLibrary;
+using VRage.Game.GUI.TextPanel;
 
 namespace console
 {
@@ -21,6 +22,8 @@ namespace console
 
             TestProgrammableBlock owner = new TestProgrammableBlock();
             owner.CustomName = "Sequencer";
+            owner.SetProperty(new TestProp<Int64>("Content", (Int64)ContentType.NONE));
+
             /*    owner.CustomData = @"
     ##usetimer :timer 1
 
@@ -146,7 +149,7 @@ namespace console
             /repeat
 
             ";*/
-            
+
             owner.CustomData = @"
 #this program will called after ""cold"" start 
 @_load 

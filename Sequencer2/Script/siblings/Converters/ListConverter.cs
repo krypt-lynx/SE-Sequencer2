@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VRage.Game.GUI.TextPanel;
 using VRageMath;
 
 namespace Script
@@ -22,7 +23,7 @@ namespace Script
 
     public static class ListConverter
     {
-        delegate bool TryGet(string str, out long value); 
+        delegate bool TryGet(string str, out long value);
 
         static Dictionary<string, long> flightModes = new Dictionary<string, long> {
             { "patrol", 0 },
@@ -38,11 +39,20 @@ namespace Script
         static Dictionary<string, TryGet> knownLists = new Dictionary<string, TryGet>() {
             { "CameraList", TryGetBlockId<IMyCameraBlock> },
             { "FlightMode", (string str, out long value) => flightModes.TryGetValue(str.ToLower(), out value) },
-            { "Direction", (string str, out long value) => { Base6Directions.Direction d; bool r = Enum.TryParse(str, true, out d); value = (long) d; return r; } },
+            { "Direction", TryParseEnum<Base6Directions.Direction> },
             { "blacklistWhitelist", (string str, out long value) => filterTypes.TryGetValue(str.ToLower(), out value) },
             { "PBList", TryGetBlockId<IMyProgrammableBlock> },
             { "Font",  (string str, out long value) => { value = VRageHash.GetHash(str); return true; } },
+            { "Content", TryParseEnum<ContentType> },
         };
+
+        static bool TryParseEnum<T>(string str, out long value) where T : struct
+        {
+            T e;
+            bool r = Enum.TryParse(str, true, out e);
+            value = Convert.ToInt64(e);
+            return r;
+        }
 
         static bool TryGetBlockId<T>(string str, out long value) where T : class, IMyTerminalBlock
         {
