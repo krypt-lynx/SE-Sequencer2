@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sandbox.ModAPI.Ingame;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,18 @@ namespace Script
         public static void LogBlocks(IList blocks)
         {
             Log.WriteFormat(LOG_CAT, LogLevel.Verbose, "{0} block(s) found", blocks.Count);
+            foreach (var block in blocks)
+            {
+                var tb = block as IMyTerminalBlock;
+                if (tb != null)
+                {
+                    Log.Write(LOG_CAT, LogLevel.Verbose, tb.CustomName);
+                }
+                else
+                {
+                    Log.Write(LOG_CAT, LogLevel.Verbose, "not a IMyTerminalBlock");
+                }
+            }
         }
     }
 

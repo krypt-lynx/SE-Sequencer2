@@ -45,6 +45,7 @@ namespace Script
                  new CommandRef("text", new ParamRef[] {
                     new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
+                    new ParamRef (ParamType.Double, true, 0.0), // surface index
                     new ParamRef (ParamType.Bool, true, false), // append
                     new ParamRef (ParamType.String), // value
                 }, Text),
@@ -204,17 +205,33 @@ namespace Script
 
             MatchingType type = (MatchingType)args[0];
             string filter = (string)args[1];
-            bool append = (bool)args[2];
-            string text = (string)args[3];
+            int index = (int)(double)args[2];
+            bool append = (bool)args[3];
+            string text = (string)args[4];
 
-            List<IMyTextPanel> blocks = new List<IMyTextPanel>();
+            var blocks = new List<IMyTextSurfaceProvider>();
             BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
             ImplLogger.LogBlocks(blocks);
 
-
             foreach (var block in blocks)
             {
-                block.WritePublicText(text, append);
+                IMyTextSurface surface;
+                if (block is IMyTextPanel && index == 0)
+                {
+                    surface = block as IMyTextSurface;
+                }
+                else
+                {
+                    surface = block.GetSurface(index);
+                }
+
+                if (surface != null)
+                {
+                    surface?.WriteText(text, append);
+                } else
+                {
+                    Log.Write(ImplLogger.LOG_CAT, LogLevel.Verbose, "surface index out of range");
+                }
             }
         }
 

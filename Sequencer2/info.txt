@@ -93,7 +93,7 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 changelog:
 
 2.2.5
-* /data command (write to Custom Data)
++ /data command (write to Custom Data)
 
 2.2.4
 * deserialization fix

@@ -99,15 +99,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Script\nested\Commands.cs" />
-    <Compile Include="Script\siblings\Commands\ApiCommandImpl.cs" />
-    <Compile Include="Script\siblings\Commands\ImplLogger.cs" />
-    <Compile Include="Script\siblings\Commands\DebugCommandImpl.cs" />
-    <Compile Include="Script\siblings\Commands\TestCommandImpl.cs" />
+    <Compile Include="Script\siblings\Commands\Implementations\ApiCommandImpl.cs" />
+    <Compile Include="Script\siblings\Commands\Implementations\ImplLogger.cs" />
+    <Compile Include="Script\siblings\Commands\Implementations\DebugCommandImpl.cs" />
+    <Compile Include="Script\siblings\Commands\Implementations\TestCommandImpl.cs" />
     <Compile Include="Script\siblings\Converters\ColorConverter.cs" />
     <Compile Include="Lib\siblings\Serializer.cs" />
     <Compile Include="Script\siblings\SqCommand.cs" />
     <Compile Include="Script\siblings\Tasks\RuntimeTask.cs" />
-    <Compile Include="Script\siblings\Commands\ExecFlowCommandImpl.cs" />
+    <Compile Include="Script\siblings\Commands\Implementations\ExecFlowCommandImpl.cs" />
     <Compile Include="Script\siblings\BlockSelector.cs" />
     <Compile Include="Script\siblings\Commands\Commands.cs" />
     <Compile Include="Lib\siblings\Keeeen.cs" />

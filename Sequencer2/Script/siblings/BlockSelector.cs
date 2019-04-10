@@ -21,23 +21,23 @@ namespace Script
 
     class BlockSelector
     {
-        public static void GetBlocksOfTypeWithQuery<T>(MatchingType selectionMode, string query, List<T> blocks) where T : class, IMyTerminalBlock
+        public static void GetBlocksOfTypeWithQuery<T>(MatchingType selectionMode, string query, List<T> blocks) where T : class
         {
             switch (selectionMode)
             {
                 case MatchingType.Match:
                     {
-                        Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x.CustomName.Equals(query));
+                        Program.Current.GridTerminalSystem.GetBlocksOfType(blocks, x => (x as IMyTerminalBlock)?.CustomName?.Equals(query) ?? false);
                         return;
                     }
                 case MatchingType.Contains:
                     {
-                        Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x.CustomName.Contains(query));
+                        Program.Current.GridTerminalSystem.GetBlocksOfType(blocks, x => (x as IMyTerminalBlock)?.CustomName?.Contains(query) ?? false);
                         return;
                     }
                 case MatchingType.Head:
                     {
-                        Program.Current.GridTerminalSystem.GetBlocksOfType<T>(blocks, x => x.CustomName.StartsWith(query));
+                        Program.Current.GridTerminalSystem.GetBlocksOfType(blocks, x => (x as IMyTerminalBlock)?.CustomName?.StartsWith(query) ?? false);
                         return;
                     }
                 case MatchingType.Group:
@@ -46,7 +46,6 @@ namespace Script
                         blocks.Clear();
                         if (group != null)
                         {
-                            List<T> gBlocks = new List<T>();
                             group.GetBlocksOfType<T>(blocks);
                         }
                         return;
@@ -70,7 +69,7 @@ namespace Script
                         Program.Current.GridTerminalSystem.GetBlocksOfType(blocks, block =>
                         {
                             return (allTypes || block.GetType().Name == type) &&
-                                   (allSubtypes || block.BlockDefinition.SubtypeName == subtype);
+                                   (allSubtypes || (block as IMyTerminalBlock)?.BlockDefinition.SubtypeName == subtype);
                         });
 
                         return;

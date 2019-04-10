@@ -84,6 +84,7 @@ namespace Script
             Log.Write((string)args[0]);
         }
 
+
         internal static void ListProps(IList args, IMethodContext context)
         {
             ImplLogger.LogImpl("listprops", args);
@@ -99,40 +100,62 @@ namespace Script
             foreach (var block in blocks)
             {
                 Log.WriteFormat("Block \"{0}\" of type \"{1}\" contains properties:", new object[] { block.CustomName, block.GetType().Name });
-
+                props.Clear();
                 block.GetProperties(props);
 
 
+                var allProps = new HashSet<string>();
+                var badProps = new HashSet<string>(); // Termimal Properties can have same ids, which makes them unaccessible
 
+                foreach (var prop in props)
+                {
+                    if (allProps.Contains(prop.Id))
+                    {
+                        badProps.Add(prop.Id);
+                    }
+                    else
+                    {
+                        allProps.Add(prop.Id);
+                    }
+                }
 
                 foreach (var prop in props)
                 {
                     // block.GetValue<object>(prop.Id) - Property is not of Type object <...>
-                    // Какая тебе, ***, разница? Просто отдай мне это чёртово свойство!
                     object value = null;
-
-                    switch (prop.TypeName)
+                    try
                     {
-                        case "Boolean":
-                            value = block.GetValueBool(prop.Id);
-                            break;
-                        case "Single":
-                            value = block.GetValueFloat(prop.Id);
-                            break;
-                        case "Color":
-                            value = block.GetValueColor(prop.Id);
-                            break;
-                        case "StringBuilder":
-                            value = block.GetValue<StringBuilder>(prop.Id);
-                            break;
-                        case "Int64":
-                            value = block.GetValue<long>(prop.Id);
-                            break;
-                        default:
-                            value = null;
-                            break;
+                        PropType propType;
+                        if (!badProps.Contains(prop.Id) && Enum.TryParse(prop.TypeName, out propType))
+                        {
+                            switch (propType)
+                            {
+                                case PropType.Boolean:
+                                    value = block.GetValueBool(prop.Id);
+                                    break;
+                                case PropType.Single:
+                                    value = block.GetValueFloat(prop.Id);
+                                    break;
+                                case PropType.Color:
+                                    value = block.GetValueColor(prop.Id);
+                                    break;
+                                case PropType.StringBuilder:
+                                    value = block.GetValue<StringBuilder>(prop.Id);
+                                    break;
+                                case PropType.String:
+                                    value = block.GetValue<string>(prop.Id);
+                                    break;
+                                case PropType.Int64:
+                                    value = block.GetValue<long>(prop.Id);
+                                    break;
+                            }
+                        }
                     }
-
+                    catch
+                    {
+                        // Looks like some game mod is broken, which is bad. Game breaking bad.
+                        Log.WriteFormat(ImplLogger.LOG_CAT, LogLevel.Warning, $"Error reading property \"{prop.Id}\"");
+                    }
                     Log.WriteFormat("\"{0}\" ({1}) = \"{2}\"", new object[] { prop.Id, prop.TypeName, value });
                 }
                 Log.WriteLine();
@@ -154,7 +177,7 @@ namespace Script
             foreach (var block in blocks)
             {
                 Log.WriteFormat("block \"{0}\" of type \"{1}\" have actions:", new object[] { block.CustomName, block.GetType().Name });
-
+                actions.Clear();
                 block.GetActions(actions);
 
                 foreach (var action in actions)
