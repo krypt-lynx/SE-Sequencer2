@@ -152,6 +152,13 @@ namespace Script
                         result = g;
                         return success;
                     }
+                case ParamType.DataPermision:
+                    {
+                        DataPermision g;
+                        bool success = Enum.TryParse(value, true, out g);
+                        result = g;
+                        return success;
+                    }
                 case ParamType.InputAction:
                     {
                         InputEvent a;
@@ -198,6 +205,37 @@ namespace Script
 
         public void Serialize(Serializer enc)
         {
+            enc.Write(Cmd)
+               .Write(_cycle);
+
+            var map = new Dictionary<ParamType, Action<object>> {
+                       { ParamType.String, (t) => enc.Write((string)t) },
+                       { ParamType.Bool, (t) => enc.Write((bool)t) },
+                       { ParamType.Double, (t) => enc.Write((double)t) },
+                       { ParamType.MatchingType, (t) => enc.Write((MatchingType)t) },
+                       { ParamType.DataPermision, (t) => enc.Write((DataPermision)t) },
+            };
+
+            var def = Commands.CmdDefs[Cmd];
+
+            enc.Write(Args, (int i, object t) =>
+            {
+                var arg = def.Arguments[i];
+                var argType = arg.Type;
+                if (arg.Aggregative)
+                {
+                    enc.Write((IList)t, (object s) => map[argType](s));
+                }
+                else
+                {
+                    map[argType](t);
+                }
+            });
+        }
+
+        /*
+        public void Serialize(Serializer enc)
+        {
             var map = new Dictionary<Type, Action<object>> {
                        { typeof(string), (i) => enc.Write((string)i) },
                        { typeof(bool), (i) => enc.Write((bool)i) },
@@ -214,7 +252,7 @@ namespace Script
             enc.Write(Cmd)
                .Write(_cycle)
                .Write(Args, (object i) => map[i.GetType()](i));
-        }
+        }*/
 
         public void Deserialize(Deserializer dec)
         {
@@ -223,9 +261,11 @@ namespace Script
                        { () => dec.ReadBool() },
                        { () => dec.ReadDouble() },
                        { () => dec.ReadEnum<MatchingType>() },
+                       { () => dec.ReadEnum<DataPermision>() },
                        { () => dec.ReadEnum<InputEvent>() },
                     };
 
+            
             Cmd = dec.ReadString();
             var def = Commands.CmdDefs[Cmd];
             Impl = def.Implementation;

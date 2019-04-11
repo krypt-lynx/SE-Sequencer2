@@ -16,7 +16,7 @@ using VRage.Game.ModAPI.Ingame;
 using SpaceEngineers.Game.ModAPI.Ingame;
 using SETestEnv;
 using System.Linq;
-
+using VRage.Game.GUI.TextPanel;
 
 namespace Script
 {
@@ -112,8 +112,18 @@ namespace Script
             });
         }
 
+        void DrawLogo()
+        {
+            if (Me.SurfaceCount == 0)
+            {
+                return;
+            }
+        }
+
         void Initialize()
         {
+            DrawLogo();
+
             Deserializer decoder = TryInitStorageDecoder();
             bool hasStoredData = decoder != null;
 

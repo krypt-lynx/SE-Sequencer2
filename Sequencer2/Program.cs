@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VRageMath;
 using ConsoleClassLibrary;
+using VRage.Game.GUI.TextPanel;
 
 namespace console
 {
@@ -20,7 +21,9 @@ namespace console
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo("en-US");
 
             TestProgrammableBlock owner = new TestProgrammableBlock();
-            owner.CustomName = "Sequenser";
+            owner.CustomName = "Sequencer";
+            owner.SetProperty(new TestProp<Int64>("Content", (Int64)ContentType.NONE));
+
             /*    owner.CustomData = @"
     ##usetimer :timer 1
 
@@ -155,6 +158,12 @@ namespace console
 
 @test
 /echo :input test
+
+
+@lcd_inventory
+/data ""Text panel[LCD]"" :Mass * 100 M;Cargo;InvListX;echo;echo;echo;echo;echo;echo
+@lcd_power
+/data ""Text panel[LCD]"" :Power
 
 #vtol
    

@@ -15,6 +15,7 @@ namespace Script
         Bool,
         Double,
         MatchingType,
+        DataPermision,
         InputAction,
     }
 

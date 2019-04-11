@@ -99,7 +99,7 @@ namespace Script
             foreach (var block in blocks)
             {
                 Log.WriteFormat("Block \"{0}\" of type \"{1}\" contains properties:", new object[] { block.CustomName, block.GetType().Name });
-
+                props.Clear();
                 block.GetProperties(props);
 
 
@@ -122,7 +122,8 @@ namespace Script
                 {
                     // block.GetValue<object>(prop.Id) - Property is not of Type object <...>
                     object value = null;
-                    try {
+                    try
+                    {
                         PropType propType;
                         if (!badProps.Contains(prop.Id) && Enum.TryParse(prop.TypeName, out propType))
                         {
@@ -175,7 +176,7 @@ namespace Script
             foreach (var block in blocks)
             {
                 Log.WriteFormat("block \"{0}\" of type \"{1}\" have actions:", new object[] { block.CustomName, block.GetType().Name });
-
+                actions.Clear();
                 block.GetActions(actions);
 
                 foreach (var action in actions)

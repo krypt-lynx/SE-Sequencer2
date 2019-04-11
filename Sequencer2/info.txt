@@ -1,4 +1,4 @@
-﻿// Sequencer v2.2.4
+﻿// Sequencer v2.2.5
 // http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
 /* 
 
@@ -56,7 +56,8 @@ Commands:
  /set [filter_type] blocks property value
  /text [filter_type] text_panels [append] text
  /transmit [filter_type] antennas [target] value
-
+ /data [filter_type] blocks [append] [permission] text
+ 
  /wait seconds
  /waitticks ticks
  /repeat
@@ -71,6 +72,7 @@ Commands:
  /loglevel [category|all] [value]
  /listprops [filter_type] filter
  /listactions [filter_type] filter
+ /listblocks [filter_type] filter
 
  stuff inside [] is optional
 
@@ -90,15 +92,16 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 
 changelog:
 
+2.2.x
+* /text - support for surfaces
+* blocks enumeration fix
+
+2.2.5
++ /data command (write to Custom Data)
+
 2.2.4
 * deserialization fix
 
-2.2.3
-* wait intervals quantized to whole numbers fixed
-
-2.2.2
-* update handling improvements
-* runtime rework
 
 */
 

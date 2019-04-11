@@ -512,8 +512,8 @@ namespace SETestEnv
         public string TypeName
         {
             get
-            {
-                return "System.Single"; // todo
+            {                
+                return typeof(T).Name;
             }
         }
 
