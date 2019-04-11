@@ -145,7 +145,7 @@ namespace Script
                         result = d;
                         return success;
                     }
-                case ParamType.GroupType:
+                case ParamType.MatchingType:
                     {
                         MatchingType g;
                         bool success = Enum.TryParse(value, true, out g);

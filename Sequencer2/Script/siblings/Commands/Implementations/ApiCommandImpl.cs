@@ -20,29 +20,29 @@ namespace Script
         {
             return new CommandRef[] {
                 new CommandRef("run", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // arg
                 }, Run),
                 new CommandRef("action", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // action
                 }, Action),
                 new CommandRef("set", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String), // prop
                     new ParamRef (ParamType.String), // value
                 }, Set),
                  new CommandRef("text", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.Bool, true, false), // append
                     new ParamRef (ParamType.String), // value
                 }, Text),
                 new CommandRef("transmit", new ParamRef[] {
-                    new ParamRef (ParamType.GroupType, true, MatchingType.Match),
+                    new ParamRef (ParamType.MatchingType, true, MatchingType.Match),
                     new ParamRef (ParamType.String), // name
                     new ParamRef (ParamType.String, true, "default"), // MyTransmitTarget
                     new ParamRef (ParamType.String), // value

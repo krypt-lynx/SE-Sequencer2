@@ -14,7 +14,7 @@ namespace Script
         String = 0,
         Bool,
         Double,
-        GroupType,
+        MatchingType,
         InputAction,
     }
 
