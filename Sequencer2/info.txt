@@ -54,7 +54,7 @@ Commands:
  /run [filter_type] programmable_blocks argument
  /action [filter_type] blocks action
  /set [filter_type] blocks property value
- /text [filter_type] text_panels [append] text
+ /text [filter_type] text_panels [serface_id] [append] text
  /transmit [filter_type] antennas [target] value
  /data [filter_type] blocks [append] [permission] text
  

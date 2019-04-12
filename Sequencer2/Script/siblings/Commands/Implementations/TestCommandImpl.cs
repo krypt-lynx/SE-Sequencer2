@@ -12,7 +12,7 @@ using VRageMath;
 namespace Script
 {
     /* #override
-     * IgnoreFile: true
+     * IgnoreFile: false
      */
 
     #region ingame script start
@@ -28,6 +28,11 @@ namespace Script
                 }, Test1),
                 new CommandRef("test2", new ParamRef[] {
                 }, Test2),
+                new CommandRef("test3", new ParamRef[] {
+                    new ParamRef (ParamType.MatchingType),
+                    new ParamRef (ParamType.String),
+//                    new ParamRef (ParamType.String),
+                }, Test3),
             };
         }
 
@@ -63,9 +68,33 @@ namespace Script
                 var block = lcd as IMyTerminalBlock;
                 Log.Write($"{block.GetType().Name}/{block.BlockDefinition.SubtypeName} \"{block.CustomName}\" [{block.EntityId}]");
                 Log.WriteFormat("surfaces count: {0}", lcd.SurfaceCount);
-            }
+            }           
+        }
 
-           
+
+        internal static void Test3(IList args, IMethodContext context)
+        {
+            ImplLogger.LogImpl("test3", args);
+
+            MatchingType type = (MatchingType)args[0];
+            string filter = (string)args[1];
+ //           string prop = (string)args[2];
+
+            var blocks = new List<IMyTerminalBlock>();
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
+            ImplLogger.LogBlocks(blocks);
+            
+            Log.Write("TypeName/SubtypeName \"Name\" [IntityId]");
+            Log.WriteLine();
+            foreach (var block in blocks)
+            {
+                var propDef = block.GetProperty("FontColor");
+                
+                Log.WriteFormat("name as sb {0}", propDef.As<Color>());
+                Log.WriteFormat("name as int {0}", propDef.As<int>());
+                Log.WriteFormat("existing prop {0}", block.GetProperty("FontColor"));
+                Log.WriteFormat("unexisting prop {0}", block.GetProperty("someunexistingproperty"));
+            }
         }
     }
 

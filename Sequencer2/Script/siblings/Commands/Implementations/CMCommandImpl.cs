@@ -27,9 +27,14 @@ namespace Script
         //List<Tuple<string, InputEvent, string>> actions = new List<Tuple<string, InputEvent, string>>();
         Dictionary<string, Dictionary<InputEvent, HashSet<string>>> actions = new Dictionary<string, Dictionary<InputEvent, HashSet<string>>>();
 
+        bool? isAvailable = null;
         public bool IsAvailable()
         {
-            return true;
+            if (isAvailable == null)
+            {
+                isAvailable = Program.Current.Me.GetProperty("ControlModule.Inputs") != null;
+            }
+            return isAvailable.Value;
         }
 
         public bool HasBindings()
@@ -39,10 +44,14 @@ namespace Script
 
         public void RegisterCM()
         {
-            Log.Write(LOG_CAT, LogLevel.Verbose, $"RegisterCM");
-            Program.Current.Me.SetValue<int>("ControlModule.InputCheck", 1);
-            Program.Current.Me.SetValue<int>("ControlModule.InputState", 1); 
+            if (!IsAvailable())
+            {
+                return;
+            }
 
+            Log.Write(LOG_CAT, LogLevel.Verbose, $"RegisterCM");
+            Program.Current.Me.SetValue("ControlModule.RepeatDelay", 0.02f);
+            Program.Current.Me.SetValue("ControlModule.InputState", 1); 
         }
 
         public void UnregisterCM()
@@ -60,6 +69,11 @@ namespace Script
 
         public void Add(string action, InputEvent _event, string method)
         {
+            if (!IsAvailable())
+            {
+                return;
+            }
+
             Log.Write(LOG_CAT, LogLevel.Verbose, $"add action: {action} {_event}");
             if (actions.Count == 0)
             {
@@ -81,6 +95,11 @@ namespace Script
 
         public void Remove(string action, InputEvent? _event, string method)
         {
+            if (!IsAvailable())
+            {
+                return;
+            }
+
             if (action == "all")
             {
                 Clear();
@@ -119,14 +138,24 @@ namespace Script
                 }
             }
 
-            //Program.Current.Me.SetValue("ControlModule.RemoveInput", action);
+            if (!actions.ContainsKey(action))
+            {
+                Program.Current.Me.SetValue("ControlModule.RemoveInput", action);
+            }
 
-            //    UnregisterCM();
-
+            if (actions.Count == 0)
+            {
+                UnregisterCM();
+            }
         }
 
         public void Clear()
         {
+            if (!IsAvailable())
+            {
+                return;
+            }
+
             actions.Clear();
             Program.Current.Me.SetValue("ControlModule.RemoveInput", "all");
             UnregisterCM();
@@ -136,6 +165,13 @@ namespace Script
 
         internal void HandleInputs(RuntimeTask runtime)
         {
+            if (!IsAvailable())
+            {
+                return;
+            }
+
+            Log.Write(LOG_CAT, (LogLevel)10, $"HandleInputs");
+
             var inputs = Program.Current.Me.GetValue<Dictionary<string, object>>("ControlModule.Inputs");
 
             foreach (var action in actions)
@@ -176,6 +212,7 @@ namespace Script
                 .Write(i.Value, j => encoder
                     .Write(j.Key)
                     .Write(j.Value, k => encoder.Write(k))));
+            encoder.Write(lastActions, i => encoder.Write(i));
         }
 
         public void Deserialize(Deserializer decoder)
@@ -192,6 +229,9 @@ namespace Script
                                 ()  => new HashSet<string>(),
                                 (f) => f.ReadString()
                             )))));
+            lastActions = decoder.ReadCollection(
+                () => new HashSet<string>(),
+                (d) => d.ReadString());
         }
     }
 
@@ -202,12 +242,12 @@ namespace Script
             return new CommandRef[] {
                 new CommandRef("cm_addinput", new ParamRef[] {
                     new ParamRef(ParamType.String), // input
-                    new ParamRef(ParamType.InputAction, true, InputEvent.Press), // action
+                    new ParamRef(ParamType.InputEvent, true, InputEvent.Press), // action
                     new ParamRef(ParamType.String), // method
                 }, CM_AddInput, SqRequirements.ControlModule),
                 new CommandRef("cm_removeinput", new ParamRef[] {
                     new ParamRef(ParamType.String), // input
-                    new ParamRef(ParamType.InputAction, true, null), // action
+                    new ParamRef(ParamType.InputEvent, true, null), // action
                     new ParamRef(ParamType.String, true, null), // method
                 }, CM_RemoveInput, SqRequirements.ControlModule),
                 new CommandRef("cm_clearinputs", new ParamRef[] {

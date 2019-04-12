@@ -46,9 +46,9 @@ namespace Script
             {
                 { Scheduler.LOG_CAT,       LogLevel.Warning },
                 { Parser.LOG_CAT,          LogLevel.Warning },
-                { Program.LOG_CAT,         LogLevel.Warning },
+                { Program.LOG_CAT,         LogLevel.Verbose },
                 { RuntimeTask.LOG_CAT,     LogLevel.Warning },
-                { ImplLogger.LOG_CAT,      LogLevel.Warning },
+                { ImplLogger.LOG_CAT,      LogLevel.Verbose },
                 { TimerController.LOG_CAT, LogLevel.Warning },
                 { CMMapper.LOG_CAT,        LogLevel.Verbose },
             };
@@ -138,6 +138,7 @@ namespace Script
                     decoder.ReadObject(timerController = new TimerController());
                     decoder.ReadObject(runtime = new RuntimeTask(timerController));
                     decoder.ReadObject(VariablesStorage.Shared);
+                    decoder.ReadObject(CMMapper.Shared);
                 }
                 catch (Exception e)
                 {
@@ -220,7 +221,8 @@ namespace Script
                     .Write(Log.D)
                     .Write(timerController)
                     .Write(runtime)
-                    .Write(VariablesStorage.Shared);
+                    .Write(VariablesStorage.Shared)
+                    .Write(CMMapper.Shared);
 
                 Storage = encoder.ToString();
 
@@ -235,12 +237,12 @@ namespace Script
         {
             IsolatedRun(() =>
             {
+                //Log.WriteFormat(LOG_CAT, LogLevel.Verbose, $"start with argument: {argument}; reason: {updateSource};");
+
                 if (updateSource == UpdateType.Mod)
                 {
                     CMMapper.Shared.HandleInputs(runtime);
-                  //  argument = ""
                 }
-                //Log.Write($"main: args: {argument}; source {updateSource}");
 
                 timerController.UpdateBefore();
 

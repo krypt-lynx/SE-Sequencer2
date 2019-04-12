@@ -159,7 +159,7 @@ namespace Script
                         result = g;
                         return success;
                     }
-                case ParamType.InputAction:
+                case ParamType.InputEvent:
                     {
                         InputEvent a;
                         bool success = Enum.TryParse(value, true, out a);
@@ -214,6 +214,7 @@ namespace Script
                        { ParamType.Double, (t) => enc.Write((double)t) },
                        { ParamType.MatchingType, (t) => enc.Write((MatchingType)t) },
                        { ParamType.DataPermision, (t) => enc.Write((DataPermision)t) },
+                       { ParamType.InputEvent, (t) => enc.Write((InputEvent)t) },
             };
 
             var def = Commands.CmdDefs[Cmd];

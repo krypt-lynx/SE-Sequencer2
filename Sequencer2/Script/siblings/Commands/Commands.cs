@@ -16,7 +16,7 @@ namespace Script
         Double,
         MatchingType,
         DataPermision,
-        InputAction,
+        InputEvent,
     }
 
     public struct ParamRef
@@ -95,7 +95,7 @@ namespace Script
             cmdDefs_.AddRange(ApiCommandImpl.Defs());
             cmdDefs_.AddRange(DebugCommandImpl.Defs());
             cmdDefs_.AddRange(CMCommandImpl.Defs());
-            //cmdDefs_.AddRange(TestCommandImpl.Defs()); // todo: Remove before release!
+            cmdDefs_.AddRange(TestCommandImpl.Defs()); // todo: Remove before release!
 
             CmdDefs = cmdDefs_.ToDictionary(x => x.Name);
         }

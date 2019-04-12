@@ -385,7 +385,7 @@ owner.CustomData = @"
 ";*/
             owner.SetProperty(new TestProp<string>("ControlModule.AddInput", ""));
             owner.SetProperty(new TestProp<string>("ControlModule.RemoveInput", ""));
-            owner.SetProperty(new TestProp<int>("ControlModule.InputCheck", 0));
+            owner.SetProperty(new TestProp<float>("ControlModule.RepeatDelay", 0));
             owner.SetProperty(new TestProp<int>("ControlModule.InputState", 0));
             
             Script.Program.FutureOwner = owner;
