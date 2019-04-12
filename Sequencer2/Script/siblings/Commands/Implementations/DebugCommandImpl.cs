@@ -92,7 +92,7 @@ namespace Script
             string filter = (string)args[1];
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
             ImplLogger.LogBlocks(blocks);
 
             List<ITerminalProperty> props = new List<ITerminalProperty>();
@@ -169,7 +169,7 @@ namespace Script
             string filter = (string)args[1];
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
             ImplLogger.LogBlocks(blocks);
 
             List<ITerminalAction> actions = new List<ITerminalAction>();
@@ -195,7 +195,7 @@ namespace Script
             string filter = (string)args[1];
 
             List<IMyTerminalBlock> blocks = new List<IMyTerminalBlock>();
-            BlockSelector.GetBlocksOfTypeWithQuery<IMyTerminalBlock>(type, filter, blocks);
+            BlockSelector.GetBlocksOfTypeWithQuery(type, filter, blocks);
             ImplLogger.LogBlocks(blocks);
 
 

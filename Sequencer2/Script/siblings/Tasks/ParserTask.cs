@@ -28,7 +28,12 @@ namespace Script
                 if (parser.Finalize())
                 {
                     var validator = new SqValidator();
-                    validator.Validate(parser.Programs, SqRequirements.Timer);
+                    SqRequirements req = SqRequirements.Timer;
+                    if (CMMapper.Shared.IsAvailable()) {
+                        req |= SqRequirements.ControlModule;
+                    }
+
+                    validator.Validate(parser.Programs, req);
                 }
 
                 result = new Tuple<List<SqProgram>, string>(parser.Programs, parser.ErrorMessage);

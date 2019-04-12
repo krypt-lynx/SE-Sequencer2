@@ -24,7 +24,6 @@ namespace Script
 
         public static CMMapper Shared = new CMMapper();
 
-        //List<Tuple<string, InputEvent, string>> actions = new List<Tuple<string, InputEvent, string>>();
         Dictionary<string, Dictionary<InputEvent, HashSet<string>>> actions = new Dictionary<string, Dictionary<InputEvent, HashSet<string>>>();
 
         bool? isAvailable = null;
@@ -151,13 +150,12 @@ namespace Script
 
         public void Clear()
         {
-            if (!IsAvailable())
+            if (IsAvailable())
             {
-                return;
+                actions.Clear();
+                Program.Current.Me.SetValue("ControlModule.RemoveInput", "all");
             }
 
-            actions.Clear();
-            Program.Current.Me.SetValue("ControlModule.RemoveInput", "all");
             UnregisterCM();
         }
 
