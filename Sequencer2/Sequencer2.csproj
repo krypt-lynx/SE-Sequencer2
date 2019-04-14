@@ -120,7 +120,8 @@
     <Compile Include="Script\siblings\SqProgram.cs" />
     <Compile Include="Script\siblings\ParamsRouter.cs" />
     <Compile Include="Script\siblings\TimerController.cs" />
-    <Compile Include="Script\siblings\Transmitter.cs" />
+    <Compile Include="Script\siblings\Tools\CMMapper.cs" />
+    <Compile Include="Script\siblings\Tools\Transmitter.cs" />
     <Compile Include="Script\siblings\Converters\ListConverter.cs" />
     <Compile Include="Script\siblings\VariablesStorage.cs" />
     <Compile Include="Sequencer2.cs" />

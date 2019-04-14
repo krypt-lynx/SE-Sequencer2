@@ -1,4 +1,4 @@
-﻿// Sequencer v2.2.5
+﻿// Sequencer v2.2.6
 // http://steamcommunity.com/sharedfiles/filedetails/?id=1085402845
 /* 
 
@@ -74,6 +74,11 @@ Commands:
  /listactions [filter_type] filter
  /listblocks [filter_type] filter
 
+ /addinput input [press|release] method
+ /removeinput input [press|release] [method]
+ /clearinputs 
+ /setCMfilter cm_filter
+
  stuff inside [] is optional
 
 
@@ -92,15 +97,13 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=1085342742
 
 changelog:
 
-2.2.x
+2.2.6
++ Digi's Control Module support
 * /text - support for surfaces
 * blocks enumeration fix
 
 2.2.5
 + /data command (write to Custom Data)
-
-2.2.4
-* deserialization fix
 
 
 */

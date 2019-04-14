@@ -46,11 +46,11 @@ namespace Script
             {
                 { Scheduler.LOG_CAT,       LogLevel.Warning },
                 { Parser.LOG_CAT,          LogLevel.Warning },
-                { Program.LOG_CAT,         LogLevel.Verbose },
+                { Program.LOG_CAT,         LogLevel.Warning },
                 { RuntimeTask.LOG_CAT,     LogLevel.Warning },
-                { ImplLogger.LOG_CAT,      LogLevel.Verbose },
+                { ImplLogger.LOG_CAT,      LogLevel.Warning },
                 { TimerController.LOG_CAT, LogLevel.Warning },
-                { CMMapper.LOG_CAT,        LogLevel.Verbose },
+                { CMMapper.LOG_CAT,        LogLevel.Warning },
             };
         }
 
@@ -76,7 +76,7 @@ namespace Script
         RuntimeTask runtime;
 
         const string uti = "name.krypt.sequencer2";
-        Version ver = new Version(2, 2, 4);
+        Version ver = new Version(2, 2, 6);
 
         UpdateType paramertizedTypes = (UpdateType)0x1F; // .Terminal | .Trigger | .Antenna | .Mod | .Script;
 

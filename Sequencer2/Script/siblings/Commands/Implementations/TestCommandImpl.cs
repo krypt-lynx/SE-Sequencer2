@@ -12,7 +12,7 @@ using VRageMath;
 namespace Script
 {
     /* #override
-     * IgnoreFile: false
+     * IgnoreFile: true
      */
 
     #region ingame script start
